@@ -104,16 +104,23 @@
                 
                 <section class="col-sm-9 col-lg-10 content">
                     <h1 id="stampe">Stampe</h1>
-<!-- TOC depthFrom:2 depthTo:6 orderedList:false updateOnSave:true withLinks:true -->
+<ul>
+<li><a href="#mpdf">MPDF</a></li>
+<li><a href="#html2pdf">HTML2PDF</a>
 <ul>
 <li><a href="#struttura">Struttura</a>
 <ul>
 <li><a href="#pdfgenphp">pdfgen.php</a></li>
-<li><a href="#pdfgen_variablesphp-include">pdfgen_variables.php (INCLUDE)</a></li>
+<li><a href="#pdfgenvariablesphp-include">pdfgen_variables.php (INCLUDE)</a></li>
 <li><a href="#struttura-interna">Struttura interna</a></li>
 </ul></li>
+</ul></li>
 </ul>
-<!-- /TOC -->
+<h2 id="mpdf">MPDF</h2>
+<p><strong>Attenzione</strong>: come indicato nel secondo punto in <a href="http://mpdf.github.io/tables/auto-layout-algorithm.html">http://mpdf.github.io/tables/auto-layout-algorithm.html</a>, MPDF effettua un resizing del font nel caso il contenuto di una cella superi l'altezza totale di una pagina.
+Fino a quel punto, il rendering funziona perfettamente.</p>
+<p>Nel caso fosse per esempio aumentare le dimensioni del font, si consiglia di effettuare alcuni test per controllare se le tabelle vengono renderizzate nel modo corretto e previsto.</p>
+<h2 id="html2pdf">HTML2PDF</h2>
 <h3 id="struttura">Struttura</h3>
 <p>La cartella <em>templates</em> contiene tutti i template per la creazione dei PDF, raggruppati in base al nome del modulo. QUesti vengono utilizzati da <code>pdfgen.php</code> e da <code>pdfgen_variables.php</code> per la generazione vera e propria del PDF tramite il framework <a href="https://github.com/spipu/html2pdf">HTML2PDF</a>.</p>
 <h4 id="pdfgenphp">pdfgen.php</h4>
@@ -124,10 +131,10 @@
 <p>La cartella <em>templates</em> contiene tutti i template per la creazione dei PDF relativi al modulo specifico, in una struttura interna simile alla seguente (modulo <strong>Contratti</strong> utilizzato come esempio).</p>
 <pre><code>.
 └── contratti
-    ├── contratto_body.html (OPEN) - Struttura di base del PDF
-    ├── contratto.html (OPEN) - Contenitore personalizzato della struttura del PDF
-    ├── logo_azienda.jpg (HTML) - Logo dell'azienda specifico per il PDF
-    └── pdfgen.contratti.php (INCLUDE) - Individuazione delle informazioni da visualizzare e generazione della loro struttura</code></pre>
+    ├── contratto_body.html - Struttura di base del PDF
+    ├── contratto.html - Contenitore personalizzato della struttura del PDF
+    ├── logo_azienda.jpg - Logo dell'azienda specifico per il PDF
+    └── pdfgen.contratti.php - Individuazione delle informazioni da visualizzare e generazione della loro struttura</code></pre>
                 </section>
 
             </div>
@@ -175,13 +182,6 @@
                 });
             });
 
-                            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-                            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-                        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-                })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-                ga('create', 'UA-42808312-1', 'auto');
-                ga('send', 'pageview');
             
         </script>
 

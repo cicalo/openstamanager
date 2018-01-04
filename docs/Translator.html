@@ -96,18 +96,10 @@
                 <td><small>from&nbsp;<a href="Util/Singleton.html#property_instance"><abbr title="Util\Singleton">Singleton</abbr></a></small></td>
             </tr>
                     <tr>
-                <td class="type" id="property_localeFormatter">
+                <td class="type" id="property_formatter">
                     static                    protected                                        <a href="Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a>
                 </td>
-                <td>$localeFormatter</td>
-                <td class="last"></td>
-                <td></td>
-            </tr>
-                    <tr>
-                <td class="type" id="property_englishFormatter">
-                    static                    protected                                        <a href="Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a>
-                </td>
-                <td>$englishFormatter</td>
+                <td>$formatter</td>
                 <td class="last"></td>
                 <td></td>
             </tr>
@@ -236,7 +228,7 @@
                     
                 </div>
                 <div class="col-md-8 type">
-                    <a href="#method_setLocale">setLocale</a>(string $locale)
+                    <a href="#method_setLocale">setLocale</a>($locale, $formatter = [])
         
                                             <p>Imposta il linguaggio in utilizzo.</p>                </div>
                 <div class="col-md-2"></div>
@@ -273,40 +265,10 @@
             </div>
                     <div class="row">
                 <div class="col-md-2 type">
-                    static&nbsp;
-                </div>
-                <div class="col-md-8 type">
-                    <a href="#method_setLocaleFormatter">setLocaleFormatter</a>(array $formatter = [])
-        
-                                            <p>Genera l'oggetto dedicato alla gestione delle conversioni nella lingua locale.</p>                </div>
-                <div class="col-md-2"></div>
-            </div>
-                    <div class="row">
-                <div class="col-md-2 type">
                     static&nbsp;<a href="Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a>
                 </div>
                 <div class="col-md-8 type">
-                    <a href="#method_getLocaleFormatter">getLocaleFormatter</a>()
-        
-                                            <p>Restituisce il formato locale della data.</p>                </div>
-                <div class="col-md-2"></div>
-            </div>
-                    <div class="row">
-                <div class="col-md-2 type">
-                    static&nbsp;<a href="Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a>
-                </div>
-                <div class="col-md-8 type">
-                    <a href="#method_getEnglishFormatter">getEnglishFormatter</a>()
-        
-                                            <p>Restituisce il formato locale della data.</p>                </div>
-                <div class="col-md-2"></div>
-            </div>
-                    <div class="row">
-                <div class="col-md-2 type">
-                    static&nbsp;string
-                </div>
-                <div class="col-md-8 type">
-                    <a href="#method_getLocaleDatePattern">getLocaleDatePattern</a>()
+                    <a href="#method_getFormatter">getFormatter</a>()
         
                                             <p>Restituisce il formato locale della data.</p>                </div>
                 <div class="col-md-2"></div>
@@ -326,7 +288,7 @@
                     static&nbsp;string
                 </div>
                 <div class="col-md-8 type">
-                    <a href="#method_numberToLocale">numberToLocale</a>(string $string, mixed $decimals = true)
+                    <a href="#method_numberToLocale">numberToLocale</a>(string $string, mixed $decimals = null)
         
                                             <p>Converte il numero dalla formattazione inglese a quella locale.</p>                </div>
                 <div class="col-md-2"></div>
@@ -346,7 +308,7 @@
                     static&nbsp;string
                 </div>
                 <div class="col-md-8 type">
-                    <a href="#method_dateToLocale">dateToLocale</a>(string $string, string $fail = null)
+                    <a href="#method_dateToLocale">dateToLocale</a>($string)
         
                                             <p>Converte la data dalla formattazione inglese a quella locale.</p>                </div>
                 <div class="col-md-2"></div>
@@ -366,7 +328,7 @@
                     static&nbsp;string
                 </div>
                 <div class="col-md-8 type">
-                    <a href="#method_timeToLocale">timeToLocale</a>(string $string, string $fail = null)
+                    <a href="#method_timeToLocale">timeToLocale</a>($string)
         
                                             <p>Converte la data dalla formattazione inglese a quella locale.</p>                </div>
                 <div class="col-md-2"></div>
@@ -386,19 +348,9 @@
                     static&nbsp;string
                 </div>
                 <div class="col-md-8 type">
-                    <a href="#method_timestampToLocale">timestampToLocale</a>($string, $fail = null)
+                    <a href="#method_timestampToLocale">timestampToLocale</a>($string)
         
                                             <p>Converte un timestamp dalla formattazione inglese a quella locale.</p>                </div>
-                <div class="col-md-2"></div>
-            </div>
-                    <div class="row">
-                <div class="col-md-2 type">
-                    static&nbsp;bool
-                </div>
-                <div class="col-md-8 type">
-                    <a href="#method_isValid">isValid</a>($string)
-        
-                                            <p>Controlla se una data inserita nella formattazione inglese è valida.</p>                </div>
                 <div class="col-md-2"></div>
             </div>
             </div>
@@ -409,7 +361,7 @@
             <div id="method-details">
                     <div class="method-item">
                     <h3 id="method___construct">
-        <div class="location">at         line 23</div>
+        <div class="location">at         line 21</div>
         <code>                    
     <strong>__construct</strong>($default_locale = &#039;it&#039;, $fallback_locales = [&#039;it&#039;])
         </code>
@@ -517,7 +469,7 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_addLocalePath">
-        <div class="location">at         line 40</div>
+        <div class="location">at         line 38</div>
         <code>                    
     <strong>addLocalePath</strong>([type] $string)
         </code>
@@ -548,7 +500,7 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_addLocales">
-        <div class="location">at         line 53</div>
+        <div class="location">at         line 51</div>
         <code>            protected        
     <strong>addLocales</strong>(string $path)
         </code>
@@ -579,7 +531,7 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_addLocale">
-        <div class="location">at         line 81</div>
+        <div class="location">at         line 79</div>
         <code>            protected        
     <strong>addLocale</strong>(string $language)
         </code>
@@ -610,7 +562,7 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_getAvailableLocales">
-        <div class="location">at         line 93</div>
+        <div class="location">at         line 91</div>
         <code>                    array
     <strong>getAvailableLocales</strong>()
         </code>
@@ -640,7 +592,7 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_isLocaleAvailable">
-        <div class="location">at         line 105</div>
+        <div class="location">at         line 103</div>
         <code>                    bool
     <strong>isLocaleAvailable</strong>(string $language)
         </code>
@@ -680,9 +632,9 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_setLocale">
-        <div class="location">at         line 115</div>
+        <div class="location">at         line 113</div>
         <code>                    
-    <strong>setLocale</strong>(string $locale)
+    <strong>setLocale</strong>($locale, $formatter = [])
         </code>
     </h3>
     <div class="details">
@@ -696,8 +648,13 @@
 
                     <table class="table table-condensed">
                     <tr>
-                <td>string</td>
+                <td></td>
                 <td>$locale</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$formatter</td>
                 <td></td>
             </tr>
             </table>
@@ -711,7 +668,7 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_getCurrentLocale">
-        <div class="location">at         line 128</div>
+        <div class="location">at         line 139</div>
         <code>                    string
     <strong>getCurrentLocale</strong>()
         </code>
@@ -741,7 +698,7 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_getTranslator">
-        <div class="location">at         line 138</div>
+        <div class="location">at         line 149</div>
         <code>                    <abbr title="Symfony\Component\Translation\Translator">Translator</abbr>
     <strong>getTranslator</strong>()
         </code>
@@ -771,7 +728,7 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_translate">
-        <div class="location">at         line 153</div>
+        <div class="location">at         line 164</div>
         <code>        static            string
     <strong>translate</strong>($string, $parameters = [], $operations = [])
         </code>
@@ -820,41 +777,10 @@
 
             </div>
                     <div class="method-item">
-                    <h3 id="method_setLocaleFormatter">
-        <div class="location">at         line 176</div>
-        <code>        static            
-    <strong>setLocaleFormatter</strong>(array $formatter = [])
-        </code>
-    </h3>
-    <div class="details">
-            
-    
-
-                    <div class="method-description">
-                                    <p>Genera l'oggetto dedicato alla gestione delle conversioni nella lingua locale.</p>                                                </div>
-                <div class="tags">
-                            <h4>Parameters</h4>
-
-                    <table class="table table-condensed">
-                    <tr>
-                <td>array</td>
-                <td>$formatter</td>
-                <td></td>
-            </tr>
-            </table>
-
-            
-            
-            
-                    </div>
-    </div>
-
-            </div>
-                    <div class="method-item">
-                    <h3 id="method_getLocaleFormatter">
-        <div class="location">at         line 193</div>
+                    <h3 id="method_getFormatter">
+        <div class="location">at         line 187</div>
         <code>        static            <a href="Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a>
-    <strong>getLocaleFormatter</strong>()
+    <strong>getFormatter</strong>()
         </code>
     </h3>
     <div class="details">
@@ -870,66 +796,6 @@
                     <table class="table table-condensed">
         <tr>
             <td><a href="Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a></td>
-            <td></td>
-        </tr>
-    </table>
-
-            
-            
-                    </div>
-    </div>
-
-            </div>
-                    <div class="method-item">
-                    <h3 id="method_getEnglishFormatter">
-        <div class="location">at         line 207</div>
-        <code>        static            <a href="Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a>
-    <strong>getEnglishFormatter</strong>()
-        </code>
-    </h3>
-    <div class="details">
-            
-    
-
-                    <div class="method-description">
-                                    <p>Restituisce il formato locale della data.</p>                                                </div>
-                <div class="tags">
-            
-                            <h4>Return Value</h4>
-
-                    <table class="table table-condensed">
-        <tr>
-            <td><a href="Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a></td>
-            <td></td>
-        </tr>
-    </table>
-
-            
-            
-                    </div>
-    </div>
-
-            </div>
-                    <div class="method-item">
-                    <h3 id="method_getLocaleDatePattern">
-        <div class="location">at         line 221</div>
-        <code>        static            string
-    <strong>getLocaleDatePattern</strong>()
-        </code>
-    </h3>
-    <div class="details">
-            
-    
-
-                    <div class="method-description">
-                                    <p>Restituisce il formato locale della data.</p>                                                </div>
-                <div class="tags">
-            
-                            <h4>Return Value</h4>
-
-                    <table class="table table-condensed">
-        <tr>
-            <td>string</td>
             <td></td>
         </tr>
     </table>
@@ -942,7 +808,7 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_numberToEnglish">
-        <div class="location">at         line 233</div>
+        <div class="location">at         line 199</div>
         <code>        static            string
     <strong>numberToEnglish</strong>(string $string)
         </code>
@@ -982,9 +848,9 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_numberToLocale">
-        <div class="location">at         line 246</div>
+        <div class="location">at         line 212</div>
         <code>        static            string
-    <strong>numberToLocale</strong>(string $string, mixed $decimals = true)
+    <strong>numberToLocale</strong>(string $string, mixed $decimals = null)
         </code>
     </h3>
     <div class="details">
@@ -1027,7 +893,7 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_dateToEnglish">
-        <div class="location">at         line 266</div>
+        <div class="location">at         line 226</div>
         <code>        static            string
     <strong>dateToEnglish</strong>(string $string)
         </code>
@@ -1067,9 +933,9 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_dateToLocale">
-        <div class="location">at         line 279</div>
+        <div class="location">at         line 239</div>
         <code>        static            string
-    <strong>dateToLocale</strong>(string $string, string $fail = null)
+    <strong>dateToLocale</strong>($string)
         </code>
     </h3>
     <div class="details">
@@ -1083,13 +949,8 @@
 
                     <table class="table table-condensed">
                     <tr>
-                <td>string</td>
-                <td>$string</td>
                 <td></td>
-            </tr>
-                    <tr>
-                <td>string</td>
-                <td>$fail</td>
+                <td>$string</td>
                 <td></td>
             </tr>
             </table>
@@ -1112,7 +973,7 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_timeToEnglish">
-        <div class="location">at         line 295</div>
+        <div class="location">at         line 251</div>
         <code>        static            string
     <strong>timeToEnglish</strong>(string $string)
         </code>
@@ -1152,9 +1013,9 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_timeToLocale">
-        <div class="location">at         line 308</div>
+        <div class="location">at         line 264</div>
         <code>        static            string
-    <strong>timeToLocale</strong>(string $string, string $fail = null)
+    <strong>timeToLocale</strong>($string)
         </code>
     </h3>
     <div class="details">
@@ -1168,13 +1029,8 @@
 
                     <table class="table table-condensed">
                     <tr>
-                <td>string</td>
-                <td>$string</td>
                 <td></td>
-            </tr>
-                    <tr>
-                <td>string</td>
-                <td>$fail</td>
+                <td>$string</td>
                 <td></td>
             </tr>
             </table>
@@ -1197,7 +1053,7 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_timestampToEnglish">
-        <div class="location">at         line 324</div>
+        <div class="location">at         line 276</div>
         <code>        static            string
     <strong>timestampToEnglish</strong>($string)
         </code>
@@ -1237,9 +1093,9 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_timestampToLocale">
-        <div class="location">at         line 337</div>
+        <div class="location">at         line 289</div>
         <code>        static            string
-    <strong>timestampToLocale</strong>($string, $fail = null)
+    <strong>timestampToLocale</strong>($string)
         </code>
     </h3>
     <div class="details">
@@ -1257,11 +1113,6 @@
                 <td>$string</td>
                 <td></td>
             </tr>
-                    <tr>
-                <td></td>
-                <td>$fail</td>
-                <td></td>
-            </tr>
             </table>
 
             
@@ -1270,46 +1121,6 @@
                     <table class="table table-condensed">
         <tr>
             <td>string</td>
-            <td></td>
-        </tr>
-    </table>
-
-            
-            
-                    </div>
-    </div>
-
-            </div>
-                    <div class="method-item">
-                    <h3 id="method_isValid">
-        <div class="location">at         line 353</div>
-        <code>        static    protected        bool
-    <strong>isValid</strong>($string)
-        </code>
-    </h3>
-    <div class="details">
-            
-    
-
-                    <div class="method-description">
-                                    <p>Controlla se una data inserita nella formattazione inglese è valida.</p>                                                </div>
-                <div class="tags">
-                            <h4>Parameters</h4>
-
-                    <table class="table table-condensed">
-                    <tr>
-                <td></td>
-                <td>$string</td>
-                <td></td>
-            </tr>
-            </table>
-
-            
-                            <h4>Return Value</h4>
-
-                    <table class="table table-condensed">
-        <tr>
-            <td>bool</td>
             <td></td>
         </tr>
     </table>

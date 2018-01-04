@@ -104,9 +104,7 @@
                 
                 <section class="col-sm-9 col-lg-10 content">
                     <h1 id="installazione">Installazione</h1>
-<!-- TOC depthFrom:2 depthTo:6 orderedList:false updateOnSave:true withLinks:true -->
 <ul>
-<li><a href="#tabella-dei-contenuti">Tabella dei contenuti</a></li>
 <li><a href="#requisiti">Requisiti</a></li>
 <li><a href="#installazione">Installazione</a>
 <ul>
@@ -121,41 +119,44 @@
 </ul></li>
 <li><a href="#problemi-comuni">Problemi comuni</a>
 <ul>
-<li><a href="#schermata-bianca-iniziale">Schermata bianca iniziale</a></li>
-<li><a href="#blocco-dellinstallazione-allo-0%25">Blocco dell'installazione allo 0%</a></li>
+<li><a href="#schermata-bianca">Schermata bianca</a></li>
+<li><a href="#blocco-dellinstallazione-0">Blocco dell'installazione (0%)</a></li>
 </ul></li>
 </ul>
-<!-- /TOC -->
 <h2 id="requisiti">Requisiti</h2>
-<p>Prima di iniziare l'installazione, è necessario procedere al download di una versione del progetto da <a href="https://github.com/devcode-it/openstamanager">Github</a>. Si consiglia inoltre di controllare che i prerequisiti del software, elencati di seguito, siano soddisfatti.</p>
-<p>L'installazione del gestionale richiede la presenza di un server web con abilitato il <a href="https://it.wikipedia.org/wiki/Database_management_system">DBMS (Database Management System)</a> MySQL e il linguaggio di programmazione <a href="http://php.net/">PHP</a>.</p>
+<p>L'installazione del gestionale richiede la presenza di un server web con abilitato il <a href="https://www.mysql.com">DBMS MySQL</a>  e il linguaggio di programmazione <a href="http://php.net">PHP</a>.</p>
 <ul>
-<li>PHP &gt;= 5.4 (si consiglia come minimo la versione 5.6 per poter usufruire di tutte le funzionalità del progetto)</li>
+<li>PHP &gt;= 5.6</li>
 <li>MySQL &gt;= 5.0</li>
 </ul>
+<p>Per ulteriori informazioni sui pacchetti che forniscono questi elementi di default, visitare la sezione <a href="https://devcode-it.github.io/openstamanager/installazione.html">Installazione</a> della documentazione.</p>
 <h2 id="installazione-1">Installazione</h2>
 <p>Per procedere all'installazione è necessario seguire i seguenti punti:</p>
 <ol>
+<li><a href="https://github.com/devcode-it/openstamanager/releases">Scaricare una release ufficiale del progetto</a>.</li>
 <li>
-<p>Creare una cartella (ad esempio <code>openstamanager</code>) nella root del sever web installato ed estrarvi il contenuto della release scaricata. Il percorso della cartella root del server varia in base al software in utilizzo:</p>
+<p>Creare una cartella (ad esempio <code>openstamanager</code>) nella root del server web installato ed estrarvi il contenuto della release scaricata. Il percorso della cartella root del server varia in base al software in utilizzo:</p>
 <ul>
-<li>LAMP (<code>/var/www/html</code>);</li>
-<li>XAMPP (<code>C:/xampp/htdocs</code> per Windows, <code>/opt/lampp/htdocs/</code> per Linux, <code>/Applications/XAMPP/htdocs/</code> per MAC);</li>
-<li>WAMP (<code>C:\wamp\www</code>);</li>
-<li>MAMP (<code>C:\MAMP\htdocs</code> per Windows, <code>/Applications/MAMP/htdocs</code> per MAC).</li>
+<li>LAMP (<code>/var/www/html</code>)</li>
+<li>XAMPP (<code>C:/xampp/htdocs</code> per Windows, <code>/opt/lampp/htdocs/</code> per Linux, <code>/Applications/XAMPP/htdocs/</code> per MAC)</li>
+<li>WAMP (<code>C:\wamp\www</code>)</li>
+<li>MAMP (<code>C:\MAMP\htdocs</code> per Windows, <code>/Applications/MAMP/htdocs</code> per MAC)</li>
 </ul>
 </li>
 <li>Creare un database vuoto (tramite <a href="http://localhost/phpmyadmin/">PHPMyAdmin</a> o riga di comando).</li>
 <li>Accedere a <a href="http://localhost/openstamanager">http://localhost/openstamanager</a> dal vostro browser.</li>
-<li>Inserire i dati per collegarsi al database e cliccare su <strong>Installa</strong> per completare l'installazione.</li>
+<li>Inserire i dati di configurazione per collegarsi al database.</li>
+<li>Procedere all'installazione del software, cliccando sul pulsante <strong>Installa</strong>.</li>
 </ol>
 <p><strong>Attenzione</strong>: è possibile che l'installazione richieda del tempo. Si consiglia pertanto di attendere almeno qualche minuto senza alcun cambiamento nella pagina di installazione (in particolare, della progress bar presente) prima di cercare una possibile soluzione nelle discussioni del forum o nella sezione dedicata.</p>
 <h3 id="versioni">Versioni</h3>
-<p>Per mantenere un elevato grado di trasparenza riguardo al ciclo delle release, seguiamo le linee guida <a href="http://semver.org/">Semantic Versioning (SemVer)</a> per definire le versioni del progetto. Per vedere tutte le versioni disponibili al download, visitare la <a href="https://github.com/devcode-it/openstamanager/releases">pagina relativa</a> su Github (per versioni precedenti alla 2.3, visitare <a href="https://sourceforge.net/projects/openstamanager/files/">SourceForge</a>).</p>
+<p>Per mantenere un elevato grado di trasparenza riguardo al ciclo delle release, seguiamo le linee guida <a href="http://semver.org/">Semantic Versioning (SemVer)</a> per definire le versioni del progetto.
+Per vedere tutte le versioni disponibili al download, visitare la <a href="https://github.com/devcode-it/openstamanager/releases">pagina relativa</a> su Github (per versioni precedenti alla 2.3, visitare <a href="https://sourceforge.net/projects/openstamanager/files">SourceForge</a>).</p>
+<p>Nel caso utilizziate il programma per uso commerciale, si consiglia di scaricare le release disponibili nel sito ufficiale del progetto (<a href="http://www.openstamanager.com">http://www.openstamanager.com</a>), evitando di utilizzare direttamente il codice della repository.
+Se siete inoltre interessati a supporto e assistenza professionali, li potete richiedere nella <a href="http://www.openstamanager.com/per-le-aziende/">sezione dedicata</a>.</p>
 <h3 id="github">Github</h3>
-<p>Nel caso si stia utilizzando la versione direttamente ottenuta dalla repository di Github, è necessario eseguire i seguenti comandi da linea di comando per completare le dipendenze PHP (tramite <a href="https://getcomposer.org/">Composer</a>) e gli asssets (tramite <a href="https://yarnpkg.com/">Yarn</a>) del progetto.</p>
+<p>Nel caso si stia utilizzando la versione direttamente ottenuta dalla repository di Github, è necessario eseguire i seguenti comandi da linea di comando per completare le dipendenze PHP (tramite <a href="https://getcomposer.org">Composer</a>) e gli assets (tramite <a href="https://yarnpkg.com">Yarn</a>) del progetto.</p>
 <pre><code class="language-bash">php composer.phar install
-php composer.phar update
 yarn global add gulp
 yarn install
 gulp</code></pre>
@@ -182,27 +183,35 @@ Una volta terminata l’installazione è necessario creare una cartella per il g
 <p>La piattaforma Apple non è stata oggetto di molti test: pertanto si consiglia di individuare in prima persona un server web funzionante e con caratteristiche corrispondenti ai requisiti indicati.</p>
 <p>Il gestionale è stato testato con successo su Mac OS X con <a href="http://www.mamp.info/en/">MAMP</a> e XAMPP.</p>
 <h2 id="problemi-comuni">Problemi comuni</h2>
-<h3 id="schermata-bianca-iniziale">Schermata bianca iniziale</h3>
-<p><strong>Attenzione</strong>: a partire dalla versione 2.3 questa problema non è più presente.</p>
+<h3 id="schermata-bianca">Schermata bianca</h3>
+<p><strong>Attenzione</strong>: a partire dalla versione 2.3 questo problema non è più presente.</p>
 <p>Nel caso si verifichi il problema di schermata bianca iniziale è necessario controllare i valori delle variabili <code>$rootdir</code> e <code>$docroot</code> nelle prime righe di <em>core.php</em>. Una possibile soluzione, implementata dalla versione 2.3, potrebbe essere:</p>
 <pre><code class="language-php">$docroot = __DIR__;
-$rootdir = substr($_SERVER['SCRIPT_NAME'], 0, strrpos($_SERVER['SCRIPT_NAME'], '/'));
+$rootdir = substr($_SERVER['SCRIPT_NAME'], 0, strrpos($_SERVER['SCRIPT_NAME'], '/')).'/';
 if (strrpos($rootdir, '/'.basename($docroot).'/') !== false) {
     $rootdir = substr($rootdir, 0, strrpos($rootdir, '/'.basename($docroot).'/')).'/'.basename($docroot);
+} else {
+    $rootdir = '/';
 }
+$rootdir = rtrim($rootdir, '/');
 $rootdir = str_replace('%2F', '/', rawurlencode($rootdir));</code></pre>
 <p>Si ricorda comunque che:</p>
 <ul>
 <li><code>$docroot</code> deve corrispondere al percorso reale nel file system per raggiungere la cartella principale del gestionale.</li>
 <li><code>$rootdir</code> deve corrispondere al percorso URL del browser per raggiungere il gestionale nel server web.</li>
 </ul>
-<h3 id="blocco-dellinstallazione-allo-0">Blocco dell'installazione allo 0%</h3>
-<p><strong>Attenzione</strong>: a partire dalla versione 2.3 questa problema non è più presente.</p>
-<p>Nel caso l'installazione iniziale del database si blocchi allo 0% è probabilmente necessario effettuare una modifica nel file di impostazione del DBMS (<code>my.ini</code> nel caso di MySQL).</p>
+<h3 id="blocco-dellinstallazione-0">Blocco dell'installazione (0%)</h3>
+<p><strong>Attenzione</strong>: a partire dalla versione 2.3 questo problema non è più presente.</p>
+<p>Nel caso l'installazione iniziale del database si blocchi allo 0% è necessario effettuare la seguente modifica nelle righe 15, 16 e 17 del file <code>lib\dbo.class.php</code> (<a href="https://www.openstamanager.com/forum/viewtopic.php?f=4&t=88353#p93976">https://www.openstamanager.com/forum/viewtopic.php?f=4&t=88353#p93976</a>):</p>
+<pre><code class="language-php">if(@mysql_select_db($db_name, $conn)) {
+    @mysql_query("SET sql_mode = ''");
+    return "ok";
+} else</code></pre>
+<p>Eventualmente, se questo primo passaggio si rivelasse non funzionante, si può procedere alla modifica delle impostazioni del DBMS (file <code>my.ini</code> di MySQL).</p>
 <pre><code class="language-ini">#sql-mode="STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"
 sql-mode="NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"</code></pre>
-<p>La riga preceduta da <code>#</code> è quella originale, mentre quella seguente è l'opzione che permette il corretto funzionamento dell'installazione.</p>
-<p>Discussioni originale:</p>
+<p>La riga iniziante da <code>#</code> è quella originale, mentre quella seguente è l'opzione che permette il corretto funzionamento dell'installazione.</p>
+<p>Discussioni originali:</p>
 <ul>
 <li><a href="http://www.openstamanager.com/forum/viewtopic.php?f=2&amp;t=86981">[RISOLTO] Tabelle Mancanti</a></li>
 <li><a href="http://stackoverflow.com/questions/21667601/mysql-running-in-strict-mode-and-giving-me-problems-how-to-fix-this">MySQL running in Strict Mode and giving me problems. How to fix this?</a></li>
@@ -254,13 +263,6 @@ sql-mode="NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"</code></pre>
                 });
             });
 
-                            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-                            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-                        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-                })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-                ga('create', 'UA-42808312-1', 'auto');
-                ga('send', 'pageview');
             
         </script>
 

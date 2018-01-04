@@ -94,10 +94,34 @@
 
             <table class="table table-condensed">
                     <tr>
-                <td class="type" id="property_numberSeparators">
-                                        protected                                        array
+                <td class="type" id="property_standards">
+                    static                    protected                                        
                 </td>
-                <td>$numberSeparators</td>
+                <td>$standards</td>
+                <td class="last"></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_numberFormatter">
+                                        protected                                        <a target="_blank" href="http://php.net/NumberFormatter">NumberFormatter</a>|array
+                </td>
+                <td>$numberFormatter</td>
+                <td class="last"></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_precision">
+                                        protected                                        
+                </td>
+                <td>$precision</td>
+                <td class="last"></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_timestampPattern">
+                                        protected                                        string
+                </td>
+                <td>$timestampPattern</td>
                 <td class="last"></td>
                 <td></td>
             </tr>
@@ -117,14 +141,6 @@
                 <td class="last"></td>
                 <td></td>
             </tr>
-                    <tr>
-                <td class="type" id="property_timestampPattern">
-                                        protected                                        string
-                </td>
-                <td>$timestampPattern</td>
-                <td class="last"></td>
-                <td></td>
-            </tr>
             </table>
 
     
@@ -136,7 +152,7 @@
                     
                 </div>
                 <div class="col-md-8 type">
-                    <a href="#method___construct">__construct</a>($numberSeparators = [], $date = null, $time = null, $timestamp = null)
+                    <a href="#method___construct">__construct</a>($locale, $timestamp = null, $date = null, $time = null, $number = [])
         
                                             <p class="no-description">No description</p>
                                     </div>
@@ -144,52 +160,32 @@
             </div>
                     <div class="row">
                 <div class="col-md-2 type">
-                    
-                </div>
-                <div class="col-md-8 type">
-                    <a href="#method_setNumberSeparators">setNumberSeparators</a>(string $values)
-        
-                                            <p>Imposta il formato dei numeri.</p>                </div>
-                <div class="col-md-2"></div>
-            </div>
-                    <div class="row">
-                <div class="col-md-2 type">
                     array
                 </div>
                 <div class="col-md-8 type">
-                    <a href="#method_getNumberSeparators">getNumberSeparators</a>()
+                    <a href="#method_getStandardFormats">getStandardFormats</a>()
         
-                                            <p>Restituisce i separatori utilizzati per la formattazione.</p>                </div>
+                                            <p>Restituisce gli elementi di separazione secondo la formattazione in utilizzo.</p>                </div>
                 <div class="col-md-2"></div>
             </div>
                     <div class="row">
                 <div class="col-md-2 type">
-                    
+                    mixed
                 </div>
                 <div class="col-md-8 type">
-                    <a href="#method_setDatePattern">setDatePattern</a>(string $value)
+                    <a href="#method_format">format</a>($value)
         
-                                            <p>Imposta il formato della data.</p>                </div>
+                                            <p>Restituisce gli elementi di separazione secondo la formattazione in utilizzo.</p>                </div>
                 <div class="col-md-2"></div>
             </div>
                     <div class="row">
                 <div class="col-md-2 type">
-                    string
+                    mixed
                 </div>
                 <div class="col-md-8 type">
-                    <a href="#method_getDatePattern">getDatePattern</a>()
+                    <a href="#method_parse">parse</a>($value)
         
-                                            <p>Restituisce il formato della data.</p>                </div>
-                <div class="col-md-2"></div>
-            </div>
-                    <div class="row">
-                <div class="col-md-2 type">
-                    
-                </div>
-                <div class="col-md-8 type">
-                    <a href="#method_setTimePattern">setTimePattern</a>(string $value)
-        
-                                            <p>Imposta il formato dell'orario.</p>                </div>
+                                            <p>Restituisce gli elementi di separazione secondo la formattazione in utilizzo.</p>                </div>
                 <div class="col-md-2"></div>
             </div>
                     <div class="row">
@@ -197,19 +193,9 @@
                     string
                 </div>
                 <div class="col-md-8 type">
-                    <a href="#method_getTimePattern">getTimePattern</a>()
+                    <a href="#method_formatNumber">formatNumber</a>($value, $decimals = null)
         
-                                            <p>Restituisce il formato dell'orario.</p>                </div>
-                <div class="col-md-2"></div>
-            </div>
-                    <div class="row">
-                <div class="col-md-2 type">
-                    
-                </div>
-                <div class="col-md-8 type">
-                    <a href="#method_setTimestampPattern">setTimestampPattern</a>(string $value)
-        
-                                            <p>Imposta il formato del timestamp.</p>                </div>
+                                            <p>Converte un numero da una formattazione all'altra.</p>                </div>
                 <div class="col-md-2"></div>
             </div>
                     <div class="row">
@@ -217,9 +203,9 @@
                     string
                 </div>
                 <div class="col-md-8 type">
-                    <a href="#method_getTimestampPattern">getTimestampPattern</a>()
+                    <a href="#method_parseNumber">parseNumber</a>(string $value)
         
-                                            <p>Restituisce il formato del timestamp.</p>                </div>
+                                            <p>Converte un numero da una formattazione all'altra.</p>                </div>
                 <div class="col-md-2"></div>
             </div>
                     <div class="row">
@@ -227,7 +213,7 @@
                     bool
                 </div>
                 <div class="col-md-8 type">
-                    <a href="#method_isNumber">isNumber</a>(string $value)
+                    <a href="#method_isStandardNumber">isStandardNumber</a>(string $value)
         
                                             <p>Controlla se l'elemento indicato è un numero.</p>                </div>
                 <div class="col-md-2"></div>
@@ -237,29 +223,29 @@
                     bool
                 </div>
                 <div class="col-md-8 type">
-                    <a href="#method_isTimestamp">isTimestamp</a>(string $value)
+                    <a href="#method_isFormattedNumber">isFormattedNumber</a>(string $value)
         
-                                            <p>Controlla se l'elemento indicato è un timestamp.</p>                </div>
+                                            <p>Controlla se l'elemento indicato è un numero.</p>                </div>
                 <div class="col-md-2"></div>
             </div>
                     <div class="row">
                 <div class="col-md-2 type">
-                    bool
+                    
                 </div>
                 <div class="col-md-8 type">
-                    <a href="#method_isDate">isDate</a>(string $value)
+                    <a href="#method_setPrecision">setPrecision</a>(int $decimals)
         
-                                            <p>Controlla se l'elemento indicato è una data.</p>                </div>
+                                            <p>Imposta la precisione di default per i numeri da formattare.</p>                </div>
                 <div class="col-md-2"></div>
             </div>
                     <div class="row">
                 <div class="col-md-2 type">
-                    bool
+                    int
                 </div>
                 <div class="col-md-8 type">
-                    <a href="#method_isTime">isTime</a>(string $value)
+                    <a href="#method_getPrecision">getPrecision</a>()
         
-                                            <p>Controlla se l'elemento indicato è un orario.</p>                </div>
+                                            <p>Restituisce la precisione di default per i numeri da formattare.</p>                </div>
                 <div class="col-md-2"></div>
             </div>
                     <div class="row">
@@ -267,7 +253,17 @@
                     array
                 </div>
                 <div class="col-md-8 type">
-                    <a href="#method_toNumberObject">toNumberObject</a>(string $value)
+                    <a href="#method_getNumberSeparators">getNumberSeparators</a>()
+        
+                                            <p>Restituisce gli elementi di separazione secondo la formattazione in utilizzo.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_customNumber">customNumber</a>($value, $current, $format)
         
                                             <p>Converte l'elemento in una rappresentazione numerica.</p>                </div>
                 <div class="col-md-2"></div>
@@ -277,47 +273,7 @@
                     string
                 </div>
                 <div class="col-md-8 type">
-                    <a href="#method_toTimestampObject">toTimestampObject</a>(string $value)
-        
-                                            <p>Converte l'elemento dal formato personalizzato a quello predefinito di PHP.</p>                </div>
-                <div class="col-md-2"></div>
-            </div>
-                    <div class="row">
-                <div class="col-md-2 type">
-                    string
-                </div>
-                <div class="col-md-8 type">
-                    <a href="#method_toDateObject">toDateObject</a>(string $value)
-        
-                                            <p>Converte l'elemento dal formato personalizzato a quello predefinito di PHP.</p>                </div>
-                <div class="col-md-2"></div>
-            </div>
-                    <div class="row">
-                <div class="col-md-2 type">
-                    string
-                </div>
-                <div class="col-md-8 type">
-                    <a href="#method_toTimeObject">toTimeObject</a>(string $value)
-        
-                                            <p>Converte l'elemento dal formato personalizzato a quello predefinito di PHP.</p>                </div>
-                <div class="col-md-2"></div>
-            </div>
-                    <div class="row">
-                <div class="col-md-2 type">
-                    string
-                </div>
-                <div class="col-md-8 type">
-                    <a href="#method_formatNumberTo">formatNumberTo</a>(<a href="../Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a> $formatter, string $value)
-        
-                                            <p>Converte un numero da una formattazione all'altra.</p>                </div>
-                <div class="col-md-2"></div>
-            </div>
-                    <div class="row">
-                <div class="col-md-2 type">
-                    string
-                </div>
-                <div class="col-md-8 type">
-                    <a href="#method_formatTimestampTo">formatTimestampTo</a>(<a href="../Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a> $formatter, string $value)
+                    <a href="#method_formatTimestamp">formatTimestamp</a>(string $value)
         
                                             <p>Converte un timestamp da una formattazione all'altra.</p>                </div>
                 <div class="col-md-2"></div>
@@ -327,47 +283,57 @@
                     string
                 </div>
                 <div class="col-md-8 type">
-                    <a href="#method_formatDateTo">formatDateTo</a>(<a href="../Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a> $formatter, string $value)
-        
-                                            <p>Converte una data da una formattazione all'altra.</p>                </div>
-                <div class="col-md-2"></div>
-            </div>
-                    <div class="row">
-                <div class="col-md-2 type">
-                    string
-                </div>
-                <div class="col-md-8 type">
-                    <a href="#method_formatTimeTo">formatTimeTo</a>(<a href="../Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a> $formatter, string $value)
-        
-                                            <p>Converte un orario da una formattazione all'altra.</p>                </div>
-                <div class="col-md-2"></div>
-            </div>
-                    <div class="row">
-                <div class="col-md-2 type">
-                    string
-                </div>
-                <div class="col-md-8 type">
-                    <a href="#method_formatNumberFrom">formatNumberFrom</a>(<a href="../Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a> $formatter, string $value)
-        
-                                            <p>Converte un numero da una formattazione all'altra.</p>                </div>
-                <div class="col-md-2"></div>
-            </div>
-                    <div class="row">
-                <div class="col-md-2 type">
-                    string
-                </div>
-                <div class="col-md-8 type">
-                    <a href="#method_formatTimestampFrom">formatTimestampFrom</a>(<a href="../Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a> $formatter, string $value)
+                    <a href="#method_parseTimestamp">parseTimestamp</a>(string $value)
         
                                             <p>Converte un timestamp da una formattazione all'altra.</p>                </div>
                 <div class="col-md-2"></div>
             </div>
                     <div class="row">
                 <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_isStandardTimestamp">isStandardTimestamp</a>(string $value)
+        
+                                            <p>Controlla se l'elemento indicato è un timestamp.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_isFormattedTimestamp">isFormattedTimestamp</a>(string $value)
+        
+                                            <p>Controlla se l'elemento indicato è un timestamp.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
                     string
                 </div>
                 <div class="col-md-8 type">
-                    <a href="#method_formatDateFrom">formatDateFrom</a>(<a href="../Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a> $formatter, string $value)
+                    <a href="#method_getTimestampPattern">getTimestampPattern</a>($type = null)
+        
+                                            <p>Restituisce il formato del timestamp.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_setTimestampPattern">setTimestampPattern</a>($pattern)
+        
+                                            <p>Imposta il formato del timestamp.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_formatDate">formatDate</a>(string $value)
         
                                             <p>Converte una data da una formattazione all'altra.</p>                </div>
                 <div class="col-md-2"></div>
@@ -377,9 +343,109 @@
                     string
                 </div>
                 <div class="col-md-8 type">
-                    <a href="#method_formatTimeFrom">formatTimeFrom</a>(<a href="../Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a> $formatter, string $value)
+                    <a href="#method_parseDate">parseDate</a>(string $value)
+        
+                                            <p>Converte una data da una formattazione all'altra.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_isStandardDate">isStandardDate</a>(string $value)
+        
+                                            <p>Controlla se l'elemento indicato è una data.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_isFormattedDate">isFormattedDate</a>(string $value)
+        
+                                            <p>Controlla se l'elemento indicato è una data.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_getDatePattern">getDatePattern</a>($type = null)
+        
+                                            <p>Restituisce il formato del timestamp.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_setDatePattern">setDatePattern</a>($pattern)
+        
+                                            <p>Imposta il formato del timestamp.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_formatTime">formatTime</a>(string $value)
         
                                             <p>Converte un orario da una formattazione all'altra.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_parseTime">parseTime</a>(string $value)
+        
+                                            <p>Converte un orario da una formattazione all'altra.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_isStandardTime">isStandardTime</a>(string $value)
+        
+                                            <p>Controlla se l'elemento indicato è un orario.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_isFormattedTime">isFormattedTime</a>(string $value)
+        
+                                            <p>Controlla se l'elemento indicato è un orario.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_getTimePattern">getTimePattern</a>($type = null)
+        
+                                            <p>Restituisce il formato del orario.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_setTimePattern">setTimePattern</a>($pattern)
+        
+                                            <p>Imposta il formato del orario.</p>                </div>
                 <div class="col-md-2"></div>
             </div>
             </div>
@@ -390,9 +456,9 @@
             <div id="method-details">
                     <div class="method-item">
                     <h3 id="method___construct">
-        <div class="location">at         line 26</div>
+        <div class="location">at         line 36</div>
         <code>                    
-    <strong>__construct</strong>($numberSeparators = [], $date = null, $time = null, $timestamp = null)
+    <strong>__construct</strong>($locale, $timestamp = null, $date = null, $time = null, $number = [])
         </code>
     </h3>
     <div class="details">
@@ -405,7 +471,12 @@
                     <table class="table table-condensed">
                     <tr>
                 <td></td>
-                <td>$numberSeparators</td>
+                <td>$locale</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$timestamp</td>
                 <td></td>
             </tr>
                     <tr>
@@ -420,7 +491,7 @@
             </tr>
                     <tr>
                 <td></td>
-                <td>$timestamp</td>
+                <td>$number</td>
                 <td></td>
             </tr>
             </table>
@@ -433,41 +504,10 @@
 
             </div>
                     <div class="method-item">
-                    <h3 id="method_setNumberSeparators">
-        <div class="location">at         line 42</div>
-        <code>            protected        
-    <strong>setNumberSeparators</strong>(string $values)
-        </code>
-    </h3>
-    <div class="details">
-            
-    
-
-                    <div class="method-description">
-                                    <p>Imposta il formato dei numeri.</p>                                                </div>
-                <div class="tags">
-                            <h4>Parameters</h4>
-
-                    <table class="table table-condensed">
-                    <tr>
-                <td>string</td>
-                <td>$values</td>
-                <td></td>
-            </tr>
-            </table>
-
-            
-            
-            
-                    </div>
-    </div>
-
-            </div>
-                    <div class="method-item">
-                    <h3 id="method_getNumberSeparators">
-        <div class="location">at         line 62</div>
+                    <h3 id="method_getStandardFormats">
+        <div class="location">at         line 56</div>
         <code>                    array
-    <strong>getNumberSeparators</strong>()
+    <strong>getStandardFormats</strong>()
         </code>
     </h3>
     <div class="details">
@@ -475,7 +515,7 @@
     
 
                     <div class="method-description">
-                                    <p>Restituisce i separatori utilizzati per la formattazione.</p>                                                </div>
+                                    <p>Restituisce gli elementi di separazione secondo la formattazione in utilizzo.</p>                                                </div>
                 <div class="tags">
             
                             <h4>Return Value</h4>
@@ -494,10 +534,10 @@
 
             </div>
                     <div class="method-item">
-                    <h3 id="method_setDatePattern">
-        <div class="location">at         line 72</div>
-        <code>            protected        
-    <strong>setDatePattern</strong>(string $value)
+                    <h3 id="method_format">
+        <div class="location">at         line 66</div>
+        <code>                    mixed
+    <strong>format</strong>($value)
         </code>
     </h3>
     <div class="details">
@@ -505,19 +545,28 @@
     
 
                     <div class="method-description">
-                                    <p>Imposta il formato della data.</p>                                                </div>
+                                    <p>Restituisce gli elementi di separazione secondo la formattazione in utilizzo.</p>                                                </div>
                 <div class="tags">
                             <h4>Parameters</h4>
 
                     <table class="table table-condensed">
                     <tr>
-                <td>string</td>
+                <td></td>
                 <td>$value</td>
                 <td></td>
             </tr>
             </table>
 
             
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>mixed</td>
+            <td></td>
+        </tr>
+    </table>
+
             
             
                     </div>
@@ -525,10 +574,10 @@
 
             </div>
                     <div class="method-item">
-                    <h3 id="method_getDatePattern">
-        <div class="location">at         line 91</div>
-        <code>                    string
-    <strong>getDatePattern</strong>()
+                    <h3 id="method_parse">
+        <div class="location">at         line 88</div>
+        <code>                    mixed
+    <strong>parse</strong>($value)
         </code>
     </h3>
     <div class="details">
@@ -536,8 +585,63 @@
     
 
                     <div class="method-description">
-                                    <p>Restituisce il formato della data.</p>                                                </div>
+                                    <p>Restituisce gli elementi di separazione secondo la formattazione in utilizzo.</p>                                                </div>
                 <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$value</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>mixed</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_formatNumber">
+        <div class="location">at         line 114</div>
+        <code>                    string
+    <strong>formatNumber</strong>($value, $decimals = null)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Converte un numero da una formattazione all'altra.</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$value</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$decimals</td>
+                <td></td>
+            </tr>
+            </table>
+
             
                             <h4>Return Value</h4>
 
@@ -555,10 +659,10 @@
 
             </div>
                     <div class="method-item">
-                    <h3 id="method_setTimePattern">
-        <div class="location">at         line 101</div>
-        <code>            protected        
-    <strong>setTimePattern</strong>(string $value)
+                    <h3 id="method_parseNumber">
+        <div class="location">at         line 145</div>
+        <code>                    string
+    <strong>parseNumber</strong>(string $value)
         </code>
     </h3>
     <div class="details">
@@ -566,7 +670,7 @@
     
 
                     <div class="method-description">
-                                    <p>Imposta il formato dell'orario.</p>                                                </div>
+                                    <p>Converte un numero da una formattazione all'altra.</p>                                                </div>
                 <div class="tags">
                             <h4>Parameters</h4>
 
@@ -578,27 +682,6 @@
             </tr>
             </table>
 
-            
-            
-            
-                    </div>
-    </div>
-
-            </div>
-                    <div class="method-item">
-                    <h3 id="method_getTimePattern">
-        <div class="location">at         line 120</div>
-        <code>                    string
-    <strong>getTimePattern</strong>()
-        </code>
-    </h3>
-    <div class="details">
-            
-    
-
-                    <div class="method-description">
-                                    <p>Restituisce il formato dell'orario.</p>                                                </div>
-                <div class="tags">
             
                             <h4>Return Value</h4>
 
@@ -616,71 +699,10 @@
 
             </div>
                     <div class="method-item">
-                    <h3 id="method_setTimestampPattern">
-        <div class="location">at         line 130</div>
-        <code>            protected        
-    <strong>setTimestampPattern</strong>(string $value)
-        </code>
-    </h3>
-    <div class="details">
-            
-    
-
-                    <div class="method-description">
-                                    <p>Imposta il formato del timestamp.</p>                                                </div>
-                <div class="tags">
-                            <h4>Parameters</h4>
-
-                    <table class="table table-condensed">
-                    <tr>
-                <td>string</td>
-                <td>$value</td>
-                <td></td>
-            </tr>
-            </table>
-
-            
-            
-            
-                    </div>
-    </div>
-
-            </div>
-                    <div class="method-item">
-                    <h3 id="method_getTimestampPattern">
-        <div class="location">at         line 152</div>
-        <code>                    string
-    <strong>getTimestampPattern</strong>()
-        </code>
-    </h3>
-    <div class="details">
-            
-    
-
-                    <div class="method-description">
-                                    <p>Restituisce il formato del timestamp.</p>                                                </div>
-                <div class="tags">
-            
-                            <h4>Return Value</h4>
-
-                    <table class="table table-condensed">
-        <tr>
-            <td>string</td>
-            <td></td>
-        </tr>
-    </table>
-
-            
-            
-                    </div>
-    </div>
-
-            </div>
-                    <div class="method-item">
-                    <h3 id="method_isNumber">
-        <div class="location">at         line 164</div>
+                    <h3 id="method_isStandardNumber">
+        <div class="location">at         line 182</div>
         <code>                    bool
-    <strong>isNumber</strong>(string $value)
+    <strong>isStandardNumber</strong>(string $value)
         </code>
     </h3>
     <div class="details">
@@ -717,10 +739,271 @@
 
             </div>
                     <div class="method-item">
-                    <h3 id="method_isTimestamp">
-        <div class="location">at         line 182</div>
+                    <h3 id="method_isFormattedNumber">
+        <div class="location">at         line 196</div>
         <code>                    bool
-    <strong>isTimestamp</strong>(string $value)
+    <strong>isFormattedNumber</strong>(string $value)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Controlla se l'elemento indicato è un numero.</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$value</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_setPrecision">
+        <div class="location">at         line 208</div>
+        <code>                    
+    <strong>setPrecision</strong>(int $decimals)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Imposta la precisione di default per i numeri da formattare.</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>int</td>
+                <td>$decimals</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getPrecision">
+        <div class="location">at         line 222</div>
+        <code>                    int
+    <strong>getPrecision</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Restituisce la precisione di default per i numeri da formattare.</p>                                                </div>
+                <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>int</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getNumberSeparators">
+        <div class="location">at         line 232</div>
+        <code>                    array
+    <strong>getNumberSeparators</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Restituisce gli elementi di separazione secondo la formattazione in utilizzo.</p>                                                </div>
+                <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_customNumber">
+        <div class="location">at         line 247</div>
+        <code>                    array
+    <strong>customNumber</strong>($value, $current, $format)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Converte l'elemento in una rappresentazione numerica.</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$value</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$current</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$format</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_formatTimestamp">
+        <div class="location">at         line 317</div>
+        <code>                    string
+    <strong>formatTimestamp</strong>(string $value)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Converte un timestamp da una formattazione all'altra.</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$value</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_parseTimestamp">
+        <div class="location">at         line 332</div>
+        <code>                    string
+    <strong>parseTimestamp</strong>(string $value)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Converte un timestamp da una formattazione all'altra.</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$value</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_isStandardTimestamp">
+        <div class="location">at         line 347</div>
+        <code>                    bool
+    <strong>isStandardTimestamp</strong>(string $value)
         </code>
     </h3>
     <div class="details">
@@ -757,10 +1040,210 @@
 
             </div>
                     <div class="method-item">
-                    <h3 id="method_isDate">
-        <div class="location">at         line 200</div>
+                    <h3 id="method_isFormattedTimestamp">
+        <div class="location">at         line 361</div>
         <code>                    bool
-    <strong>isDate</strong>(string $value)
+    <strong>isFormattedTimestamp</strong>(string $value)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Controlla se l'elemento indicato è un timestamp.</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$value</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getTimestampPattern">
+        <div class="location">at         line 373</div>
+        <code>                    string
+    <strong>getTimestampPattern</strong>($type = null)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Restituisce il formato del timestamp.</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$type</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_setTimestampPattern">
+        <div class="location">at         line 383</div>
+        <code>                    string
+    <strong>setTimestampPattern</strong>($pattern)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Imposta il formato del timestamp.</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$pattern</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_formatDate">
+        <div class="location">at         line 397</div>
+        <code>                    string
+    <strong>formatDate</strong>(string $value)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Converte una data da una formattazione all'altra.</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$value</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_parseDate">
+        <div class="location">at         line 416</div>
+        <code>                    string
+    <strong>parseDate</strong>(string $value)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Converte una data da una formattazione all'altra.</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$value</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_isStandardDate">
+        <div class="location">at         line 431</div>
+        <code>                    bool
+    <strong>isStandardDate</strong>(string $value)
         </code>
     </h3>
     <div class="details">
@@ -797,10 +1280,210 @@
 
             </div>
                     <div class="method-item">
-                    <h3 id="method_isTime">
-        <div class="location">at         line 218</div>
+                    <h3 id="method_isFormattedDate">
+        <div class="location">at         line 445</div>
         <code>                    bool
-    <strong>isTime</strong>(string $value)
+    <strong>isFormattedDate</strong>(string $value)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Controlla se l'elemento indicato è una data.</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$value</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getDatePattern">
+        <div class="location">at         line 457</div>
+        <code>                    string
+    <strong>getDatePattern</strong>($type = null)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Restituisce il formato del timestamp.</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$type</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_setDatePattern">
+        <div class="location">at         line 467</div>
+        <code>                    string
+    <strong>setDatePattern</strong>($pattern)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Imposta il formato del timestamp.</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$pattern</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_formatTime">
+        <div class="location">at         line 481</div>
+        <code>                    string
+    <strong>formatTime</strong>(string $value)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Converte un orario da una formattazione all'altra.</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$value</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_parseTime">
+        <div class="location">at         line 500</div>
+        <code>                    string
+    <strong>parseTime</strong>(string $value)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Converte un orario da una formattazione all'altra.</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$value</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_isStandardTime">
+        <div class="location">at         line 515</div>
+        <code>                    bool
+    <strong>isStandardTime</strong>(string $value)
         </code>
     </h3>
     <div class="details">
@@ -837,10 +1520,10 @@
 
             </div>
                     <div class="method-item">
-                    <h3 id="method_toNumberObject">
-        <div class="location">at         line 236</div>
-        <code>                    array
-    <strong>toNumberObject</strong>(string $value)
+                    <h3 id="method_isFormattedTime">
+        <div class="location">at         line 529</div>
+        <code>                    bool
+    <strong>isFormattedTime</strong>(string $value)
         </code>
     </h3>
     <div class="details">
@@ -848,7 +1531,7 @@
     
 
                     <div class="method-description">
-                                    <p>Converte l'elemento in una rappresentazione numerica.</p>                                                </div>
+                                    <p>Controlla se l'elemento indicato è un orario.</p>                                                </div>
                 <div class="tags">
                             <h4>Parameters</h4>
 
@@ -865,7 +1548,7 @@
 
                     <table class="table table-condensed">
         <tr>
-            <td>array</td>
+            <td>bool</td>
             <td></td>
         </tr>
     </table>
@@ -877,10 +1560,10 @@
 
             </div>
                     <div class="method-item">
-                    <h3 id="method_toTimestampObject">
-        <div class="location">at         line 298</div>
+                    <h3 id="method_getTimePattern">
+        <div class="location">at         line 541</div>
         <code>                    string
-    <strong>toTimestampObject</strong>(string $value)
+    <strong>getTimePattern</strong>($type = null)
         </code>
     </h3>
     <div class="details">
@@ -888,54 +1571,14 @@
     
 
                     <div class="method-description">
-                                    <p>Converte l'elemento dal formato personalizzato a quello predefinito di PHP.</p>                                                </div>
+                                    <p>Restituisce il formato del orario.</p>                                                </div>
                 <div class="tags">
                             <h4>Parameters</h4>
 
                     <table class="table table-condensed">
                     <tr>
-                <td>string</td>
-                <td>$value</td>
                 <td></td>
-            </tr>
-            </table>
-
-            
-                            <h4>Return Value</h4>
-
-                    <table class="table table-condensed">
-        <tr>
-            <td>string</td>
-            <td></td>
-        </tr>
-    </table>
-
-            
-            
-                    </div>
-    </div>
-
-            </div>
-                    <div class="method-item">
-                    <h3 id="method_toDateObject">
-        <div class="location">at         line 318</div>
-        <code>                    string
-    <strong>toDateObject</strong>(string $value)
-        </code>
-    </h3>
-    <div class="details">
-            
-    
-
-                    <div class="method-description">
-                                    <p>Converte l'elemento dal formato personalizzato a quello predefinito di PHP.</p>                                                </div>
-                <div class="tags">
-                            <h4>Parameters</h4>
-
-                    <table class="table table-condensed">
-                    <tr>
-                <td>string</td>
-                <td>$value</td>
+                <td>$type</td>
                 <td></td>
             </tr>
             </table>
@@ -957,10 +1600,10 @@
 
             </div>
                     <div class="method-item">
-                    <h3 id="method_toTimeObject">
-        <div class="location">at         line 340</div>
+                    <h3 id="method_setTimePattern">
+        <div class="location">at         line 551</div>
         <code>                    string
-    <strong>toTimeObject</strong>(string $value)
+    <strong>setTimePattern</strong>($pattern)
         </code>
     </h3>
     <div class="details">
@@ -968,374 +1611,14 @@
     
 
                     <div class="method-description">
-                                    <p>Converte l'elemento dal formato personalizzato a quello predefinito di PHP.</p>                                                </div>
+                                    <p>Imposta il formato del orario.</p>                                                </div>
                 <div class="tags">
                             <h4>Parameters</h4>
 
                     <table class="table table-condensed">
                     <tr>
-                <td>string</td>
-                <td>$value</td>
                 <td></td>
-            </tr>
-            </table>
-
-            
-                            <h4>Return Value</h4>
-
-                    <table class="table table-condensed">
-        <tr>
-            <td>string</td>
-            <td></td>
-        </tr>
-    </table>
-
-            
-            
-                    </div>
-    </div>
-
-            </div>
-                    <div class="method-item">
-                    <h3 id="method_formatNumberTo">
-        <div class="location">at         line 363</div>
-        <code>                    string
-    <strong>formatNumberTo</strong>(<a href="../Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a> $formatter, string $value)
-        </code>
-    </h3>
-    <div class="details">
-            
-    
-
-                    <div class="method-description">
-                                    <p>Converte un numero da una formattazione all'altra.</p>                                                </div>
-                <div class="tags">
-                            <h4>Parameters</h4>
-
-                    <table class="table table-condensed">
-                    <tr>
-                <td><a href="../Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a></td>
-                <td>$formatter</td>
-                <td></td>
-            </tr>
-                    <tr>
-                <td>string</td>
-                <td>$value</td>
-                <td></td>
-            </tr>
-            </table>
-
-            
-                            <h4>Return Value</h4>
-
-                    <table class="table table-condensed">
-        <tr>
-            <td>string</td>
-            <td></td>
-        </tr>
-    </table>
-
-            
-            
-                    </div>
-    </div>
-
-            </div>
-                    <div class="method-item">
-                    <h3 id="method_formatTimestampTo">
-        <div class="location">at         line 386</div>
-        <code>                    string
-    <strong>formatTimestampTo</strong>(<a href="../Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a> $formatter, string $value)
-        </code>
-    </h3>
-    <div class="details">
-            
-    
-
-                    <div class="method-description">
-                                    <p>Converte un timestamp da una formattazione all'altra.</p>                                                </div>
-                <div class="tags">
-                            <h4>Parameters</h4>
-
-                    <table class="table table-condensed">
-                    <tr>
-                <td><a href="../Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a></td>
-                <td>$formatter</td>
-                <td></td>
-            </tr>
-                    <tr>
-                <td>string</td>
-                <td>$value</td>
-                <td></td>
-            </tr>
-            </table>
-
-            
-                            <h4>Return Value</h4>
-
-                    <table class="table table-condensed">
-        <tr>
-            <td>string</td>
-            <td></td>
-        </tr>
-    </table>
-
-            
-            
-                    </div>
-    </div>
-
-            </div>
-                    <div class="method-item">
-                    <h3 id="method_formatDateTo">
-        <div class="location">at         line 401</div>
-        <code>                    string
-    <strong>formatDateTo</strong>(<a href="../Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a> $formatter, string $value)
-        </code>
-    </h3>
-    <div class="details">
-            
-    
-
-                    <div class="method-description">
-                                    <p>Converte una data da una formattazione all'altra.</p>                                                </div>
-                <div class="tags">
-                            <h4>Parameters</h4>
-
-                    <table class="table table-condensed">
-                    <tr>
-                <td><a href="../Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a></td>
-                <td>$formatter</td>
-                <td></td>
-            </tr>
-                    <tr>
-                <td>string</td>
-                <td>$value</td>
-                <td></td>
-            </tr>
-            </table>
-
-            
-                            <h4>Return Value</h4>
-
-                    <table class="table table-condensed">
-        <tr>
-            <td>string</td>
-            <td></td>
-        </tr>
-    </table>
-
-            
-            
-                    </div>
-    </div>
-
-            </div>
-                    <div class="method-item">
-                    <h3 id="method_formatTimeTo">
-        <div class="location">at         line 416</div>
-        <code>                    string
-    <strong>formatTimeTo</strong>(<a href="../Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a> $formatter, string $value)
-        </code>
-    </h3>
-    <div class="details">
-            
-    
-
-                    <div class="method-description">
-                                    <p>Converte un orario da una formattazione all'altra.</p>                                                </div>
-                <div class="tags">
-                            <h4>Parameters</h4>
-
-                    <table class="table table-condensed">
-                    <tr>
-                <td><a href="../Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a></td>
-                <td>$formatter</td>
-                <td></td>
-            </tr>
-                    <tr>
-                <td>string</td>
-                <td>$value</td>
-                <td></td>
-            </tr>
-            </table>
-
-            
-                            <h4>Return Value</h4>
-
-                    <table class="table table-condensed">
-        <tr>
-            <td>string</td>
-            <td></td>
-        </tr>
-    </table>
-
-            
-            
-                    </div>
-    </div>
-
-            </div>
-                    <div class="method-item">
-                    <h3 id="method_formatNumberFrom">
-        <div class="location">at         line 431</div>
-        <code>                    string
-    <strong>formatNumberFrom</strong>(<a href="../Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a> $formatter, string $value)
-        </code>
-    </h3>
-    <div class="details">
-            
-    
-
-                    <div class="method-description">
-                                    <p>Converte un numero da una formattazione all'altra.</p>                                                </div>
-                <div class="tags">
-                            <h4>Parameters</h4>
-
-                    <table class="table table-condensed">
-                    <tr>
-                <td><a href="../Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a></td>
-                <td>$formatter</td>
-                <td></td>
-            </tr>
-                    <tr>
-                <td>string</td>
-                <td>$value</td>
-                <td></td>
-            </tr>
-            </table>
-
-            
-                            <h4>Return Value</h4>
-
-                    <table class="table table-condensed">
-        <tr>
-            <td>string</td>
-            <td></td>
-        </tr>
-    </table>
-
-            
-            
-                    </div>
-    </div>
-
-            </div>
-                    <div class="method-item">
-                    <h3 id="method_formatTimestampFrom">
-        <div class="location">at         line 444</div>
-        <code>                    string
-    <strong>formatTimestampFrom</strong>(<a href="../Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a> $formatter, string $value)
-        </code>
-    </h3>
-    <div class="details">
-            
-    
-
-                    <div class="method-description">
-                                    <p>Converte un timestamp da una formattazione all'altra.</p>                                                </div>
-                <div class="tags">
-                            <h4>Parameters</h4>
-
-                    <table class="table table-condensed">
-                    <tr>
-                <td><a href="../Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a></td>
-                <td>$formatter</td>
-                <td></td>
-            </tr>
-                    <tr>
-                <td>string</td>
-                <td>$value</td>
-                <td></td>
-            </tr>
-            </table>
-
-            
-                            <h4>Return Value</h4>
-
-                    <table class="table table-condensed">
-        <tr>
-            <td>string</td>
-            <td></td>
-        </tr>
-    </table>
-
-            
-            
-                    </div>
-    </div>
-
-            </div>
-                    <div class="method-item">
-                    <h3 id="method_formatDateFrom">
-        <div class="location">at         line 457</div>
-        <code>                    string
-    <strong>formatDateFrom</strong>(<a href="../Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a> $formatter, string $value)
-        </code>
-    </h3>
-    <div class="details">
-            
-    
-
-                    <div class="method-description">
-                                    <p>Converte una data da una formattazione all'altra.</p>                                                </div>
-                <div class="tags">
-                            <h4>Parameters</h4>
-
-                    <table class="table table-condensed">
-                    <tr>
-                <td><a href="../Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a></td>
-                <td>$formatter</td>
-                <td></td>
-            </tr>
-                    <tr>
-                <td>string</td>
-                <td>$value</td>
-                <td></td>
-            </tr>
-            </table>
-
-            
-                            <h4>Return Value</h4>
-
-                    <table class="table table-condensed">
-        <tr>
-            <td>string</td>
-            <td></td>
-        </tr>
-    </table>
-
-            
-            
-                    </div>
-    </div>
-
-            </div>
-                    <div class="method-item">
-                    <h3 id="method_formatTimeFrom">
-        <div class="location">at         line 470</div>
-        <code>                    string
-    <strong>formatTimeFrom</strong>(<a href="../Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a> $formatter, string $value)
-        </code>
-    </h3>
-    <div class="details">
-            
-    
-
-                    <div class="method-description">
-                                    <p>Converte un orario da una formattazione all'altra.</p>                                                </div>
-                <div class="tags">
-                            <h4>Parameters</h4>
-
-                    <table class="table table-condensed">
-                    <tr>
-                <td><a href="../Intl/Formatter.html"><abbr title="Intl\Formatter">Formatter</abbr></a></td>
-                <td>$formatter</td>
-                <td></td>
-            </tr>
-                    <tr>
-                <td>string</td>
-                <td>$value</td>
+                <td>$pattern</td>
                 <td></td>
             </tr>
             </table>
