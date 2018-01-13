@@ -86,6 +86,8 @@
         
     
 
+            <div class="description">
+            <p>Gestione dell'input di tipo "timestamp", "date" e "time".</p>                                </div>
     
     
     
@@ -95,46 +97,42 @@
             <div class="container-fluid underlined">
                     <div class="row">
                 <div class="col-md-2 type">
-                    
+                    string
                 </div>
                 <div class="col-md-8 type">
-                    <a href="#method_handle">handle</a>($values, $extras)
+                    <a href="#method_handle">handle</a>(array $values, array $extras)
         
-                                            <p class="no-description">No description</p>
-                                    </div>
+                                            <p>Gestore pubblico, liberamente implementabile per la creazione del codice HTML.</p>                </div>
                 <div class="col-md-2"></div>
             </div>
                     <div class="row">
                 <div class="col-md-2 type">
-                    
+                    string
                 </div>
                 <div class="col-md-8 type">
-                    <a href="#method_timestamp">timestamp</a>($values, $extras)
+                    <a href="#method_timestamp">timestamp</a>(array $values, array $extras)
         
-                                            <p class="no-description">No description</p>
-                                    </div>
+                                            <p>Gestione dell'input di tipo "timestamp".</p>                </div>
                 <div class="col-md-2"></div>
             </div>
                     <div class="row">
                 <div class="col-md-2 type">
-                    
+                    string
                 </div>
                 <div class="col-md-8 type">
-                    <a href="#method_date">date</a>($values, $extras)
+                    <a href="#method_date">date</a>(array $values, array $extras)
         
-                                            <p class="no-description">No description</p>
-                                    </div>
+                                            <p>Gestione dell'input di tipo "date".</p>                </div>
                 <div class="col-md-2"></div>
             </div>
                     <div class="row">
                 <div class="col-md-2 type">
-                    
+                    string
                 </div>
                 <div class="col-md-8 type">
-                    <a href="#method_time">time</a>($values, $extras)
+                    <a href="#method_time">time</a>(array $values, array $extras)
         
-                                            <p class="no-description">No description</p>
-                                    </div>
+                                            <p>Gestione dell'input di tipo "time".</p>                </div>
                 <div class="col-md-2"></div>
             </div>
             </div>
@@ -145,32 +143,43 @@
             <div id="method-details">
                     <div class="method-item">
                     <h3 id="method_handle">
-        <div class="location">at         line 10</div>
-        <code>                    
-    <strong>handle</strong>($values, $extras)
+        <div class="location">at         line 12</div>
+        <code>                    string
+    <strong>handle</strong>(array $values, array $extras)
         </code>
     </h3>
     <div class="details">
             
     
 
+                    <div class="method-description">
+                                    <p>Gestore pubblico, liberamente implementabile per la creazione del codice HTML.</p>                                                </div>
                 <div class="tags">
                             <h4>Parameters</h4>
 
                     <table class="table table-condensed">
                     <tr>
-                <td></td>
+                <td>array</td>
                 <td>$values</td>
                 <td></td>
             </tr>
                     <tr>
-                <td></td>
+                <td>array</td>
                 <td>$extras</td>
                 <td></td>
             </tr>
             </table>
 
             
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
             
             
                     </div>
@@ -179,32 +188,43 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_timestamp">
-        <div class="location">at         line 53</div>
-        <code>            protected        
-    <strong>timestamp</strong>($values, $extras)
+        <div class="location">at         line 74</div>
+        <code>            protected        string
+    <strong>timestamp</strong>(array $values, array $extras)
         </code>
     </h3>
     <div class="details">
             
     
 
+                    <div class="method-description">
+                                    <p>Gestione dell'input di tipo "timestamp".</p>                    <p>Esempio: {[ "type": "timestamp", "label": "Timestamp di test", "name": "timestamp", "value": "2018-01-01 12:00:30" ]}.</p>                            </div>
                 <div class="tags">
                             <h4>Parameters</h4>
 
                     <table class="table table-condensed">
                     <tr>
-                <td></td>
+                <td>array</td>
                 <td>$values</td>
                 <td></td>
             </tr>
                     <tr>
-                <td></td>
+                <td>array</td>
                 <td>$extras</td>
                 <td></td>
             </tr>
             </table>
 
             
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
             
             
                     </div>
@@ -213,32 +233,43 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_date">
-        <div class="location">at         line 60</div>
-        <code>            protected        
-    <strong>date</strong>($values, $extras)
+        <div class="location">at         line 90</div>
+        <code>            protected        string
+    <strong>date</strong>(array $values, array $extras)
         </code>
     </h3>
     <div class="details">
             
     
 
+                    <div class="method-description">
+                                    <p>Gestione dell'input di tipo "date".</p>                    <p>Esempio: {[ "type": "date", "label": "Data di test", "name": "date", "value": "2018-01-01" ]}.</p>                            </div>
                 <div class="tags">
                             <h4>Parameters</h4>
 
                     <table class="table table-condensed">
                     <tr>
-                <td></td>
+                <td>array</td>
                 <td>$values</td>
                 <td></td>
             </tr>
                     <tr>
-                <td></td>
+                <td>array</td>
                 <td>$extras</td>
                 <td></td>
             </tr>
             </table>
 
             
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
             
             
                     </div>
@@ -247,32 +278,43 @@
             </div>
                     <div class="method-item">
                     <h3 id="method_time">
-        <div class="location">at         line 67</div>
-        <code>            protected        
-    <strong>time</strong>($values, $extras)
+        <div class="location">at         line 106</div>
+        <code>            protected        string
+    <strong>time</strong>(array $values, array $extras)
         </code>
     </h3>
     <div class="details">
             
     
 
+                    <div class="method-description">
+                                    <p>Gestione dell'input di tipo "time".</p>                    <p>Esempio: {[ "type": "time", "label": "Orario di test", "name": "time", "value": "12:00:30" ]}.</p>                            </div>
                 <div class="tags">
                             <h4>Parameters</h4>
 
                     <table class="table table-condensed">
                     <tr>
-                <td></td>
+                <td>array</td>
                 <td>$values</td>
                 <td></td>
             </tr>
                     <tr>
-                <td></td>
+                <td>array</td>
                 <td>$extras</td>
                 <td></td>
             </tr>
             </table>
 
             
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
             
             
                     </div>

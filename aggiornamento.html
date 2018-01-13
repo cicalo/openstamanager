@@ -56,12 +56,12 @@
                                             Installazione
                                         </a>
                                     </li>
-                                                                    <li class="">
+                                                                    <li class="active">
                                         <a href="./aggiornamento.html">
                                             Aggiornamento
                                         </a>
                                     </li>
-                                                                    <li class="active">
+                                                                    <li class="">
                                         <a href="./api.html">
                                             API
                                         </a>
@@ -135,114 +135,62 @@
 
                 
                 <section class="col-sm-9 col-lg-10 content">
-                    <h1 id="api">API</h1>
-<blockquote>
-<p>Con application programming interface (in acronimo API, in italiano interfaccia di programmazione di un'applicazione), in informatica, si indica ogni insieme di procedure disponibili al programmatore, di solito raggruppate a formare un set di strumenti specifici per l'espletamento di un determinato compito all'interno di un certo programma.</p>
-<p>-- <cite><a href="https://it.wikipedia.org/wiki/Application_programming_interface">Wikipedia</a></cite></p>
-</blockquote>
-<p>L'API del progetto è attualmente ancora in sviluppo, e pertanto le funzioni disponibili potrebbero essere piuttosto ridotte.
-Di seguito sono elencate le basi per connettersi al sistema e ottenere i dati a cui si è interessati.</p>
-<!-- TOC depthFrom:2 depthTo:6 orderedList:false updateOnSave:true withLinks:true -->
+                    <h1 id="aggiornamento">Aggiornamento</h1>
+<p><strong>Attenzione</strong>: Questa documentazione è esclusivamente relativa all'aggiornamento del software. Per maggiori informazioni sull'installazione consultare la documentazione relativa nella sezione <a href="installazione.html">Installazione</a>.</p>
+<p>Esistono due procedure ufficiale per effettuare l'aggiornamento di OpenSTAManager in modo corretto: una semplificata (<em>consigliata</em>) e una manuale.</p>
+<p>In ogni caso, il corretto procedimento prevede di <a href="https://github.com/devcode-it/openstamanager/releases">scaricare una release ufficiale del progetto</a> ed <strong>effettuare un backup della versione corrente</strong> (comprensivo di file e database).</p>
 <ul>
-<li><a href="#standard-di-comunicazione">Standard di comunicazione</a>
+<li><a href="#aggiornamento-semplificato">Aggiornamento semplificato</a></li>
+<li><a href="#aggiornamento-manuale">Aggiornamento manuale</a></li>
+<li><a href="#migrazione-dalla-versione-1x">Migrazione dalla versione 1.x</a></li>
+<li><a href="#reimpostare-la-password-di-admin">Reimpostare la password di admin</a></li>
+</ul>
+<h2 id="aggiornamento-semplificato">Aggiornamento semplificato</h2>
+<p>La procedura di aggiornamento semplificato ha l'obiettivo di fornire un sistema di facile utilizzo per favorire l'aggiornamento, e migliorare in questo modo l'interazione con l'utente finale.</p>
+<p>L'utilizzo di questa procedura è però sottoposto alla seguenti condizioni nelle impostazioni PHP:</p>
 <ul>
-<li><a href="#ottenere-la-chiave">Ottenere la chiave</a></li>
-<li><a href="#formato-dei-componenti">Formato dei componenti</a></li>
+<li>upload_max_filesize &gt;= 16MB</li>
+<li>post_max_size &gt;= 16MB</li>
+</ul>
+<p>Di seguito la procedura:</p>
+<ol>
+<li>Accedere con un account amministrativo</li>
+<li>Entrare nel modulo <strong>Aggiornamenti</strong> (disponibile nel menu principale a sinistra, eventualmente sotto la dicitura <strong>Strumenti</strong>)</li>
+<li>Selezionare il file <em>.zip</em> della release attraverso l'apposita sezione &quot;Carica un aggiornamento&quot; e cliccare sul pulsante &quot;Carica&quot;</li>
+</ol>
+<p>Dopo l'esecuzione di queste azioni, il gestionale effettuerà automaticamente il logout di tutti gli utenti connessi e renderà disponibile l'interfaccia di aggiornamento.</p>
+<h2 id="aggiornamento-manuale">Aggiornamento manuale</h2>
+<p>La procedura di aggiornamento manuale è resa disponibile per ovviare ai problemi relativi al caricamento del file <em>.zip</em> (in alcuni casi il file non viene correttamente rilevato, non sono disponibili i permessi per caricare file oppure la dimensione del file eccede il limite di upload sul server).</p>
+<p>Di seguito la procedura:</p>
+<ol>
+<li>De-comprimere il contenuto del file <em>.zip</em> in una cartella temporanea</li>
+<li>Rinominare il file VERSION dell'installazione corrente in VERSION.old (rispettando minuscole e maiuscole) [facoltativo a partire dalla versione 2.3]</li>
+<li>Copiare i file della nuova versione dalla cartella temporanea alla cartella del server, in modo che le cartelle principali (<code>files</code>, <code>modules</code>, <code>templates</code>, ...) vengano sovrascritte</li>
+</ol>
+<p>Dopo l'esecuzione di queste azioni, il gestionale effettuerà automaticamente il logout di tutti gli utenti connessi e renderà disponibile l'interfaccia di aggiornamento.</p>
+<h2 id="migrazione-dalla-versione-1x">Migrazione dalla versione 1.x</h2>
+<p>E' possibile effettuare la migrazione da una qualsiasi versione 1.x alla nuova 2.0,  seguendo una procedura un po’ diversa dalle precedenti:</p>
+<ol>
+<li>Scaricare la versione 2.0 per la migrazione da SourceForge (<a href="https://sourceforge.net/projects/openstamanager/files/openstamanager/openstamanager-2.x/">openstamanager-2.0-migrazione.zip</a>)</li>
+<li>Creare un backup completo della versione in uso</li>
+<li>De-comprimere il contenuto del file <em>.zip</em> in una cartella temporanea</li>
+<li>Effettuare le seguenti operazioni dal backup della precedente versione alla cartella della versione 2.0:
+<ul>
+<li>Copiare il file <code>VERSION</code>, rinominandolo in <code>VERSION.old</code></li>
+<li>Copiare il file <code>config.inc.php</code></li>
+<li>Copiare la cartella <code>files/</code></li>
+<li>Copiare i contenuti della cartella <code>/modules/magazzino/articoli/images/</code> in <code>/files/articoli/</code></li>
+<li>Copiare la cartella <code>templates/</code> (mantenendo però i file <code>pdfgen.php</code> e <code>pdfgen_variables.php</code> di della versione 2.0)</li>
 </ul></li>
-<li><a href="#output">Output</a>
-<ul>
-<li><a href="#stati">Stati</a></li>
-<li><a href="#lettura">Lettura</a></li>
-</ul></li>
-<li><a href="#personalizzazione">Personalizzazione</a></li>
-<li><a href="#richieste-di-lettura">Richieste di lettura</a>
-<ul>
-<li><a href="#interventi">Interventi</a></li>
-<li><a href="#anagrafiche">Anagrafiche</a></li>
-<li><a href="#richieste-disabilitate">Richieste disabilitate</a>
-<ul>
-<li><a href="#modifiche">Modifiche</a></li>
-<li><a href="#eliminazioni">Eliminazioni</a></li>
-</ul></li>
-</ul></li>
-</ul>
-<!-- /TOC -->
-<h2 id="standard-di-comunicazione">Standard di comunicazione</h2>
-<p>Il funzionamento dell'API si basa fondamentalmente sull'utilizzo di una chiave di accesso, ospitata all'interno della tabella <code>zz_tokens</code> del database del progetto, univoca per ogni istanza dell'utente.</p>
-<p>Ogni richiesta all'API deve contenere la chiave di accesso (campo <code>token</code>) e l'operazione richiesta (campo <code>resource</code>), inserendo questi elementi tra gli ulteriori contenuti che si intendono inviare.
-I contenuti della richiesta devono quindi essere convertiti in formato JSON ed inviati all'API secondo uno specifico schema:</p>
-<ul>
-<li><code>POST</code> - Richieste di creazione (<strong>Create</strong>).</li>
-<li><code>GET</code> - Richieste di informazioni (<strong>Retrieve</strong>).</li>
-<li><code>PUT</code> - Richieste di modifica (<strong>Update</strong>).</li>
-<li><code>DELETE</code> - Richieste di eliminazione (<strong>Delete</strong>).</li>
-</ul>
-<h3 id="ottenere-la-chiave">Ottenere la chiave</h3>
-<p>La chiave di accesso può essere ottenuta sfruttando l'operazione di accesso nativa dell'API, che prevede l'invio di una richiesta <strong>POST</strong> corrispondente alla seguente struttura:</p>
-<ul>
-<li><code>resource</code> - login.</li>
-<li><code>username</code> - &lt;username dell'account&gt;.</li>
-<li><code>password</code> - &lt;password dell'account&gt;.</li>
-</ul>
-<h3 id="formato-dei-componenti">Formato dei componenti</h3>
-<p>I seguenti componenti delle richieste devono seguire una rigida struttura:</p>
-<ul>
-<li><code>page</code> - intero.</li>
-<li><code>upd</code> - yyyy-MM-dd hh:mm:ss.</li>
-</ul>
-<h2 id="output">Output</h2>
-<p>L'API del progetto permette di ottenere le informazioni attraverso un array in formato JSON.</p>
-<h3 id="stati">Stati</h3>
-<p>Ogni richiesta effettuata all'API viene accompagnata da un messaggio predefinito che permette di interpretare in modo più preciso la risposta.
-In particolare, sono presenti i seguenti <em>status</em>:</p>
-<ul>
-<li><code>200: OK</code> - La richiesta è andata a buon fine.</li>
-<li><code>400: Errore interno dell'API</code> - La richiesta effettuata risulta invalida per l'API.</li>
-<li><code>401: Non autorizzato</code> - Accesso non autorizzato.</li>
-<li><code>404: Non trovato</code> - La risorsa richiesta non risulta disponibile.</li>
-<li><code>500: Errore del server</code> - Il gestionale non è in grado di completare la richiesta.</li>
-<li><code>503: Servizio non disponibile</code> - L'API del gestionale non è abilitata.</li>
-</ul>
-<h3 id="lettura">Lettura</h3>
-<p>Le richieste di lettura sono solitamente completate con l'invio di un numero predefinito di informazioni.
-Per poter interpretare correttamente i dati, si devono ignorare gli indici numerici di primo livello (non rilevanti all'interno del formato) e sfruttare in particolare i seguenti campi generici:</p>
-<ul>
-<li><code>records</code>, rappresentante il numero totale dei record richiesti;</li>
-<li><code>pages</code>, indicante il numero totale della pagine disponibili.</li>
-</ul>
-<p>Si ricorda che l'API prevede la restituzione di un insieme di dati limitato rispetto alla richiesta effettuatua: per ottenere l'intero insieme di informazioni è necessario eseguire molteplici richieste consecutive basate sul campo <code>page</code>.</p>
-<h2 id="personalizzazione">Personalizzazione</h2>
-<p>L'API sfrutta una struttura modulare per poter funzionare in modo completo e garantire al tempo stesso il possibile ampliamento delle sue funzioni.
-In particolare, ogni modulo può specificare una determinata serie di operazioni che lo riguardano e che possono essere richiamate in vari modi.</p>
-<p>Di seguito lo schema attraverso cui l'API individua la presenza delle possibili richieste supportate dai moduli (cartelle <strong>api/</strong> e <strong>custom/api/</strong>):</p>
-<ul>
-<li><code>POST</code> - File <code>create.php</code>.</li>
-<li><code>GET</code> - File <code>retrieve.php</code>.</li>
-<li><code>PUT</code> - File <code>update.php</code>.</li>
-<li><code>DELETE</code> - File <code>delete.php</code>.</li>
-</ul>
-<h2 id="richieste-di-lettura">Richieste di lettura</h2>
-<h3 id="interventi">Interventi</h3>
-<p>Tutto il contenuto della tabella in_interventi:</p>
-<pre><code>http://&lt;url_osm&gt;/api/?token=&lt;token&gt;&amp;resource=in_interventi</code></pre>
-<p>Singolo intervento (riga della tabella):</p>
-<pre><code>http://&lt;url_osm&gt;/api/?token=&lt;token&gt;&amp;resource=in_interventi&amp;filter[id]=[1]</code></pre>
-<h3 id="anagrafiche">Anagrafiche</h3>
-<p>Tutto il contenuto della tabella an_anagrafiche:</p>
-<pre><code>http://&lt;url_osm&gt;/api/?token=&lt;token&gt;&amp;resource=an_anagrafiche</code></pre>
-<p>Singolo intervento (riga della tabella):</p>
-<pre><code>http://&lt;url_osm&gt;/api/?token=&lt;token&gt;&amp;resource=an_anagrafiche&amp;filter[idanagrafica]=[1]</code></pre>
-<p>Ricerca per ragione sociale:</p>
-<pre><code>http://&lt;url_osm&gt;/api/?token=&lt;token&gt;&amp;resource=an_anagrafiche&amp;filter[ragione_sociale]=[%&lt;stringa_ragione_sociale&gt;%]</code></pre>
-<h3 id="richieste-disabilitate">Richieste disabilitate</h3>
-<h4 id="modifiche">Modifiche</h4>
-<p>Tutti i contenuti di tutte le tabelle:</p>
-<pre><code>http://&lt;url_osm&gt;/api/?token=&lt;token&gt;&amp;resource=updates</code></pre>
-<p>Tutti i contenuti di tutte le tabelle, aggiornati a partire da una data precisa:</p>
-<pre><code>http://&lt;url_osm&gt;/api/?token=&lt;token&gt;&amp;resource=updates&amp;upd=2016-01-31%2010:44:31</code></pre>
-<h4 id="eliminazioni">Eliminazioni</h4>
-<p>Tutte le eliminazioni di tutte le tabelle:</p>
-<pre><code>http://&lt;url_osm&gt;/api/?token=&lt;token&gt;&amp;resource=deleted</code></pre>
+</ol>
+<p>Dopo l'esecuzione di queste azioni, il gestionale renderà disponibile l'interfaccia di aggiornamento.</p>
+<p><strong>Attenzione</strong>: le stampe di <em>Interventi</em>, <em>Riepilogo interventi</em>, <em>Contratti</em> e <em>Preventivi</em> potrebbero non essere compatibili per via dell’aggiornamento degli orari di lavoro, perciò è possibile riscrivere solo la parte di calcolo ore o partire dal template nuovo e apportare le dovute modifiche.</p>
+<h2 id="reimpostare-la-password-di-admin">Reimpostare la password di admin</h2>
+<p>Non esiste una procedura semplificata per permettere la reimpostazione o il recupero della password dell'account di amministrazione di default (<em>admin</em>).</p>
+<p>Può però essere necessario procedere alla sua reimpostazione, sia perché l'account <em>admin</em> viene utilizzato da più persone o perché è stata dimenticata.
+In questi casi, per procedere è necessario accedere al database ed eseguire la seguente query:</p>
+<pre><code class="language-sql">UPDATE `zz_utenti` SET password = MD5('nuova_password') WHERE username = 'admin';</code></pre>
+<p>Si ricorda che è comunque possibile cambiare la password in ogni momento, se è stato effettuato l'accesso, attraverso l'utilizzo del modulo <strong>Utenti e permessi</strong>.</p>
                 </section>
 
             </div>
