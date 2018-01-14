@@ -83,6 +83,11 @@
                                         </a>
                                     </li>
                                                                     <li class="">
+                                        <a href="./upload.html">
+                                            Gestione degli upload
+                                        </a>
+                                    </li>
+                                                                    <li class="">
                                         <a href="./widget.html">
                                             Plugin
                                         </a>
@@ -139,18 +144,24 @@
 <p><strong>Attenzione</strong>: Questa documentazione è esclusivamente relativa all'aggiornamento del software. Per maggiori informazioni sull'installazione consultare la documentazione relativa nella sezione <a href="installazione.html">Installazione</a>.</p>
 <p>Esistono due procedure ufficiale per effettuare l'aggiornamento di OpenSTAManager in modo corretto: una semplificata (<em>consigliata</em>) e una manuale.</p>
 <p>In ogni caso, il corretto procedimento prevede di <a href="https://github.com/devcode-it/openstamanager/releases">scaricare una release ufficiale del progetto</a> ed <strong>effettuare un backup della versione corrente</strong> (comprensivo di file e database).</p>
+<!-- TOC depthFrom:2 depthTo:6 orderedList:false updateOnSave:true withLinks:true -->
 <ul>
 <li><a href="#aggiornamento-semplificato">Aggiornamento semplificato</a></li>
 <li><a href="#aggiornamento-manuale">Aggiornamento manuale</a></li>
 <li><a href="#migrazione-dalla-versione-1x">Migrazione dalla versione 1.x</a></li>
-<li><a href="#reimpostare-la-password-di-admin">Reimpostare la password di admin</a></li>
+<li><a href="#recupero-della-password">Recupero della password</a>
+<ul>
+<li><a href="#account-comune">Account comune</a></li>
+<li><a href="#account-amministrativo">Account amministrativo</a></li>
+</ul></li>
 </ul>
+<!-- /TOC -->
 <h2 id="aggiornamento-semplificato">Aggiornamento semplificato</h2>
 <p>La procedura di aggiornamento semplificato ha l'obiettivo di fornire un sistema di facile utilizzo per favorire l'aggiornamento, e migliorare in questo modo l'interazione con l'utente finale.</p>
 <p>L'utilizzo di questa procedura è però sottoposto alla seguenti condizioni nelle impostazioni PHP:</p>
 <ul>
-<li>upload_max_filesize &gt;= 16MB</li>
-<li>post_max_size &gt;= 16MB</li>
+<li><code>upload_max_filesize</code> &gt;= 16MB</li>
+<li><code>post_max_size</code> &gt;= 16MB</li>
 </ul>
 <p>Di seguito la procedura:</p>
 <ol>
@@ -164,7 +175,7 @@
 <p>Di seguito la procedura:</p>
 <ol>
 <li>De-comprimere il contenuto del file <em>.zip</em> in una cartella temporanea</li>
-<li>Rinominare il file VERSION dell'installazione corrente in VERSION.old (rispettando minuscole e maiuscole) [facoltativo a partire dalla versione 2.3]</li>
+<li>Rinominare il file <code>VERSION</code> dell'installazione corrente in <code>VERSION.old</code> (rispettando minuscole e maiuscole) [facoltativo a partire dalla versione 2.3]</li>
 <li>Copiare i file della nuova versione dalla cartella temporanea alla cartella del server, in modo che le cartelle principali (<code>files</code>, <code>modules</code>, <code>templates</code>, ...) vengano sovrascritte</li>
 </ol>
 <p>Dopo l'esecuzione di queste azioni, il gestionale effettuerà automaticamente il logout di tutti gli utenti connessi e renderà disponibile l'interfaccia di aggiornamento.</p>
@@ -185,12 +196,21 @@
 </ol>
 <p>Dopo l'esecuzione di queste azioni, il gestionale renderà disponibile l'interfaccia di aggiornamento.</p>
 <p><strong>Attenzione</strong>: le stampe di <em>Interventi</em>, <em>Riepilogo interventi</em>, <em>Contratti</em> e <em>Preventivi</em> potrebbero non essere compatibili per via dell’aggiornamento degli orari di lavoro, perciò è possibile riscrivere solo la parte di calcolo ore o partire dal template nuovo e apportare le dovute modifiche.</p>
-<h2 id="reimpostare-la-password-di-admin">Reimpostare la password di admin</h2>
-<p>Non esiste una procedura semplificata per permettere la reimpostazione o il recupero della password dell'account di amministrazione di default (<em>admin</em>).</p>
-<p>Può però essere necessario procedere alla sua reimpostazione, sia perché l'account <em>admin</em> viene utilizzato da più persone o perché è stata dimenticata.
-In questi casi, per procedere è necessario accedere al database ed eseguire la seguente query:</p>
-<pre><code class="language-sql">UPDATE `zz_utenti` SET password = MD5('nuova_password') WHERE username = 'admin';</code></pre>
-<p>Si ricorda che è comunque possibile cambiare la password in ogni momento, se è stato effettuato l'accesso, attraverso l'utilizzo del modulo <strong>Utenti e permessi</strong>.</p>
+<h2 id="recupero-della-password">Recupero della password</h2>
+<p>Non esiste una procedura semplificata per permettere il recupero della password degli account di amministrazione (di default, <em>admin</em>) o di quelli comuni.
+Si ricorda che è comunque possibile <strong>cambiare</strong> la password in ogni momento, se è stato effettuato l'accesso, attraverso l'utilizzo del modulo <strong>Utenti e permessi</strong> (<strong>Gestione permessi</strong> per versioni precedenti alla 2.3) disponibile sotto la dicitura <strong>Strumenti</strong>.</p>
+<p>Può però essere necessario <strong>reimpostare</strong> la password, in particolare se è stata dimenticata, per ripristinare l'accesso ad OpenSTAManager.</p>
+<h3 id="account-comune">Account comune</h3>
+<p>Per procedere alla reimpostazione della password di un account comune (non amministrativo) è necessario accedere con un account amministrativo e utilizzare il modulo <strong>Utenti e permessi</strong> (<strong>Gestione permessi</strong> per versioni precedenti alla 2.3), disponibile sotto la dicitura <strong>Strumenti</strong>.
+In particolare, una volta entrati nella corretta categoria di accesso (<em>Agenti</em>, <em>Amministratori</em>, <em>Clienti</em>, ...) dell'account da modificare, è possibile utilizzare la procedura semplificata di cambio password attraverso l'<em>icona del lucchetto aperto</em>.</p>
+<p>Nel caso non sia possibile accedere con un account amministrativo, contattare l'amministratore.</p>
+<h3 id="account-amministrativo">Account amministrativo</h3>
+<p>Per reimpostare la password di un account amministrativo è possibile procedere in due modi:</p>
+<ul>
+<li>Se esiste un altro account amministrativo, seguire la procedura precedente per gli account comuni;</li>
+<li>Accedere al database ed eseguire la seguente query:
+<pre><code class="language-sql">UPDATE `zz_utenti` SET password = MD5('nuova_password') WHERE username = 'admin';</code></pre></li>
+</ul>
                 </section>
 
             </div>

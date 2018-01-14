@@ -83,6 +83,11 @@
                                         </a>
                                     </li>
                                                                     <li class="">
+                                        <a href="./upload.html">
+                                            Gestione degli upload
+                                        </a>
+                                    </li>
+                                                                    <li class="">
                                         <a href="./widget.html">
                                             Plugin
                                         </a>
@@ -144,6 +149,7 @@
 Di seguito sono elencate le basi per connettersi al sistema e ottenere i dati a cui si è interessati.</p>
 <!-- TOC depthFrom:2 depthTo:6 orderedList:false updateOnSave:true withLinks:true -->
 <ul>
+<li><a href="#requisiti-aggiuntivi">Requisiti aggiuntivi</a></li>
 <li><a href="#standard-di-comunicazione">Standard di comunicazione</a>
 <ul>
 <li><a href="#ottenere-la-chiave">Ottenere la chiave</a></li>
@@ -167,6 +173,14 @@ Di seguito sono elencate le basi per connettersi al sistema e ottenere i dati a 
 </ul></li>
 </ul>
 <!-- /TOC -->
+<h2 id="requisiti-aggiuntivi">Requisiti aggiuntivi</h2>
+<p>Per rendere la gestione dell'API maggiormente mantenibile e unificata, il suo funzionamento è stato sottoposto al seguente requisito aggiuntivo:</p>
+<ul>
+<li>MySQL &gt;= 5.6.5</li>
+</ul>
+<p>Se queste requisito non viene soddisfatto, l'installazione del gestionale procederà correttamente, ma i tentativi di connessione con l'API saranno rifiutati con il codice di errore <code>503</code> e lo stato <code>Servizio non disponibile</code>.</p>
+<p>Nel caso, a seguito dell'installazione di OpenSTAManager, venisse aggiornato il servizio MySQL per permettere il funzionamento dell'API, sarà necessaro causare l'esecuzione della procedura di aggiornamento del gestionale, che organizzarà correttamente il database per la compatibilità con l'API.</p>
+<p><strong>Attenzione</strong>: il solo aggiornamento del servizio MySQL senza il successivo aggiornamento del gestionale potrebbe causare malfunzionamenti di vario genere nell'utilizzo dell'API.</p>
 <h2 id="standard-di-comunicazione">Standard di comunicazione</h2>
 <p>Il funzionamento dell'API si basa fondamentalmente sull'utilizzo di una chiave di accesso, ospitata all'interno della tabella <code>zz_tokens</code> del database del progetto, univoca per ogni istanza dell'utente.</p>
 <p>Ogni richiesta all'API deve contenere la chiave di accesso (campo <code>token</code>) e l'operazione richiesta (campo <code>resource</code>), inserendo questi elementi tra gli ulteriori contenuti che si intendono inviare.

@@ -83,6 +83,11 @@
                                         </a>
                                     </li>
                                                                     <li class="">
+                                        <a href="./upload.html">
+                                            Gestione degli upload
+                                        </a>
+                                    </li>
+                                                                    <li class="">
                                         <a href="./widget.html">
                                             Plugin
                                         </a>
@@ -157,15 +162,15 @@ Ogni modulo è composto da diverse sezioni, generalmente suddivise in:</p>
 <li><a href="#actionsphp">actions.php</a></li>
 <li><a href="#addphp-e-editphp">add.php e edit.php</a></li>
 <li><a href="#initphp">init.php</a></li>
-<li><a href="#controller_afterphp-e-controller_beforephp">controller_after.php e controller_before.php</a></li>
+<li><a href="#controllerafterphp-e-controllerbeforephp">controller_after.php e controller_before.php</a></li>
 <li><a href="#modutilphp">modutil.php</a></li>
 </ul></li>
 <li><a href="#database">Database</a>
 <ul>
-<li><a href="#zz_modules">zz_modules</a></li>
-<li><a href="#zz_permissions-e-zz_group_module">zz_permissions e zz_group_module</a></li>
-<li><a href="#zz_views-e-zz_group_view">zz_views e zz_group_view</a></li>
-<li><a href="#zz_plugins-e-zz_widgets">zz_plugins e zz_widgets</a></li>
+<li><a href="#zzmodules">zz_modules</a></li>
+<li><a href="#zzpermissions-e-zzgroupmodule">zz_permissions e zz_group_module</a></li>
+<li><a href="#zzviews-e-zzgroupview">zz_views e zz_group_view</a></li>
+<li><a href="#zzplugins-e-zzwidgets">zz_plugins e zz_widgets</a></li>
 </ul></li>
 <li><a href="#consigli-per-lo-sviluppo">Consigli per lo sviluppo</a>
 <ul>
@@ -178,7 +183,7 @@ Ogni modulo è composto da diverse sezioni, generalmente suddivise in:</p>
 <li><a href="#archivio-zip">Archivio ZIP</a>
 <ul>
 <li><a href="#updateversionesql">update/VERSIONE.sql</a></li>
-<li><a href="#updateunistallphp-include">update/unistall.php (INCLUDE)</a></li>
+<li><a href="#updateunistallphp">update/unistall.php</a></li>
 <li><a href="#module">MODULE</a></li>
 </ul></li>
 </ul></li>
@@ -292,7 +297,7 @@ Sono permessi i seguenti valori:</p>
 └── MODULE</code></pre>
 <h4 id="updateversionesql">update/VERSIONE.sql</h4>
 <p>Il file <code>VERSIONE.sql</code> (dove VERSIONE sta per la versione del modulo con <code>_</code>[underscore] al posto di <code>.</code>[punto]) contiene le operazioni di installazione del modulo a livello del database, comprendenti la creazione delle tabelle di base del modulo e l'inserimento di ulteriori dati nelle altre tabelle.</p>
-<h4 id="updateunistallphp-include">update/unistall.php (INCLUDE)</h4>
+<h4 id="updateunistallphp">update/unistall.php</h4>
 <p>Il file <code>unistall.php</code> contiene le operazioni di disinstallazione del modulo a livello del database, comprendenti l'eliminazione delle tabelle non più necessarie e dei dati inutilizzati.</p>
 <pre><code class="language-php">&lt;?php
 

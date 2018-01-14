@@ -83,6 +83,11 @@
                                         </a>
                                     </li>
                                                                     <li class="">
+                                        <a href="./upload.html">
+                                            Gestione degli upload
+                                        </a>
+                                    </li>
+                                                                    <li class="">
                                         <a href="./widget.html">
                                             Plugin
                                         </a>
@@ -144,7 +149,7 @@
 <li><a href="#struttura">Struttura</a>
 <ul>
 <li><a href="#pdfgenphp">pdfgen.php</a></li>
-<li><a href="#pdfgenvariablesphp-include">pdfgen_variables.php (INCLUDE)</a></li>
+<li><a href="#pdfgenvariablesphp">pdfgen_variables.php</a></li>
 <li><a href="#struttura-interna">Struttura interna</a></li>
 </ul></li>
 </ul></li>
@@ -158,7 +163,7 @@ Fino a quel punto, il rendering funziona perfettamente.</p>
 <p>La cartella <em>templates</em> contiene tutti i template per la creazione dei PDF, raggruppati in base al nome del modulo. QUesti vengono utilizzati da <code>pdfgen.php</code> e da <code>pdfgen_variables.php</code> per la generazione vera e propria del PDF tramite il framework <a href="https://github.com/spipu/html2pdf">HTML2PDF</a>.</p>
 <h4 id="pdfgenphp">pdfgen.php</h4>
 <p>Il file <code>pdfgen.php</code> si occupa della formattazione dei contenuti dei template per la visualizzazione vera e propria del PDF, inizializzando l'oggetto relativo ed eseguendone l'output.</p>
-<h4 id="pdfgen_variablesphp-include">pdfgen_variables.php (INCLUDE)</h4>
+<h4 id="pdfgen_variablesphp">pdfgen_variables.php</h4>
 <p>Il file <code>pdfgen_variables.php</code> si occupa della sostituzione delle variabili comuni a tutti i template, e viene richiamata dal file <code>pdfgen.MODULO.php</code> descritto di seguito.</p>
 <h4 id="struttura-interna">Struttura interna</h4>
 <p>La cartella <em>templates</em> contiene tutti i template per la creazione dei PDF relativi al modulo specifico, in una struttura interna simile alla seguente (modulo <strong>Contratti</strong> utilizzato come esempio).</p>
