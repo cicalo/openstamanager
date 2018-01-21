@@ -242,7 +242,7 @@ if (Modules::getPermission($permesso) == 'r' || Modules::getPermission($permesso
         include $docroot.$directory.'/init.php';
     }
 
-    if(Modules::getPermission($permesso) == 'rw'){
+    if (Modules::getPermission($permesso) == 'rw') {
         // Esecuzione delle operazioni di gruppo
         $id_records = post('id_records');
         $id_records = is_array($id_records) ? $id_records : explode(';', $id_records);

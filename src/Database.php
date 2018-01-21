@@ -1,5 +1,6 @@
 <?php
 
+
 /**
  * Classe per gestire la connessione al database.
  *
@@ -7,27 +8,17 @@
  */
 class Database extends Util\Singleton
 {
-    /** @var string Host del database */
-    protected $host;
-    /** @var int Porta di accesso del database */
-    protected $port;
-    /** @var string Username di accesso */
-    protected $username;
-    /** @var string Password di accesso */
-    protected $password;
-    /** @var string Nome del database */
-    protected $database_name;
-
-    /** @var string Charset della comunicazione */
-    protected $charset;
-    /** @var array Opzioni riguardanti la comunicazione (PDO) */
-    protected $option = [];
+    /** @var \Illuminate\Database\Capsule\Manager Classe PDO tracciabile */
+    protected $capsule;
 
     /** @var DebugBar\DataCollector\PDO\TraceablePDO Classe PDO tracciabile */
     protected $pdo;
 
+    /** @var bool Stato di connessione del database */
+    protected $is_connected;
     /** @var bool Stato di installazione del database */
     protected $is_installed;
+
     /** @var string Versione corrente di MySQL */
     protected $mysql_version;
 
@@ -59,55 +50,55 @@ class Database extends Util\Singleton
             $port = !empty($temp[1]) ? $temp[1] : null;
         }
 
-        $this->host = $host;
-        if (!empty($port) && is_int($port * 1)) {
-            $this->port = $port;
+        if (empty($port) || !is_int($port * 1)) {
+            $port = 3306;
         }
 
-        $this->username = $username;
-        $this->password = $password;
-        $this->database_name = $database_name;
+        try {
+            // Istanziamento di Eloquent
+            $this->capsule = new \Illuminate\Database\Capsule\Manager();
+            $this->capsule->addConnection([
+                'driver' => 'mysql',
+                'host' => $host,
+                'database' => $database_name,
+                'username' => $username,
+                'password' => $password,
+                'charset' => 'utf8',
+                'prefix' => '',
+                'port' => 3306,
+            ]);
 
-        $this->charset = $charset;
-        $this->option = $option;
+            $this->connection = $this->capsule->getConnection();
 
-        if (!empty($this->host) && !empty($this->database_name)) {
-            try {
-                $pdo = new PDO(
-                    'mysql:host='.$this->host.(!empty($this->port) ? ';port='.$this->port : '').';dbname='.$this->database_name,
-                    $this->username,
-                    $this->password,
-                    $this->option
-                );
+            $this->is_connected = !empty($this->getPDO());
 
-                if (!empty($debug)) {
-                    $pdo = new \DebugBar\DataCollector\PDO\TraceablePDO($pdo);
-                }
-
-                $this->pdo = $pdo;
-
-                if (empty($this->charset) && version_compare($this->getMySQLVersion(), '5.5.3') >= 0) {
-                    $this->charset = 'utf8mb4';
-                }
-
-                // Fix per problemi di compatibilità delle password MySQL 4.1+ (da versione precedente)
-                $this->pdo->query('SET SESSION old_passwords = 0');
-                //$this->pdo->query('SET PASSWORD = PASSWORD('.$this->prepare($this->password).')');
-
-                // Impostazione del charset della comunicazione
-                if (!empty($this->charset)) {
-                    $this->pdo->query("SET NAMES '".$this->charset."'");
-                }
-
-                // Reset della modalità di esecuzione MySQL per la sessione corrente
-                $this->pdo->query("SET sql_mode = ''");
-            } catch (PDOException $e) {
-                if ($e->getCode() == 1049 || $e->getCode() == 1044) {
-                    $e = new PDOException(($e->getCode() == 1049) ? tr('Database non esistente!') : tr('Credenziali di accesso invalide!'));
-                }
-
-                $this->signal($e, tr('Errore durante la connessione al database'), ['throw' => false, 'session' => false]);
+            // Aggiunta dei log delle query per il debug
+            if (!empty($debug)) {
+                $this->connection->setPdo(new \DebugBar\DataCollector\PDO\TraceablePDO($this->getPDO()));
             }
+
+            // Fix per problemi di compatibilità delle password MySQL 4.1+ (da versione precedente)
+            $this->getPDO()->exec('SET SESSION old_passwords = 0');
+
+            // Impostazione del charset della comunicazione
+            if (empty($charset) && version_compare($this->getMySQLVersion(), '5.5.3') >= 0) {
+                $charset = 'utf8mb4';
+
+                $this->getPDO()->exec("SET NAMES '".$charset."'");
+            }
+
+            // Reset della modalità di esecuzione MySQL per la sessione corrente
+            $this->getPDO()->exec("SET sql_mode = ''");
+
+            //$capsule->setEventDispatcher(new \Illuminate\Events\Dispatcher(new \Illuminate\Container\Container()));
+            //$capsule->setAsGlobal();
+            $this->capsule->bootEloquent();
+        } catch (PDOException $e) {
+            if ($e->getCode() == 1049 || $e->getCode() == 1044) {
+                $e = new PDOException(($e->getCode() == 1049) ? tr('Database non esistente!') : tr('Credenziali di accesso invalide!'));
+            }
+
+            $this->signal($e, tr('Errore durante la connessione al database'), ['throw' => false, 'session' => false]);
         }
     }
 
@@ -148,7 +139,12 @@ class Database extends Util\Singleton
      */
     public function getPDO()
     {
-        return $this->pdo;
+        return $this->connection->getPDO();
+    }
+
+    public function getCapsule()
+    {
+        return $this->capsule;
     }
 
     /**
@@ -160,7 +156,7 @@ class Database extends Util\Singleton
      */
     public function isConnected()
     {
-        return !empty($this->pdo);
+        return $this->is_connected;
     }
 
     /**
@@ -222,7 +218,7 @@ class Database extends Util\Singleton
     public function query($query, $signal = null, $options = [])
     {
         try {
-            $this->pdo->query($query);
+            $this->getPDO()->exec($query);
 
             $id = $this->lastInsertedID();
             if ($id == 0) {
@@ -250,7 +246,7 @@ class Database extends Util\Singleton
         try {
             $mode = empty($numeric) ? PDO::FETCH_ASSOC : PDO::FETCH_NUM;
 
-            $result = $this->pdo->query($query)->fetchAll($mode);
+            $result = $this->getPDO()->query($query)->fetchAll($mode);
 
             return $result;
         } catch (PDOException $e) {
@@ -335,7 +331,7 @@ class Database extends Util\Singleton
     public function lastInsertedID()
     {
         try {
-            return $this->pdo->lastInsertId();
+            return $this->getPDO()->lastInsertId();
         } catch (PDOException $e) {
             $this->signal($e, tr("Impossibile ottenere l'ultimo identificativo creato"));
         }
@@ -353,7 +349,7 @@ class Database extends Util\Singleton
      */
     public function prepare($parameter)
     {
-        return $this->pdo->quote($parameter);
+        return $this->getPDO()->quote($parameter);
     }
 
     /**
@@ -715,7 +711,7 @@ class Database extends Util\Singleton
 
         for ($i = $start; $i < $end; ++$i) {
             try {
-                $this->pdo->query($queries[$i]);
+                $this->connection->query($queries[$i]);
             } catch (PDOException $e) {
                 $this->signal($e, $queries[$i], [
                     'throw' => false,
