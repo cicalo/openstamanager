@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Classe per gestire la connessione al database.
  *
@@ -90,8 +89,7 @@ class Database extends Util\Singleton
             // Reset della modalità di esecuzione MySQL per la sessione corrente
             $this->getPDO()->exec("SET sql_mode = ''");
 
-            //$capsule->setEventDispatcher(new \Illuminate\Events\Dispatcher(new \Illuminate\Container\Container()));
-            //$capsule->setAsGlobal();
+            $this->capsule->setAsGlobal();
             $this->capsule->bootEloquent();
         } catch (PDOException $e) {
             if ($e->getCode() == 1049 || $e->getCode() == 1044) {
@@ -379,41 +377,13 @@ class Database extends Util\Singleton
      *
      * @return string|array
      */
-    public function insert($table, $array, $return = false)
+    public function insert($table, $array)
     {
         if (!is_string($table) || !is_array($array)) {
             throw new UnexpectedValueException();
         }
 
-        if (!is_array($array[0])) {
-            $array = [$array];
-        }
-
-        // Chiavi dei valori
-        $keys = [];
-        $temp = array_keys($array[0]);
-        foreach ($temp as $value) {
-            $keys[] = $this->quote($value);
-        }
-
-        // Valori da inserire
-        $inserts = [];
-        foreach ($array as $values) {
-            foreach ($values as $key => $value) {
-                $values[$key] = $this->prepareValue($key, $value);
-            }
-
-            $inserts[] = '('.implode(array_values($values), ', ').')';
-        }
-
-        // Costruzione della query
-        $query = 'INSERT INTO '.$this->quote($table).' ('.implode(',', $keys).') VALUES '.implode($inserts, ', ');
-
-        if (!empty($return)) {
-            return $query;
-        } else {
-            return $this->query($query);
-        }
+        return $this->getCapsule()->table($table)->insertGetId($array);
     }
 
     /**
@@ -428,11 +398,17 @@ class Database extends Util\Singleton
      *
      * @return string|array
      */
-    public function update($table, $array, $conditions, $return = false)
+    public function update($table, $array, $conditions)
     {
         if (!is_string($table) || !is_array($array) || !is_array($conditions)) {
             throw new UnexpectedValueException();
         }
+
+        /*
+        return $this->getCapsule()->table($table)
+            ->where($conditions)
+            ->update($array);
+            */
 
         // Valori da aggiornare
         $update = [];
