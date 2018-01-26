@@ -10,6 +10,6 @@ class Plugin extends Model
 
     public function module()
     {
-        return $this->belongsTo(Module::class);
+        return $this->belongsTo(Module::class, 'id_module');
     }
 }

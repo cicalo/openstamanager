@@ -8,6 +8,17 @@ class User extends Model
 {
     protected $table = 'zz_users';
 
+    protected $appends = [
+        'is_admin',
+    ];
+
+    public function getIsAdminAttribute()
+    {
+        return $this->group()->nome == 'Amministratori';
+    }
+
+    /* Relazioni Eloquent */
+
     public function group()
     {
         return $this->belongsTo(Group::class, 'idgruppo')->first();

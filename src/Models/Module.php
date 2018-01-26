@@ -8,6 +8,64 @@ class Module extends Model
 {
     protected $table = 'zz_modules';
 
+    protected $appends = [
+        'permission',
+    ];
+
+    /**
+     * Restituisce i permessi relativi all'account in utilizzo.
+     *
+     * @return string
+     */
+    public function getPermissionAttribute()
+    {
+        if (\Auth::admin()) {
+            return 'rw';
+        }
+
+        $user = \App::getUser();
+
+        $modules = $user->modules()->get();
+
+        // Rimozione dei moduli non relativi
+        $modules = $modules->reject(function ($module) {
+            return $module->id != $this->id;
+        });
+
+        return $modules->first()->pivot['permessi'];
+    }
+
+    /**
+     * Restituisce i permessi relativi all'account in utilizzo.
+     *
+     * @return string
+     */
+    public function getViewsAttribute()
+    {
+        $database = \Database::getConnection();
+
+        $views = $database->fetchArray('SELECT * FROM `zz_views` WHERE `id_module`='.prepare($this->id).' AND
+        `id` IN (
+            SELECT `id_vista` FROM `zz_group_view` WHERE `id_gruppo`=(
+                SELECT `idgruppo` FROM `zz_users` WHERE `id`='.prepare($user['id_utente']).'
+            ))
+        ORDER BY `order` ASC');
+
+        return $views;
+    }
+
+    public function getOptionsAttribute($value)
+    {
+        return self::replacePlaceholder($value);
+    }
+
+    public function getOptions2Attribute($value)
+    {
+        return self::replacePlaceholder($value);
+    }
+
+    /* Relazioni Eloquent */
+
     public function plugins()
     {
         return $this->hasMany(Plugin::class, 'id_module');
@@ -16,6 +74,11 @@ class Module extends Model
     public function prints()
     {
         return $this->hasMany(Prints::class, 'id_module');
+    }
+
+    public function views()
+    {
+        return $this->hasMany(View::class, 'id_module');
     }
 
     public function groups()
@@ -50,34 +113,23 @@ class Module extends Model
         return $this->children()->with('allChildren');
     }
 
+    /* Metodi statici */
+
     /**
-     * Restituisce i permessi relativi all'account in utilizzo.
+     * Scope a query to only include active users.
      *
-     * @param string $value
+     * @param \Illuminate\Database\Eloquent\Builder $query
      *
-     * @return string
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function getPermission()
+    public function scopeActive($query)
     {
-        if (Auth::admin()) {
-            return 'rw';
-        }
-
-        $user = User::find(\Auth::user()['id_utente']);
-
-        $modules = $user->modules()->get();
-
-        // Rimozione dei moduli non relativi
-        $modules = $modules->reject(function ($module) {
-            return $module->id != $this->id;
-        });
-
-        return $modules->first()->pivot['permessi'];
+        return $query->where('enabled', true);
     }
 
     public static function all()
     {
-        return  parent::where('enabled', true)->get();
+        return parent::active()->get();
     }
 
     public static function getHierarchy()
@@ -89,9 +141,46 @@ class Module extends Model
     {
         $user = \Auth::user();
 
-        $custom = empty($custom) ? $user['idanagrafica'] : $custom;
-        $result = str_replace(['|idagente|', '|idtecnico|', '|idanagrafica|'], prepare($custom), $query);
+        $id = empty($custom) ? $user['idanagrafica'] : $custom;
 
-        return $result;
+        $query = str_replace(['|idagente|', '|idtecnico|', '|idanagrafica|'], prepare($id), $query);
+
+        $query = str_replace(['|period_start|', '|period_end|'], [$_SESSION['period_start'], $_SESSION['period_end']], $query);
+
+        return $query;
+    }
+
+    /**
+     * Undocumented function.
+     *
+     * @param string|int $modulo
+     * @param int        $id_record
+     * @param string     $testo
+     * @param string     $alternativo
+     * @param string     $extra
+     *
+     * @return string
+     */
+    public static function link($modulo, $id_record = null, $testo = null, $alternativo = true, $extra = null, $blank = true)
+    {
+        $testo = isset($testo) ? nl2br($testo) : tr('Visualizza scheda');
+        $alternativo = is_bool($alternativo) && $alternativo ? $testo : $alternativo;
+
+        // Aggiunta automatica dell'icona di riferimento
+        if (!str_contains($testo, '<i ')) {
+            $testo = $testo.' <i class="fa fa-external-link"></i>';
+        }
+
+        $module = self::get($modulo);
+
+        $extra .= !empty($blank) ? ' target="_blank"' : '';
+
+        if (!empty($module) && in_array($module['permessi'], ['r', 'rw'])) {
+            $link = !empty($id_record) ? 'editor.php?id_module='.$module['id'].'&id_record='.$id_record : 'controller.php?id_module='.$module['id'];
+
+            return '<a href="'.ROOTDIR.'/'.$link.'" '.$extra.'>'.$testo.'</a>';
+        } else {
+            return $alternativo;
+        }
     }
 }

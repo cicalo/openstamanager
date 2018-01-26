@@ -10,6 +10,6 @@ class Log extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'id_utente')->first();
     }
 }
