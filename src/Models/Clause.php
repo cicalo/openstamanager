@@ -17,4 +17,9 @@ class Clause extends Model
     {
         return $this->belongsTo(Module::class);
     }
+
+    public function getClauseAttribute($value)
+    {
+        return Module::replacePlaceholder($value);
+    }
 }

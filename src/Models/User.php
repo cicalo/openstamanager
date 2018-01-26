@@ -10,7 +10,7 @@ class User extends Model
 
     public function group()
     {
-        return $this->belongsTo(Group::class);
+        return $this->belongsTo(Group::class, 'idgruppo')->first();
     }
 
     public function logs()
@@ -20,6 +20,6 @@ class User extends Model
 
     public function modules()
     {
-        return $this->group()->with('modules')->modules;
+        return $this->group()->modules();
     }
 }
