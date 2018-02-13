@@ -10,6 +10,12 @@ class Module extends Model
 
     protected $appends = [
         'permission',
+        'option',
+    ];
+
+    protected $hidden = [
+        'options',
+        'options2',
     ];
 
     /**
@@ -44,10 +50,12 @@ class Module extends Model
     {
         $database = \Database::getConnection();
 
+        $user = \App::getUser();
+
         $views = $database->fetchArray('SELECT * FROM `zz_views` WHERE `id_module`='.prepare($this->id).' AND
         `id` IN (
             SELECT `id_vista` FROM `zz_group_view` WHERE `id_gruppo`=(
-                SELECT `idgruppo` FROM `zz_users` WHERE `id`='.prepare($user['id_utente']).'
+                SELECT `idgruppo` FROM `zz_users` WHERE `id`='.prepare($user->id).'
             ))
         ORDER BY `order` ASC');
 
@@ -61,19 +69,19 @@ class Module extends Model
 
     public function getOptionsAttribute($value)
     {
-        return self::replacePlaceholder($value);
+        return \App::replacePlaceholder($value);
     }
 
     public function getOptions2Attribute($value)
     {
-        return self::replacePlaceholder($value);
+        return \App::replacePlaceholder($value);
     }
 
     /* Relazioni Eloquent */
 
     public function plugins()
     {
-        return $this->hasMany(Plugin::class, 'id_module');
+        return $this->hasMany(Plugin::class, 'id_module')->active();
     }
 
     public function prints()
@@ -98,7 +106,8 @@ class Module extends Model
 
     public function children()
     {
-        return $this->hasMany(self::class, 'parent');
+        return $this->hasMany(self::class, 'parent')
+            ->orderBy('order');
     }
 
     public function parent()
@@ -132,27 +141,20 @@ class Module extends Model
         return $query->where('enabled', true);
     }
 
-    public static function all()
+    public static function get($element)
     {
-        return parent::active()->get();
+        return parent::active()
+            ->where('id', $element)
+            ->orWhere('name', $element)
+            ->first();
     }
 
     public static function getHierarchy()
     {
-        return self::with('allChildren')->get();
-    }
-
-    public static function replacePlaceholder($query, $custom = null)
-    {
-        $user = \Auth::user();
-
-        $id = empty($custom) ? $user['idanagrafica'] : $custom;
-
-        $query = str_replace(['|idagente|', '|idtecnico|', '|idanagrafica|'], prepare($id), $query);
-
-        $query = str_replace(['|period_start|', '|period_end|'], [$_SESSION['period_start'], $_SESSION['period_end']], $query);
-
-        return $query;
+        return self::with('allChildren')
+            ->whereNull('parent')
+            ->orderBy('order')
+            ->get();
     }
 
     /**

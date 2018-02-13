@@ -13,12 +13,11 @@ array_shift($columns);
 
 // Lettura parametri iniziali
 if (!empty($id_plugin)) {
-    $total = Plugins::getQuery($id_plugin);
-
-    $total['query'] = Modules::replacePlaceholder($total['query'], $id_parent);
+    $element = Models\Plugin::get($id_plugin);
 } else {
-    $total = Modules::getQuery($id_module);
+    $element = Models\Module::get($id_module);
 }
+$total = App::readQuery($element);
 
 // Lettura parametri modulo
 $module_query = $total['query'];

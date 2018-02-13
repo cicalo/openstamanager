@@ -10,7 +10,7 @@ class View extends Model
 
     public function getQueryAttribute($value)
     {
-        return Module::replacePlaceholder($value);
+        return \App::replacePlaceholder($value);
     }
 
     /* Relazioni Eloquent */
@@ -37,10 +37,5 @@ class View extends Model
     public function scopeActive($query)
     {
         return $query->where('enabled', true);
-    }
-
-    public static function all()
-    {
-        return parent::active()->get();
     }
 }

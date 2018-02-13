@@ -135,7 +135,7 @@ switch (filter('op')) {
         break;
 
     case 'test':
-        $total = Modules::getQuery($id_record);
+        $total = App::readQuery(Models\Module::get($id_record));
         $module_query = $total['query'];
 
         $module_query = str_replace('|period_start|', $_SESSION['period_start'], $module_query);

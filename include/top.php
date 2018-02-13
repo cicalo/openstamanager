@@ -220,7 +220,7 @@ if (Auth::check()) {
                     <!-- /.search form -->
 
                     <ul class="sidebar-menu">';
-    echo Modules::getMainMenu();
+    echo App::getMainMenu();
     echo '
                     </ul>
                 </section>

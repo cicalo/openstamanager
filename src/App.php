@@ -3,7 +3,7 @@
 /**
  * Classe per la gestione delle utenze.
  *
- * @since 2.3
+ * @since 2.4
  */
 class App
 {
@@ -12,6 +12,10 @@ class App
 
     /** @var int Identificativo del modulo corrente */
     protected static $current_module;
+
+    /** @var int Identificativo del modulo corrente */
+    protected static $current_plugin;
+
     /** @var int Identificativo dell'elemento corrente */
     protected static $current_element;
 
@@ -32,10 +36,24 @@ class App
     public static function getCurrentModule()
     {
         if (empty(self::$current_module)) {
-            self::$current_module = filter('id_module');
+            self::$current_module = Models\Module::find(filter('id_module'));
         }
 
         return self::$current_module;
+    }
+
+    /**
+     * Restituisce l'identificativo del modulo attualmente in utilizzo.
+     *
+     * @return int
+     */
+    public static function getCurrentPlugin()
+    {
+        if (empty(self::$current_plugin)) {
+            self::$current_plugin = Models\Plugin::find(filter('id_plugin'));
+        }
+
+        return self::$current_plugin;
     }
 
     /**
@@ -73,9 +91,9 @@ class App
      */
     public static function getMainMenu($max_depth = 3)
     {
-        $menus = Models\Module::getHierarchy();
+        $menus = Models\Module::getHierarchy()->toArray();
 
-        $module_name = Models\Module::getCurrentModule()['name'];
+        $module_name = self::getCurrentModule()['name'];
 
         $result = '';
         foreach ($menus as $menu) {
@@ -99,14 +117,14 @@ class App
             return '';
         }
 
-        $options = ($element['options2'] != '') ? $element['options2'] : $element['options'];
-        $link = ($options != '' && $options != 'menu') ? ROOTDIR.'/controller.php?id_module='.$element['id'] : 'javascript:;';
+        $options = $element['option'];
+        $link = (!empty($options) && $options != 'menu') ? ROOTDIR.'/controller.php?id_module='.$element['id'] : 'javascript:;';
         $title = $element['title'];
         $target = ($element['new'] == 1) ? '_blank' : '_self';
         $active = ($actual == $element['name']);
-        $show = (Models\Module::getPermission($element['id']) != '-' && !empty($element['enabled'])) ? true : false;
+        $show = ($element['permission'] != '-' && !empty($element['enabled'])) ? true : false;
 
-        $submenus = $element['childrens'];
+        $submenus = $element['all_children'];
         if (!empty($submenus)) {
             $temp = '';
             foreach ($submenus as $submenu) {
@@ -160,9 +178,9 @@ class App
     public static function readQuery($element)
     {
         if (str_contains($element->option, '|select|')) {
-            $result = self::readNewQuery($options);
+            $result = self::readNewQuery($element);
         } else {
-            $result = self::readOldQuery($options);
+            $result = self::readOldQuery($element);
         }
 
         return $result;
@@ -204,7 +222,7 @@ class App
             }
         }
 
-        $select = empty($$select) ? '*' : implode(', ', $select);
+        $select = empty($select) ? '*' : implode(', ', $select);
 
         $query = str_replace('|select|', $select, $query);
 
@@ -222,7 +240,7 @@ class App
 
     private static function readOldQuery($element)
     {
-        $options = str_replace(["\r", "\n", "\t"], ' ', $options);
+        $options = str_replace(["\r", "\n", "\t"], ' ', $element->option);
         $options = json_decode($options, true);
         $options = $options['main_query'][0];
 
@@ -252,11 +270,14 @@ class App
 
     public static function replacePlaceholder($query, $custom = null)
     {
-        $user = Auth::user();
+        $user = \Auth::user();
 
-        $custom = empty($custom) ? $user['idanagrafica'] : $custom;
-        $result = str_replace(['|idagente|', '|idtecnico|', '|idanagrafica|'], prepare($custom), $query);
+        $id = empty($custom) ? $user['idanagrafica'] : $custom;
 
-        return $result;
+        $query = str_replace(['|idagente|', '|idtecnico|', '|idanagrafica|'], prepare($id), $query);
+
+        $query = str_replace(['|period_start|', '|period_end|'], [$_SESSION['period_start'], $_SESSION['period_end']], $query);
+
+        return $query;
     }
 }

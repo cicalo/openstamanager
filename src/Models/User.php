@@ -12,6 +12,10 @@ class User extends Model
         'is_admin',
     ];
 
+    protected $hidden = [
+        'password',
+    ];
+
     public function getIsAdminAttribute()
     {
         return $this->group()->nome == 'Amministratori';

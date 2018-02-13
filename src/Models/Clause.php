@@ -22,6 +22,6 @@ class Clause extends Model
 
     public function getClauseAttribute($value)
     {
-        return Module::replacePlaceholder($value);
+        return \App::replacePlaceholder($value);
     }
 }
