@@ -106,7 +106,8 @@ class Update
         foreach ($modules as $value) {
             $infos = pathinfo($value);
 
-            $module = end(explode('/', dirname($infos['dirname'])));
+            $temp = explode('/', dirname($infos['dirname']));
+            $module = end($temp);
 
             $value = str_replace('_', '.', $infos['filename']);
 
@@ -242,7 +243,8 @@ class Update
             if ($database->isInstalled()) {
                 $result = self::getDatabaseVersion();
             } else {
-                $result = end(self::getCoreUpdates());
+                $updatelist = self::getCoreUpdates();
+                $result = end($updatelist);
             }
         }
 
