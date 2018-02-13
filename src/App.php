@@ -149,4 +149,114 @@ class App
 
         return [$result, $active, $show];
     }
+
+    /**
+     * Restituisce un'insieme di array comprendenti le informazioni per la costruzione della query del modulo indicato.
+     *
+     * @param int $id
+     *
+     * @return array
+     */
+    public static function readQuery($element)
+    {
+        if (str_contains($element->option, '|select|')) {
+            $result = self::readNewQuery($options);
+        } else {
+            $result = self::readOldQuery($options);
+        }
+
+        return $result;
+    }
+
+    private static function readNewQuery($element)
+    {
+        $fields = [];
+        $summable = [];
+        $search_inside = [];
+        $search = [];
+        $slow = [];
+        $order_by = [];
+
+        $query = $element->option;
+        $views = $element->views;
+
+        $select = [];
+
+        foreach ($views as $view) {
+            $select[] = $view['query'].(!empty($view['name']) ? " AS '".$view['name']."'" : '');
+
+            if ($view['enabled']) {
+                $view['name'] = trim($view['name']);
+                $view['search_inside'] = trim($view['search_inside']);
+                $view['order_by'] = trim($view['order_by']);
+
+                $fields[] = trim($view['name']);
+
+                $search_inside[] = !empty($view['search_inside']) ? $view['search_inside'] : $view['name'];
+                $order_by[] = !empty($view['order_by']) ? $view['order_by'] : $view['name'];
+                $search[] = $view['search'];
+                $slow[] = $view['slow'];
+                $format[] = $view['format'];
+
+                if ($view['summable']) {
+                    $summable[] = 'SUM(`'.trim($view['name']."`) AS 'sum_".(count($fields) - 1)."'");
+                }
+            }
+        }
+
+        $select = empty($$select) ? '*' : implode(', ', $select);
+
+        $query = str_replace('|select|', $select, $query);
+
+        return [
+            'query' => $query,
+            'fields' => $fields,
+            'search_inside' => $search_inside,
+            'order_by' => $order_by,
+            'search' => $search,
+            'slow' => $slow,
+            'format' => $format,
+            'summable' => [],
+        ];
+    }
+
+    private static function readOldQuery($element)
+    {
+        $options = str_replace(["\r", "\n", "\t"], ' ', $options);
+        $options = json_decode($options, true);
+        $options = $options['main_query'][0];
+
+        $query = $options['query'];
+        $fields = explode(',', $options['fields']);
+        foreach ($fields as $key => $value) {
+            $fields[$key] = trim($value);
+            $search[] = 1;
+            $slow[] = 0;
+            $format[] = 0;
+        }
+
+        $search_inside = $fields;
+        $order_by = $fields;
+
+        return [
+            'query' => $query,
+            'fields' => $fields,
+            'search_inside' => $search_inside,
+            'order_by' => $order_by,
+            'search' => $search,
+            'slow' => $slow,
+            'format' => $format,
+            'summable' => [],
+        ];
+    }
+
+    public static function replacePlaceholder($query, $custom = null)
+    {
+        $user = Auth::user();
+
+        $custom = empty($custom) ? $user['idanagrafica'] : $custom;
+        $result = str_replace(['|idagente|', '|idtecnico|', '|idanagrafica|'], prepare($custom), $query);
+
+        return $result;
+    }
 }

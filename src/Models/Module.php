@@ -54,6 +54,11 @@ class Module extends Model
         return $views;
     }
 
+    public function getOptionAttribute()
+    {
+        return !empty($this->options) ? $this->options : $this->options2;
+    }
+
     public function getOptionsAttribute($value)
     {
         return self::replacePlaceholder($value);
