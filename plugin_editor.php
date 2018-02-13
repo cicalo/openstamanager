@@ -2,8 +2,10 @@
 
 include_once __DIR__.'/core.php';
 
+use Models\Plugin;
+
 // Lettura parametri iniziali
-$info = Plugins::get($id_plugin);
+$info = Plugin::get($id_plugin);
 
 if (empty($info) || empty($info['enabled'])) {
     die(tr('Accesso negato'));
@@ -73,7 +75,6 @@ if (!empty($info['script'])) {
 </script>
 
 <?php
-
     }
 }
 

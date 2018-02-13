@@ -75,11 +75,90 @@ class App
      *
      * @return array
      */
-    public function getConfig()
+    public static function getConfig()
     {
         include DOCROOT.'/config.inc.php';
 
         return get_defined_vars();
+    }
+
+    /**
+     * Restituisce la configurazione dell'installazione.
+     *
+     * @return array
+     */
+    public static function getPaths()
+    {
+        $assets = ROOTDIR.'/assets/dist';
+
+        return [
+            'assets' => $assets,
+            'css' => $assets.'/css',
+            'js' => $assets.'/js',
+            'img' => $assets.'/img',
+        ];
+    }
+
+    /**
+     * Restituisce la configurazione dell'installazione.
+     *
+     * @return array
+     */
+    public static function getAssets()
+    {
+        $lang = Translator::getInstance()->getCurrentLocale();
+
+        // CSS
+        $css = [
+            'app.min.css',
+            'style.min.css',
+            'themes.min.css',
+            [
+                'href' => 'print.min.css',
+                'media' => 'print',
+            ],
+        ];
+
+        // JS
+        $js = [
+            'app.min.js',
+            'custom.min.js',
+            'i18n/parsleyjs/'.$lang.'.min.js',
+            'i18n/select2/'.$lang.'.min.js',
+            'i18n/moment/'.$lang.'.min.js',
+            'i18n/fullcalendar/'.$lang.'.min.js',
+        ];
+
+        // Assets aggiuntivi
+        $config = self::getConfig();
+        $paths = self::getPaths();
+
+        foreach ($css as $key => $value) {
+            if (is_array($value)) {
+                $value['href'] = $paths['css'].'/'.$value['href'];
+            } else {
+                $value = $paths['css'].'/'.$value;
+            }
+
+            $css[$key] = $value;
+        }
+
+        foreach ($js as $key => $value) {
+            $value = $paths['js'].'/'.$value;
+
+            $js[$key] = $value;
+        }
+
+        // JS aggiuntivi per gli utenti connessi
+        if (Auth::check()) {
+            $js[] = ROOTDIR.'/lib/functions.js';
+            $js[] = ROOTDIR.'/lib/init.js';
+        }
+
+        return [
+            'css' => $css,
+            'js' => $js,
+        ];
     }
 
     /**

@@ -7,13 +7,11 @@ if (!empty($id_plugin)) {
     $element = Models\Plugin::get($id_plugin);
 
     if (!empty($element->script)) {
-        $module_dir = $element->module()->first()->directory;
-
         // Inclusione di eventuale plugin personalizzato
-        if (file_exists($docroot.'/modules/'.$module_dir.'/plugins/custom/'.$element->script)) {
-            include $docroot.'/modules/'.$module_dir.'/plugins/custom/'.$element->script;
-        } elseif (file_exists($docroot.'/modules/'.$module_dir.'/plugins/'.$element->script)) {
-            include $docroot.'/modules/'.$module_dir.'/plugins/'.$element->script;
+        if (file_exists($docroot.'/modules/'.$element->module_dir.'/plugins/custom/'.$element->script)) {
+            include $docroot.'/modules/'.$element->module_dir.'/plugins/custom/'.$element->script;
+        } elseif (file_exists($docroot.'/modules/'.$element->module_dir.'/plugins/'.$element->script)) {
+            include $docroot.'/modules/'.$element->module_dir.'/plugins/'.$element->script;
         }
 
         return;

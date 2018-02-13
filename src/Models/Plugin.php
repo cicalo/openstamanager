@@ -17,16 +17,36 @@ class Plugin extends Model
         'options2',
     ];
 
+    public function getModuleDirAttribute()
+    {
+        return $this->originalModule()->directory;
+    }
+
     public function getOptionAttribute()
     {
         return !empty($this->options) ? $this->options : $this->options2;
     }
 
+    public function getOptionsAttribute($value)
+    {
+        return \App::replacePlaceholder($value, filter('id_parent'));
+    }
+
+    public function getOptions2Attribute($value)
+    {
+        return \App::replacePlaceholder($value, filter('id_parent'));
+    }
+
     /* Relazioni Eloquent */
+
+    public function originalModule()
+    {
+        return $this->belongsTo(Module::class, 'idmodule_from')->first();
+    }
 
     public function module()
     {
-        return $this->belongsTo(Module::class, 'idmodule_from');
+        return $this->belongsTo(Module::class, 'idmodule_to')->first();
     }
 
     /* Metodi statici */

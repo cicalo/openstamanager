@@ -179,36 +179,13 @@ if (!API::isAPIRequest()) {
     // Impostazione del tema grafico di default
     $theme = !empty($theme) ? $theme : 'default';
 
-    $assets = $rootdir.'/assets/dist';
-    $css = $assets.'/css';
-    $js = $assets.'/js';
-    $img = $assets.'/img';
+    $assets = App::getAssets();
 
     // CSS di base del progetto
-    $css_modules = [];
-
-    $css_modules[] = $css.'/app.min.css';
-    $css_modules[] = $css.'/style.min.css';
-    $css_modules[] = $css.'/themes.min.css';
-    $css_modules[] = [
-        'href' => $css.'/print.min.css',
-        'media' => 'print',
-    ];
+    $css_modules = $assets['css'];
 
     // JS di base del progetto
-    $jscript_modules = [];
-
-    $jscript_modules[] = $js.'/app.min.js';
-    $jscript_modules[] = $js.'/custom.min.js';
-    $jscript_modules[] = $js.'/i18n/parsleyjs/'.$lang.'.min.js';
-    $jscript_modules[] = $js.'/i18n/select2/'.$lang.'.min.js';
-    $jscript_modules[] = $js.'/i18n/moment/'.$lang.'.min.js';
-    $jscript_modules[] = $js.'/i18n/fullcalendar/'.$lang.'.min.js';
-
-    if (Auth::check()) {
-        $jscript_modules[] = $rootdir.'/lib/functions.js';
-        $jscript_modules[] = $rootdir.'/lib/init.js';
-    }
+    $jscript_modules = $assets['js'];
 
     if ($continue) {
         // Istanziamento della barra di debug
@@ -246,35 +223,7 @@ if (!API::isAPIRequest()) {
         }
 
         Permissions::check();
-
-        // Retrocompatibilità
-        $user_idanagrafica = $user['idanagrafica'];
-
-        $rs = $dbo->fetchArray('SELECT * FROM `zz_modules` LEFT JOIN (SELECT `idmodule`, `permessi` FROM `zz_permissions` WHERE `idgruppo`=(SELECT `idgruppo` FROM `zz_users` WHERE `id`='.prepare($_SESSION['id_utente']).')) AS `zz_permissions` ON `zz_modules`.`id`=`zz_permissions`.`idmodule` LEFT JOIN (SELECT `idmodule`, `clause` FROM `zz_group_module` WHERE `idgruppo`=(SELECT `idgruppo` FROM `zz_users` WHERE `id`='.prepare($_SESSION['id_utente']).')) AS `zz_group_module` ON `zz_modules`.`id`=`zz_group_module`.`idmodule`');
-
-        $modules_info = [];
-        for ($i = 0; $i < count($rs); ++$i) {
-            foreach ($rs[$i] as $name => $value) {
-                if ($name == 'permessi' && (Auth::admin() || $value == null)) {
-                    if (Auth::admin()) {
-                        $value = 'rw';
-                    } else {
-                        $value = '-';
-                    }
-                }
-                if ($name != 'idmodule' && $name != 'updated_at' && $name != 'created_at' && $name != 'clause') {
-                    $modules_info[$rs[$i]['name']][$name] = $value;
-                } elseif ($name == 'clause') {
-                    $additional_where[$rs[$i]['name']] = !empty($value) ? ' AND '.$value : $value;
-                }
-            }
-
-            $modules_info[$rs[$i]['id']]['name'] = $rs[$i]['name'];
-        }
     }
-
-    // Istanziamento di HTMLHelper (retrocompatibilità)
-    $html = new HTMLHelper();
 
     // Variabili GET e POST
     $post = Filter::getPOST();

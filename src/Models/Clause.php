@@ -17,7 +17,7 @@ class Clause extends Model
 
     public function module()
     {
-        return $this->belongsTo(Module::class, 'idmodule');
+        return $this->belongsTo(Module::class, 'idmodule')->first();
     }
 
     public function getClauseAttribute($value)

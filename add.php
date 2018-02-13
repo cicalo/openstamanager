@@ -2,14 +2,17 @@
 
 include_once __DIR__.'/core.php';
 
+use Models\Plugin;
+use Models\Module;
+
 if (!empty($id_plugin)) {
-    $info = Plugins::get($id_plugin);
+    $info = Plugin::get($id_plugin);
 
     $directory = '/plugins/'.$info['directory'];
 } else {
     Permissions::check('rw');
 
-    $module = Modules::get($id_module);
+    $module = Module::get($id_module);
 
     $directory = '/modules/'.$module['directory'];
 }

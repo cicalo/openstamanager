@@ -2,17 +2,20 @@
 
 include_once __DIR__.'/core.php';
 
+use Models\Plugin;
+use Models\Module;
+
 // Lettura parametri iniziali
 if (!empty($id_plugin)) {
-    $info = Plugins::get($id_plugin);
+    $info = Plugin::get($id_plugin);
 
     $directory = '/plugins/'.$info['directory'];
-    $permesso = $info['idmodule_to'];
+    $permission = $info['idmodule_to'];
 } else {
-    $info = Modules::get($id_module);
+    $info = Module::get($id_module);
 
     $directory = '/modules/'.$info['directory'];
-    $permesso = $id_module;
+    $permission = $id_module;
 }
 
 $upload_dir = $docroot.'/files/'.basename($directory);
@@ -216,7 +219,7 @@ if (filter('op') == 'link_file' || filter('op') == 'unlink_file') {
     download($upload_dir.'/'.$rs[0]['filename'], $rs[0]['original']);
 }
 
-if (Modules::getPermission($permesso) == 'r' || Modules::getPermission($permesso) == 'rw') {
+if (Modules::getPermission($permission) == 'r' || Modules::getPermission($permission) == 'rw') {
     if (!empty($info['script'])) {
         // Inclusione di eventuale plugin personalizzato
         if (file_exists($docroot.'/modules/'.$info['module_dir'].'/plugins/custom/'.$info['script'])) {
@@ -242,7 +245,7 @@ if (Modules::getPermission($permesso) == 'r' || Modules::getPermission($permesso
         include $docroot.$directory.'/init.php';
     }
 
-    if (Modules::getPermission($permesso) == 'rw') {
+    if (Modules::getPermission($permission) == 'rw') {
         // Esecuzione delle operazioni di gruppo
         $id_records = post('id_records');
         $id_records = is_array($id_records) ? $id_records : explode(';', $id_records);

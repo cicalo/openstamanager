@@ -81,12 +81,12 @@ class Module extends Model
 
     public function plugins()
     {
-        return $this->hasMany(Plugin::class, 'id_module')->active();
+        return $this->hasMany(Plugin::class, 'idmodule_to')->active();
     }
 
     public function prints()
     {
-        return $this->hasMany(Prints::class, 'id_module');
+        return $this->hasMany(PrintTemplate::class, 'id_module');
     }
 
     public function views()
