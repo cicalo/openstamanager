@@ -19,6 +19,29 @@ class App
     /** @var int Identificativo dell'elemento corrente */
     protected static $current_element;
 
+    protected static $assets = [
+        // CSS
+        'css' => [
+            'app.min.css',
+            'style.min.css',
+            'themes.min.css',
+            [
+                'href' => 'print.min.css',
+                'media' => 'print',
+            ],
+        ],
+
+        // JS
+        'js' => [
+            'app.min.js',
+            'custom.min.js',
+            'i18n/parsleyjs/|lang|.min.js',
+            'i18n/select2/|lang|.min.js',
+            'i18n/moment/|lang|.min.js',
+            'i18n/fullcalendar/|lang|.min.js',
+        ],
+    ];
+
     public static function getUser()
     {
         if (!isset(self::$user)) {
@@ -77,9 +100,48 @@ class App
      */
     public static function getConfig()
     {
-        include DOCROOT.'/config.inc.php';
+        if (file_exists(DOCROOT.'/config.inc.php')) {
+            include DOCROOT.'/config.inc.php';
 
-        return get_defined_vars();
+            $config = get_defined_vars();
+        } else {
+            $config = [];
+        }
+
+        $defaultConfig = self::getDefaultConfig();
+
+        $result = array_merge($defaultConfig, $config);
+
+        // Operazioni di normalizzazione sulla configurazione
+        $result['debug'] = !empty($result['debug']);
+
+        return $result;
+    }
+
+    /**
+     * Individuazione dei percorsi di base.
+     *
+     * @return array
+     */
+    public static function definePaths($docroot)
+    {
+        // Individuazione di $rootdir
+        $rootdir = substr($_SERVER['SCRIPT_NAME'], 0, strrpos($_SERVER['SCRIPT_NAME'], '/')).'/';
+        if (strrpos($rootdir, '/'.basename($docroot).'/') !== false) {
+            $rootdir = substr($rootdir, 0, strrpos($rootdir, '/'.basename($docroot).'/')).'/'.basename($docroot);
+        } else {
+            $rootdir = '/';
+        }
+        $rootdir = rtrim($rootdir, '/');
+        $rootdir = str_replace('%2F', '/', rawurlencode($rootdir));
+
+        // Individuazione di $baseurl
+        $baseurl = (isHTTPS(true) ? 'https' : 'http').'://'.$_SERVER['HTTP_HOST'].$rootdir;
+
+        // Impostazione delle variabili globali
+        define('DOCROOT', $docroot);
+        define('ROOTDIR', $rootdir);
+        define('BASEURL', $baseurl);
     }
 
     /**
@@ -106,38 +168,30 @@ class App
      */
     public static function getAssets()
     {
-        $lang = Translator::getInstance()->getCurrentLocale();
-
-        // CSS
-        $css = [
-            'app.min.css',
-            'style.min.css',
-            'themes.min.css',
-            [
-                'href' => 'print.min.css',
-                'media' => 'print',
-            ],
-        ];
-
-        // JS
-        $js = [
-            'app.min.js',
-            'custom.min.js',
-            'i18n/parsleyjs/'.$lang.'.min.js',
-            'i18n/select2/'.$lang.'.min.js',
-            'i18n/moment/'.$lang.'.min.js',
-            'i18n/fullcalendar/'.$lang.'.min.js',
-        ];
-
         // Assets aggiuntivi
         $config = self::getConfig();
+
+        $css = array_unique(array_merge(self::$assets['css'], $config['assets']['css']));
+        $js = array_unique(array_merge(self::$assets['js'], $config['assets']['js']));
+
+        // Impostazione dei percorsi
         $paths = self::getPaths();
+        $lang = Translator::getInstance()->getCurrentLocale();
 
         foreach ($css as $key => $value) {
             if (is_array($value)) {
-                $value['href'] = $paths['css'].'/'.$value['href'];
+                $path = $value['href'];
             } else {
-                $value = $paths['css'].'/'.$value;
+                $path = $value;
+            }
+
+            $path = $paths['css'].'/'.$path;
+            $path = str_replace('|lang|', $lang, $path);
+
+            if (is_array($value)) {
+                $value['href'] = $path;
+            } else {
+                $value = $path;
             }
 
             $css[$key] = $value;
@@ -145,6 +199,7 @@ class App
 
         foreach ($js as $key => $value) {
             $value = $paths['js'].'/'.$value;
+            $value = str_replace('|lang|', $lang, $value);
 
             $js[$key] = $value;
         }
@@ -265,7 +320,7 @@ class App
         return $result;
     }
 
-    private static function readNewQuery($element)
+    protected static function readNewQuery($element)
     {
         $fields = [];
         $summable = [];
@@ -306,37 +361,45 @@ class App
         $query = str_replace('|select|', $select, $query);
 
         return [
-            'query' => $query,
+            'query' => self::replacePlaceholder($query),
             'fields' => $fields,
             'search_inside' => $search_inside,
             'order_by' => $order_by,
             'search' => $search,
             'slow' => $slow,
             'format' => $format,
-            'summable' => [],
+            'summable' => $summable,
         ];
     }
 
-    private static function readOldQuery($element)
+    protected static function readOldQuery($element)
     {
         $options = str_replace(["\r", "\n", "\t"], ' ', $element->option);
         $options = json_decode($options, true);
         $options = $options['main_query'][0];
 
+        $fields = [];
+        $order_by = [];
+
+        $search = [];
+        $slow = [];
+        $format = [];
+
         $query = $options['query'];
-        $fields = explode(',', $options['fields']);
-        foreach ($fields as $key => $value) {
-            $fields[$key] = trim($value);
+        $views = explode(',', $options['fields']);
+        foreach ($views as $view) {
+            $fields[] = trim($view);
+            $order_by[] = '`'.trim($view).'`';
+
             $search[] = 1;
             $slow[] = 0;
             $format[] = 0;
         }
 
         $search_inside = $fields;
-        $order_by = $fields;
 
         return [
-            'query' => $query,
+            'query' => self::replacePlaceholder($query),
             'fields' => $fields,
             'search_inside' => $search_inside,
             'order_by' => $order_by,
@@ -349,14 +412,72 @@ class App
 
     public static function replacePlaceholder($query, $custom = null)
     {
-        $user = \Auth::user();
+        $id_module = filter('id_module');
+        $user = Auth::user();
 
+        // Sostituzione degli identificatori
         $id = empty($custom) ? $user['idanagrafica'] : $custom;
-
         $query = str_replace(['|idagente|', '|idtecnico|', '|idanagrafica|'], prepare($id), $query);
 
+        // Sostituzione delle date
         $query = str_replace(['|period_start|', '|period_end|'], [$_SESSION['period_start'], $_SESSION['period_end']], $query);
 
+        // Sostituzione dei segmenti
+        $query = str_replace('|segment|', !empty($_SESSION['m'.$id_module]['id_segment']) ? ' AND id_segment = '.prepare($_SESSION['m'.$id_module]['id_segment']) : '', $query);
+
         return $query;
+    }
+
+    public static function load($file, $result, $options, $directory = null)
+    {
+        $module = self::getCurrentModule();
+
+        $id_module = filter('id_module');
+        $id_record = filter('id_record');
+
+        $directory = empty($directory) ? 'include|custom|/common/' : $directory;
+        $directory = str_contains($directory, DOCROOT) ? $directory : DOCROOT.'/'.$directory;
+
+        ob_start();
+
+        $original_file = str_replace('|custom|', '', $directory).'form.php';
+        $custom_file = str_replace('|custom|', '/custom', $directory).'form.php';
+        if (file_exists($custom_file)) {
+            require $custom_file;
+        } elseif (file_exists($original_file)) {
+            require $original_file;
+        }
+
+        $form = ob_get_clean();
+
+        $response = self::internalLoad($file, $result, $options, $directory);
+        $form = str_replace('|response|', $response, $form);
+
+        return $form;
+    }
+
+    protected static function internalLoad($file, $result, $options, $directory = null)
+    {
+        $module = self::getCurrentModule();
+
+        $id_module = filter('id_module');
+        $id_record = filter('id_record');
+
+        $directory = empty($directory) ? 'include|custom|/common/' : $directory;
+        $directory = str_contains($directory, DOCROOT) ? $directory : DOCROOT.'/'.$directory;
+
+        ob_start();
+
+        $original_file = str_replace('|custom|', '', $directory).$file;
+        $custom_file = str_replace('|custom|', '/custom', $directory).$file;
+        if (file_exists($custom_file)) {
+            require $custom_file;
+        } elseif (file_exists($original_file)) {
+            require $original_file;
+        }
+
+        $response = ob_get_clean();
+
+        return $response;
     }
 }

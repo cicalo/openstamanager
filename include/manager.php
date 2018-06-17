@@ -19,7 +19,8 @@ if (!empty($id_plugin)) {
 
     echo '
         <h4>
-            '.$element->name;
+			<span  class="'.(!empty($element['help']) ? ' tip' : '').'"'.(!empty($element['help']) ? ' title="'.prepareToField($element['help']).'" data-position="bottom"' : '').' >
+            '.$element['title'].(!empty($element['help']) ? ' <i class="fa fa-question-circle-o"></i>' : '').'</span>';
 
     if (file_exists($docroot.'/plugins/'.$element->directory.'/add.php')) {
         echo '
@@ -35,6 +36,7 @@ if (!empty($id_plugin)) {
 
     $directory = '/modules/'.$element->directory;
 }
+$total = App::readQuery($element);
 
 $total = App::readQuery($element);
 
@@ -45,6 +47,31 @@ if (file_exists($docroot.$directory.'/custom/controller_before.php')) {
     include $docroot.$directory.'/custom/controller_before.php';
 } elseif (file_exists($docroot.$directory.'/controller_before.php')) {
     include $docroot.$directory.'/controller_before.php';
+}
+
+if (count(Modules::getSegments($id_module)) > 1) {
+    ?>
+    <div class="row">
+    	<div class="col-md-4 pull-right">
+    		{[ "type": "select", "label": "", "name": "id_segment_", "required": 0, "values": "query=SELECT id, name AS descrizione FROM zz_segments WHERE id_module = '<?php echo $id_module; ?>'", "value": "<?php echo $_SESSION['m'.$id_module]['id_segment']; ?>" ]}
+    	</div>
+    </div>
+    <br>
+
+    <script>
+    $(document).ready(function () {
+
+    	$("#id_segment_").on("change", function(){
+    		if ($(this).val()<1){
+    			session_set('<?php echo 'm'.$id_module; ?>,id_segment', '', 1, 1);
+    		}else{
+    			session_set('<?php echo 'm'.$id_module; ?>,id_segment', $(this).val(), 0, 1);
+    		}
+      });
+    });
+    </script>
+
+<?php
 }
 
 /*
@@ -105,6 +132,8 @@ if (!empty($module_options) && $module_options != 'menu' && $module_options != '
 
         <tfoot>
             <tr>';
+    echo '
+                <td></td>';
     foreach ($total['fields'] as $key => $field) {
         echo '
                 <td></td>';
@@ -116,14 +145,14 @@ if (!empty($module_options) && $module_options != 'menu' && $module_options != '
 
     echo '
     <div class="row" data-target="'.$table_id.'">
-        <div class="col-xs-12 col-md-5">
+        <div class="col-md-5">
             <div class="btn-group" role="group">
                 <button type="button" class="btn btn-primary btn-select-all">'.tr('Seleziona tutto').'</button>
                 <button type="button" class="btn btn-default btn-select-none">'.tr('Deseleziona tutto').'</button>
             </div>
         </div>
 
-        <div class="col-xs-12 col-md-2 dropdown">';
+        <div class="col-md-2 dropdown">';
 
     if (!empty($bulk)) {
         echo '
@@ -140,7 +169,7 @@ if (!empty($module_options) && $module_options != 'menu' && $module_options != '
             }
 
             echo '
-                <li role="presentation"><a class="bulk-action" data-op="'.$key.'" data-backto="record-list" '.implode(' ', $extra).'>'.$text.'</a></li>';
+                <li role="presentation"><a class="bulk-action clickable" data-op="'.$key.'" data-backto="record-list" '.implode(' ', $extra).'>'.$text.'</a></li>';
         }
 
         echo '
@@ -150,7 +179,7 @@ if (!empty($module_options) && $module_options != 'menu' && $module_options != '
     echo '
         </div>
 
-        <div class="col-xs-12 col-md-5 text-right">
+        <div class="col-md-5 text-right">
             <div class="btn-group" role="group">
                 <button type="button" class="btn btn-primary btn-csv disabled" disabled>'.tr('Esporta').'</button>
                 <button type="button" class="btn btn-default btn-copy disabled" disabled>'.tr('Copia').'</button>
@@ -164,9 +193,6 @@ if (!empty($module_options) && $module_options != 'menu' && $module_options != '
  * Inclusione modulo personalizzato
  */
 elseif ($module_options == 'custom') {
-    // Inclusione elementi fondamentali del modulo
-    include $docroot.'/actions.php';
-
     // Lettura template modulo (verifico se ci sono template personalizzati, altrimenti uso quello base)
     if (file_exists($docroot.$directory.'/custom/edit.php')) {
         include $docroot.$directory.'/custom/edit.php';

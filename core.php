@@ -7,28 +7,30 @@ ob_start();
 // Impostazioni di configurazione PHP
 date_default_timezone_set('Europe/Rome');
 
+// Controllo sulla versione PHP
+$minimum = '5.6.0';
+if (version_compare(phpversion(), $minimum) < 0) {
+    echo '
+<p>Stai utilizzando la versione PHP '.phpversion().', non compatibile con OpenSTAManager.</p>
+
+<p>Aggiorna PHP alla versione >= '.$minimum.'.</p>';
+    exit();
+}
+
 // Caricamento delle impostazioni personalizzabili
 if (file_exists(__DIR__.'/config.inc.php')) {
     include_once __DIR__.'/config.inc.php';
 }
 
-// Individuazione dei percorsi di base
-$docroot = __DIR__;
-$rootdir = substr($_SERVER['SCRIPT_NAME'], 0, strrpos($_SERVER['SCRIPT_NAME'], '/')).'/';
-if (strrpos($rootdir, '/'.basename($docroot).'/') !== false) {
-    $rootdir = substr($rootdir, 0, strrpos($rootdir, '/'.basename($docroot).'/')).'/'.basename($docroot);
-} else {
-    $rootdir = '/';
-}
-$rootdir = rtrim($rootdir, '/');
-$rootdir = str_replace('%2F', '/', rawurlencode($rootdir));
-
-// Aggiunta delle variabili globali
-define('DOCROOT', $docroot);
-define('ROOTDIR', $rootdir);
-
 // Caricamento delle dipendenze e delle librerie del progetto
 require_once __DIR__.'/vendor/autoload.php';
+
+// Individuazione dei percorsi di base
+App::definePaths(__DIR__);
+
+$docroot = DOCROOT;
+$rootdir = ROOTDIR;
+$baseurl = BASEURL;
 
 // Redirect al percorso HTTPS se impostato nella configurazione
 if (!empty($redirectHTTPS) && !isHTTPS(true)) {
@@ -55,11 +57,11 @@ use Monolog\Handler\RotatingFileHandler;
 $handlers = [];
 if (!API::isAPIRequest()) {
     // File di log di base (logs/error.log)
-    $handlers[] = new StreamHandler(__DIR__.'/logs/error.log', Monolog\Logger::ERROR);
-    $handlers[] = new StreamHandler(__DIR__.'/logs/setup.log', Monolog\Logger::EMERGENCY);
+    $handlers[] = new StreamHandler($docroot.'/logs/error.log', Monolog\Logger::ERROR);
+    $handlers[] = new StreamHandler($docroot.'/logs/setup.log', Monolog\Logger::EMERGENCY);
 
     // Impostazione dei log estesi (per monitorare in modo completo le azioni degli utenti)
-    $handlers[] = new StreamHandler(__DIR__.'/logs/info.log', Monolog\Logger::INFO);
+    $handlers[] = new StreamHandler($docroot.'/logs/info.log', Monolog\Logger::INFO);
 
     // Impostazioni di debug
     if (!empty($debug)) {
@@ -67,26 +69,24 @@ if (!API::isAPIRequest()) {
         error_reporting(E_ALL & ~E_WARNING & ~E_NOTICE & ~E_USER_DEPRECATED);
 
         // File di log ordinato in base alla data
-        $handlers[] = new RotatingFileHandler(__DIR__.'/logs/error.log', 0, Monolog\Logger::ERROR);
-        $handlers[] = new RotatingFileHandler(__DIR__.'/logs/setup.log', 0, Monolog\Logger::EMERGENCY);
+        $handlers[] = new RotatingFileHandler($docroot.'/logs/error.log', 0, Monolog\Logger::ERROR);
+        $handlers[] = new RotatingFileHandler($docroot.'/logs/setup.log', 0, Monolog\Logger::EMERGENCY);
 
-        if (version_compare(PHP_VERSION, '5.5.9') >= 0) {
-            $prettyPageHandler = new Whoops\Handler\PrettyPageHandler();
+        $prettyPageHandler = new Whoops\Handler\PrettyPageHandler();
 
-            // Imposta Whoops come gestore delle eccezioni di default
-            $whoops = new Whoops\Run();
-            $whoops->pushHandler($prettyPageHandler);
+        // Imposta Whoops come gestore delle eccezioni di default
+        $whoops = new Whoops\Run();
+        $whoops->pushHandler($prettyPageHandler);
 
-            // Abilita la gestione degli errori nel caso la richiesta sia di tipo AJAX
-            if (Whoops\Util\Misc::isAjaxRequest()) {
-                $whoops->pushHandler(new Whoops\Handler\JsonResponseHandler());
-            }
-
-            $whoops->register();
+        // Abilita la gestione degli errori nel caso la richiesta sia di tipo AJAX
+        if (Whoops\Util\Misc::isAjaxRequest()) {
+            $whoops->pushHandler(new Whoops\Handler\JsonResponseHandler());
         }
+
+        $whoops->register();
     }
 } else {
-    $handlers[] = new StreamHandler(__DIR__.'/logs/api.log', Monolog\Logger::ERROR);
+    $handlers[] = new StreamHandler($docroot.'/logs/api.log', Monolog\Logger::ERROR);
 }
 
 // Disabilita la segnalazione degli errori (se il debug è disabilitato)
@@ -95,7 +95,18 @@ if (empty($debug)) {
 }
 
 // Imposta il formato di salvataggio dei log
-$monologFormatter = new Monolog\Formatter\LineFormatter('[%datetime%] %channel%.%level_name%: %message%'.PHP_EOL.'%extra% '.PHP_EOL);
+$pattern = '[%datetime%] %channel%.%level_name%: %message%';
+if (!empty($debug)) {
+    $pattern .= ' %context%';
+}
+$pattern .= PHP_EOL.'%extra% '.PHP_EOL;
+
+$monologFormatter = new Monolog\Formatter\LineFormatter($pattern);
+
+if (!empty($debug)) {
+    $monologFormatter->includeStacktraces(true);
+}
+
 foreach ($handlers as $handler) {
     $handler->setFormatter($monologFormatter);
     $logger->pushHandler(new FilterHandler($handler, [$handler->getLevel()]));
@@ -127,7 +138,11 @@ $dbo = Database::getConnection();
 // Controllo sulla presenza dei permessi di accesso basilari
 $continue = $dbo->isInstalled() && !Update::isUpdateAvailable() && (Auth::check() || API::isAPIRequest());
 
-if (!$continue && getURLPath() != slashes(ROOTDIR.'/index.php')) {
+if (!empty($skip_permissions)) {
+    Permissions::skip();
+}
+
+if (!$continue && getURLPath() != slashes(ROOTDIR.'/index.php') && !Permissions::getSkip()) {
     if (Auth::check()) {
         Auth::logout();
     }
@@ -167,15 +182,6 @@ if (!API::isAPIRequest()) {
     $_SESSION['warnings'] = array_unique((array) $_SESSION['warnings']);
     $_SESSION['errors'] = array_unique((array) $_SESSION['errors']);
 
-    // Imposto il periodo di visualizzazione dei record dal 01-01-yyy al 31-12-yyyy
-    if (!empty($_GET['period_start'])) {
-        $_SESSION['period_start'] = $_GET['period_start'];
-        $_SESSION['period_end'] = $_GET['period_end'];
-    } elseif (!isset($_SESSION['period_start'])) {
-        $_SESSION['period_start'] = date('Y').'-01-01';
-        $_SESSION['period_end'] = date('Y').'-12-31';
-    }
-
     // Impostazione del tema grafico di default
     $theme = !empty($theme) ? $theme : 'default';
 
@@ -188,25 +194,27 @@ if (!API::isAPIRequest()) {
     $jscript_modules = $assets['js'];
 
     if ($continue) {
-        // Istanziamento della barra di debug
-        if (!empty($debug)) {
-            $debugbar = new DebugBar\DebugBar();
-
-            $debugbar->addCollector(new DebugBar\DataCollector\MemoryCollector());
-            $debugbar->addCollector(new DebugBar\DataCollector\PhpInfoCollector());
-
-            $debugbar->addCollector(new DebugBar\DataCollector\RequestDataCollector());
-            $debugbar->addCollector(new DebugBar\DataCollector\TimeDataCollector());
-
-            $debugbar->addCollector(new DebugBar\Bridge\MonologCollector($logger));
-            $debugbar->addCollector(new Extension\EloquentCollector($dbo->getCapsule()));
-            $debugbar->addCollector(new DebugBar\DataCollector\PDO\PDOCollector($dbo->getPDO()));
-        }
-
         $id_module = filter('id_module');
         $id_record = filter('id_record');
         $id_plugin = filter('id_plugin');
         $id_parent = filter('id_parent');
+
+        // Periodo di visualizzazione dei record
+        // Personalizzato
+        if (!empty($_GET['period_start'])) {
+            $_SESSION['period_start'] = $_GET['period_start'];
+            $_SESSION['period_end'] = $_GET['period_end'];
+        }
+        // Dal 01-01-yyy al 31-12-yyyy
+        elseif (!isset($_SESSION['period_start'])) {
+            $_SESSION['period_start'] = date('Y').'-01-01';
+            $_SESSION['period_end'] = date('Y').'-12-31';
+        }
+
+        // Segmenti
+        if (empty($_SESSION['m'.$id_module]['id_segment'])) {
+            $_SESSION['m'.$id_module]['id_segment'] = Modules::getSegments($id_module)[0]['id'];
+        }
 
         $user = Auth::user();
 

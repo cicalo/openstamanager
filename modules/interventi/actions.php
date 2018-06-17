@@ -68,103 +68,108 @@ switch (post('op')) {
         // Aggiorna tutte le sessioni di lavoro
         $lista = (array) post('id_');
 
-        // Limitazione delle azioni dei tecnici
-        if ($user['gruppo'] == 'Tecnici') {
-            $lista = get_var('Mostra i prezzi al tecnico') && !empty($user['idanagrafica']) ? [$user['idanagrafica']] : [];
-        }
-
         foreach ($lista as $idriga) {
-            // Lettura delle date di inizio e fine intervento
-            $orario_inizio = post('orario_inizio')[$idriga];
-            $orario_fine = post('orario_fine')[$idriga];
+            //Lettura del tecnico proprietario della riga
+            $rst = $dbo->fetchArray('SELECT idtecnico FROM in_interventi_tecnici WHERE id='.prepare($idriga));
 
-            $km = post('km')[$idriga];
-            $ore = post('ore')[$idriga];
+            // Limitazione delle azioni dei tecnici
+            if (($user['gruppo'] == 'Tecnici' && $user['idanagrafica'] == $rst[0]['idtecnico']) || $user['gruppo'] == 'Amministratori') {
+                // Lettura delle date di inizio e fine intervento
+                $orario_inizio = post('orario_inizio')[$idriga];
+                $orario_fine = post('orario_fine')[$idriga];
 
-            // Lettura tariffe in base al tipo di intervento ed al tecnico
-            $idtipointervento_tecnico = $post['idtipointerventot'][$idriga];
-            $rs = $dbo->fetchArray('SELECT * FROM in_interventi_tecnici WHERE idtecnico='.prepare($post['idtecnico'][$idriga]).' AND idintervento='.prepare($id_record));
+                $km = post('km')[$idriga];
+                //$ore = post('ore')[$idriga];
+				//per sicurezza ricalcolo ore lavorate da php
+				$diff = date_diff(date_create($orario_inizio), date_create($orario_fine));
+				$ore = ($diff->h + ($diff->i / 60));
+				
+				
+                // Lettura tariffe in base al tipo di intervento ed al tecnico
+                $idtipointervento_tecnico = $post['idtipointerventot'][$idriga];
+                $rs = $dbo->fetchArray('SELECT * FROM in_interventi_tecnici WHERE idtecnico='.prepare($post['idtecnico'][$idriga]).' AND idintervento='.prepare($id_record));
 
-            if ($idtipointervento_tecnico != $rs[0]['idtipointervento']) {
-                $rsc = $dbo->fetchArray('SELECT * FROM in_tariffe WHERE idtecnico='.prepare($post['idtecnico'][$idriga]).' AND idtipointervento='.prepare($idtipointervento_tecnico));
+                if ($idtipointervento_tecnico != $rs[0]['idtipointervento']) {
+                    $rsc = $dbo->fetchArray('SELECT * FROM in_tariffe WHERE idtecnico='.prepare($post['idtecnico'][$idriga]).' AND idtipointervento='.prepare($idtipointervento_tecnico));
 
-                if ($rsc[0]['costo_ore'] != 0 || $rsc[0]['costo_km'] != 0 || $rsc[0]['costo_dirittochiamata'] != 0 || $rsc[0]['costo_ore_tecnico'] != 0 || $rsc[0]['costo_km_tecnico'] != 0 || $rsc[0]['costo_dirittochiamata_tecnico'] != 0) {
-                    $prezzo_ore_unitario = $rsc[0]['costo_ore'];
-                    $prezzo_km_unitario = $rsc[0]['costo_km'];
-                    $prezzo_dirittochiamata = $rsc[0]['costo_dirittochiamata'];
+                    if ($rsc[0]['costo_ore'] != 0 || $rsc[0]['costo_km'] != 0 || $rsc[0]['costo_dirittochiamata'] != 0 || $rsc[0]['costo_ore_tecnico'] != 0 || $rsc[0]['costo_km_tecnico'] != 0 || $rsc[0]['costo_dirittochiamata_tecnico'] != 0) {
+                        $prezzo_ore_unitario = $rsc[0]['costo_ore'];
+                        $prezzo_km_unitario = $rsc[0]['costo_km'];
+                        $prezzo_dirittochiamata = $rsc[0]['costo_dirittochiamata'];
 
-                    $prezzo_ore_unitario_tecnico = $rsc[0]['costo_ore_tecnico'];
-                    $prezzo_km_unitario_tecnico = $rsc[0]['costo_km_tecnico'];
-                    $prezzo_dirittochiamata_tecnico = $rsc[0]['costo_dirittochiamata_tecnico'];
+                        $prezzo_ore_unitario_tecnico = $rsc[0]['costo_ore_tecnico'];
+                        $prezzo_km_unitario_tecnico = $rsc[0]['costo_km_tecnico'];
+                        $prezzo_dirittochiamata_tecnico = $rsc[0]['costo_dirittochiamata_tecnico'];
+                    }
+
+                    // ...altrimenti se non c'è una tariffa per il tecnico leggo i costi globali
+                    else {
+                        $rsc = $dbo->fetchArray('SELECT * FROM in_tipiintervento WHERE idtipointervento='.prepare($idtipointervento_tecnico));
+
+                        $prezzo_ore_unitario = $rsc[0]['costo_orario'];
+                        $prezzo_km_unitario = $rsc[0]['costo_km'];
+                        $prezzo_dirittochiamata = $rsc[0]['costo_diritto_chiamata'];
+
+                        $prezzo_ore_unitario_tecnico = $rsc[0]['costo_orario_tecnico'];
+                        $prezzo_km_unitario_tecnico = $rsc[0]['costo_km_tecnico'];
+                        $prezzo_dirittochiamata_tecnico = $rsc[0]['costo_diritto_chiamata_tecnico'];
+                    }
+                } else {
+                    $prezzo_ore_unitario = $rs[0]['prezzo_ore_unitario'];
+                    $prezzo_km_unitario = $rs[0]['prezzo_km_unitario'];
+                    $prezzo_dirittochiamata = $rs[0]['prezzo_dirittochiamata'];
+                    $prezzo_ore_unitario_tecnico = $rs[0]['prezzo_ore_unitario_tecnico'];
+                    $prezzo_km_unitario_tecnico = $rs[0]['prezzo_km_unitario_tecnico'];
+                    $prezzo_dirittochiamata_tecnico = $rs[0]['prezzo_dirittochiamata_tecnico'];
                 }
 
-                // ...altrimenti se non c'è una tariffa per il tecnico leggo i costi globali
-                else {
-                    $rsc = $dbo->fetchArray('SELECT * FROM in_tipiintervento WHERE idtipointervento='.prepare($idtipointervento_tecnico));
+                // Totali
+                $prezzo_ore_consuntivo = $prezzo_ore_unitario * $ore;
+                $prezzo_km_consuntivo = $prezzo_km_unitario * $km;
 
-                    $prezzo_ore_unitario = $rsc[0]['costo_orario'];
-                    $prezzo_km_unitario = $rsc[0]['costo_km'];
-                    $prezzo_dirittochiamata = $rsc[0]['costo_diritto_chiamata'];
+                $prezzo_ore_consuntivo_tecnico = $prezzo_ore_unitario_tecnico * $ore;
+                $prezzo_km_consuntivo_tecnico = $prezzo_km_unitario_tecnico * $km;
 
-                    $prezzo_ore_unitario_tecnico = $rsc[0]['costo_orario_tecnico'];
-                    $prezzo_km_unitario_tecnico = $rsc[0]['costo_km_tecnico'];
-                    $prezzo_dirittochiamata_tecnico = $rsc[0]['costo_diritto_chiamata_tecnico'];
-                }
-            } else {
-                $prezzo_ore_unitario = $rs[0]['prezzo_ore_unitario'];
-                $prezzo_km_unitario = $rs[0]['prezzo_km_unitario'];
-                $prezzo_dirittochiamata = $rs[0]['prezzo_dirittochiamata'];
-                $prezzo_ore_unitario_tecnico = $rs[0]['prezzo_ore_unitario_tecnico'];
-                $prezzo_km_unitario_tecnico = $rs[0]['prezzo_km_unitario_tecnico'];
-                $prezzo_dirittochiamata_tecnico = $rs[0]['prezzo_dirittochiamata_tecnico'];
+                // Sconti
+                $sconto_unitario = post('sconto')[$idriga];
+                $tipo_sconto = post('tipo_sconto')[$idriga];
+                $sconto = ($tipo_sconto == 'PRC') ? ($prezzo_ore_consuntivo * $sconto_unitario) / 100 : $sconto_unitario;
+
+                $scontokm_unitario = post('scontokm')[$idriga];
+                $tipo_scontokm = post('tipo_scontokm')[$idriga];
+                $scontokm = ($tipo_scontokm == 'PRC') ? ($prezzo_km_consuntivo * $scontokm_unitario) / 100 : $scontokm_unitario;
+
+                $dbo->update('in_interventi_tecnici', [
+                    'idintervento' => $id_record,
+                    'idtipointervento' => $idtipointervento_tecnico,
+                    'idtecnico' => post('idtecnico')[$idriga],
+
+                    'orario_inizio' => $orario_inizio,
+                    'orario_fine' => $orario_fine,
+                    'ore' => $ore,
+                    'km' => $km,
+
+                    'prezzo_ore_unitario' => $prezzo_ore_unitario,
+                    'prezzo_km_unitario' => $prezzo_km_unitario,
+                    'prezzo_dirittochiamata' => $prezzo_dirittochiamata,
+                    'prezzo_ore_unitario_tecnico' => $prezzo_ore_unitario_tecnico,
+                    'prezzo_km_unitario_tecnico' => $prezzo_km_unitario_tecnico,
+                    'prezzo_dirittochiamata_tecnico' => $prezzo_dirittochiamata_tecnico,
+
+                    'prezzo_ore_consuntivo' => $prezzo_ore_consuntivo,
+                    'prezzo_km_consuntivo' => $prezzo_km_consuntivo,
+                    'prezzo_ore_consuntivo_tecnico' => $prezzo_ore_consuntivo_tecnico,
+                    'prezzo_km_consuntivo_tecnico' => $prezzo_km_consuntivo_tecnico,
+
+                    'sconto' => $sconto,
+                    'sconto_unitario' => $sconto_unitario,
+                    'tipo_sconto' => $tipo_sconto,
+
+                    'scontokm' => $scontokm,
+                    'scontokm_unitario' => $scontokm_unitario,
+                    'tipo_scontokm' => $tipo_scontokm,
+                ], ['id' => $idriga]);
             }
-
-            // Totali
-            $prezzo_ore_consuntivo = $prezzo_ore_unitario * $ore;
-            $prezzo_km_consuntivo = $prezzo_km_unitario * $km;
-
-            $prezzo_ore_consuntivo_tecnico = $prezzo_ore_unitario_tecnico * $ore;
-            $prezzo_km_consuntivo_tecnico = $prezzo_km_unitario_tecnico * $km;
-
-            // Sconti
-            $sconto_unitario = post('sconto')[$idriga];
-            $tipo_sconto = post('tipo_sconto')[$idriga];
-            $sconto = ($tipo_sconto == 'PRC') ? ($prezzo_ore_consuntivo * $sconto_unitario) / 100 : $sconto_unitario;
-
-            $scontokm_unitario = post('scontokm')[$idriga];
-            $tipo_scontokm = post('tipo_scontokm')[$idriga];
-            $scontokm = ($tipo_scontokm == 'PRC') ? ($prezzo_km_consuntivo * $scontokm_unitario) / 100 : $scontokm_unitario;
-
-            $dbo->update('in_interventi_tecnici', [
-                'idintervento' => $id_record,
-                'idtipointervento' => $idtipointervento_tecnico,
-                'idtecnico' => post('idtecnico')[$idriga],
-
-                'orario_inizio' => $orario_inizio,
-                'orario_fine' => $orario_fine,
-                'ore' => $ore,
-                'km' => $km,
-
-                'prezzo_ore_unitario' => $prezzo_ore_unitario,
-                'prezzo_km_unitario' => $prezzo_km_unitario,
-                'prezzo_dirittochiamata' => $prezzo_dirittochiamata,
-                'prezzo_ore_unitario_tecnico' => $prezzo_ore_unitario_tecnico,
-                'prezzo_km_unitario_tecnico' => $prezzo_km_unitario_tecnico,
-                'prezzo_dirittochiamata_tecnico' => $prezzo_dirittochiamata_tecnico,
-
-                'prezzo_ore_consuntivo' => $prezzo_ore_consuntivo,
-                'prezzo_km_consuntivo' => $prezzo_km_consuntivo,
-                'prezzo_ore_consuntivo_tecnico' => $prezzo_ore_consuntivo_tecnico,
-                'prezzo_km_consuntivo_tecnico' => $prezzo_km_consuntivo_tecnico,
-
-                'sconto' => $sconto,
-                'sconto_unitario' => $sconto_unitario,
-                'tipo_sconto' => $tipo_sconto,
-
-                'scontokm' => $scontokm,
-                'scontokm_unitario' => $scontokm_unitario,
-                'tipo_scontokm' => $tipo_scontokm,
-            ], ['id' => $idriga]);
         }
 
         $tipo_sconto = $post['tipo_sconto_globale'];
@@ -195,36 +200,16 @@ switch (post('op')) {
         break;
 
     case 'add':
-        /*
-        $codice = post('codice');
-
-        // Controlli sul codice
-        $count = -1;
-        do {
-            $new_codice = ($count < 0) ? $codice : get_next_code($codice, 1, get_var('Formato codice intervento'));
-            $rs = $dbo->fetchArray('SELECT codice FROM in_interventi WHERE codice='.prepare($new_codice));
-            ++$count;
-        } while (!empty($rs) || empty($new_codice));
-
-        if ($count > 0) {
-            $_SESSION['warnings'][] = tr('Numero intervento _NUM_ saltato perchè già esistente!', [
-                '_NUM_' => "'".$codice."'"
-            ]);
-            $_SESSION['warnings'][] = tr('Nuovo numero intervento calcolato _NUM_', [
-                '_NUM_' => "'".$new_codice."'"
-            ]);
-        }
-        */
         $formato = get_var('Formato codice intervento');
         $template = str_replace('#', '%', $formato);
 
         $rs = $dbo->fetchArray('SELECT codice FROM in_interventi WHERE codice=(SELECT MAX(CAST(codice AS SIGNED)) FROM in_interventi) AND codice LIKE '.prepare($template).' ORDER BY codice DESC LIMIT 0,1');
-        $codice = get_next_code($rs[0]['codice'], 1, $formato);
+        $codice = Util\Generator::generate($formato, $rs[0]['codice']);
 
         if (empty($codice)) {
             $rs = $dbo->fetchArray('SELECT codice FROM in_interventi WHERE codice LIKE '.prepare($template).' ORDER BY codice DESC LIMIT 0,1');
 
-            $codice = get_next_code($rs[0]['codice'], 1, $formato);
+            $codice = Util\Generator::generate($formato, $rs[0]['codice']);
         }
 
         // Informazioni di base
@@ -277,10 +262,28 @@ switch (post('op')) {
             // Se è specificato che l'intervento fa parte di una pianificazione aggiorno il codice dell'intervento sulla riga della pianificazione
             if (!empty($idcontratto_riga)) {
                 $dbo->update('co_righe_contratti', $array, ['idcontratto' => $idcontratto, 'id' => $idcontratto_riga]);
-            }
-            // Altrimenti inserisco una nuova pianificazione e collego l'intervento
-            else {
-                $dbo->insert('co_righe_contratti', array_merge(['idcontratto' => $idcontratto], $array));
+				
+				//copio le righe dal promemoria all'intervento
+				$dbo->query('INSERT INTO in_righe_interventi (descrizione, qta,um,prezzo_vendita,prezzo_acquisto,idiva,desc_iva,iva,idintervento,sconto,sconto_unitario,tipo_sconto) SELECT descrizione, qta,um,prezzo_vendita,prezzo_acquisto,idiva,desc_iva,iva,'.$id_record.',sconto,sconto_unitario,tipo_sconto FROM co_righe_contratti_materiali WHERE id_riga_contratto = '.$idcontratto_riga.'  ');
+				
+				//copio  gli articoli dal promemoria all'intervento
+				$dbo->query('INSERT INTO mg_articoli_interventi (idarticolo, idintervento,descrizione,prezzo_acquisto,prezzo_vendita,sconto,	sconto_unitario,	tipo_sconto,idiva,desc_iva,iva,idautomezzo, qta, um, abilita_serial, idimpianto) SELECT idarticolo, '.$id_record.',descrizione,prezzo_acquisto,prezzo_vendita,sconto,sconto_unitario,tipo_sconto,idiva,desc_iva,iva,idautomezzo, qta, um, abilita_serial, idimpianto FROM co_righe_contratti_articoli WHERE id_riga_contratto = '.$idcontratto_riga.'  ');
+				
+				 // Decremento la quantità per ogni articolo copiato
+				$rs_articoli = $dbo->fetchArray('SELECT * FROM mg_articoli_interventi WHERE idintervento = '.$id_record.' ');
+				foreach ($rs_articoli as $rs_articolo) {
+					add_movimento_magazzino($rs_articolo['idarticolo'], -force_decimal($rs_articolo['qta']), ['idautomezzo' => $rs_articolo['idautomezzo'], 'idintervento' => $id_record]);
+				}
+				
+            }else{
+                $dbo->insert('co_righe_contratti', [
+                    'idcontratto' => $idcontratto,
+                    'idintervento' => $id_record,
+                    'idtipointervento' => $idtipointervento,
+                    'data_richiesta' => $data_richiesta,
+                    'richiesta' => $richiesta,
+                    'idsede' => $idsede ?: 0,
+                ]);
             }
         }
 
@@ -401,6 +404,7 @@ switch (post('op')) {
         $descrizione = post('descrizione');
         $qta = post('qta');
         $um = post('um');
+        $idiva = post('idiva');
         $prezzo_vendita = post('prezzo_vendita');
         $prezzo_acquisto = post('prezzo_acquisto');
 
@@ -409,7 +413,13 @@ switch (post('op')) {
         $sconto = ($tipo_sconto == 'PRC') ? ($prezzo_vendita * $sconto_unitario) / 100 : $sconto_unitario;
         $sconto = $sconto * $qta;
 
-        $dbo->query('INSERT INTO in_righe_interventi(descrizione, qta, um, prezzo_vendita, prezzo_acquisto, sconto, sconto_unitario, tipo_sconto, idintervento) VALUES ('.prepare($descrizione).', '.prepare($qta).', '.prepare($um).', '.prepare($prezzo_vendita).', '.prepare($prezzo_acquisto).', '.prepare($sconto).', '.prepare($sconto_unitario).', '.prepare($tipo_sconto).', '.prepare($id_record).')');
+        //Calcolo iva
+        $rs_iva = $dbo->fetchArray('SELECT * FROM co_iva WHERE id='.prepare($idiva));
+        $desc_iva = $rs_iva[0]['descrizione'];
+
+        $iva = (($prezzo_vendita * $qta) - $sconto) * $rs_iva[0]['percentuale'] / 100;
+
+        $dbo->query('INSERT INTO in_righe_interventi(descrizione, qta, um, prezzo_vendita, prezzo_acquisto, idiva, desc_iva, iva, sconto, sconto_unitario, tipo_sconto, idintervento) VALUES ('.prepare($descrizione).', '.prepare($qta).', '.prepare($um).', '.prepare($prezzo_vendita).', '.prepare($prezzo_acquisto).', '.prepare($idiva).', '.prepare($desc_iva).', '.prepare($iva).', '.prepare($sconto).', '.prepare($sconto_unitario).', '.prepare($tipo_sconto).', '.prepare($id_record).')');
 
         break;
 
@@ -418,6 +428,7 @@ switch (post('op')) {
         $descrizione = post('descrizione');
         $qta = post('qta');
         $um = post('um');
+        $idiva = post('idiva');
         $prezzo_vendita = post('prezzo_vendita');
         $prezzo_acquisto = post('prezzo_acquisto');
 
@@ -426,12 +437,21 @@ switch (post('op')) {
         $sconto = ($tipo_sconto == 'PRC') ? ($prezzo_vendita * $sconto_unitario) / 100 : $sconto_unitario;
         $sconto = $sconto * $qta;
 
+        //Calcolo iva
+        $rs_iva = $dbo->fetchArray('SELECT * FROM co_iva WHERE id='.prepare($idiva));
+        $desc_iva = $rs_iva[0]['descrizione'];
+
+        $iva = (($prezzo_vendita * $qta) - $sconto) * $rs_iva[0]['percentuale'] / 100;
+
         $dbo->query('UPDATE in_righe_interventi SET '.
             ' descrizione='.prepare($descrizione).','.
             ' qta='.prepare($qta).','.
             ' um='.prepare($um).','.
             ' prezzo_vendita='.prepare($prezzo_vendita).','.
             ' prezzo_acquisto='.prepare($prezzo_acquisto).','.
+            ' idiva='.prepare($idiva).','.
+            ' desc_iva='.prepare($desc_iva).','.
+            ' iva='.prepare($iva).','.
             ' sconto='.prepare($sconto).','.
             ' sconto_unitario='.prepare($sconto_unitario).','.
             ' tipo_sconto='.prepare($tipo_sconto).
@@ -486,6 +506,7 @@ switch (post('op')) {
         $qta = post('qta');
         $um = post('um');
         $prezzo_vendita = post('prezzo_vendita');
+        $idiva = post('idiva');
 
         $sconto_unitario = $post['sconto'];
         $tipo_sconto = $post['tipo_sconto'];
@@ -501,8 +522,14 @@ switch (post('op')) {
         $rsart = $dbo->fetchArray('SELECT abilita_serial, prezzo_acquisto FROM mg_articoli WHERE id='.prepare($idarticolo));
         $prezzo_acquisto = $rsart[0]['prezzo_acquisto'];
 
+        //Calcolo iva
+        $rs_iva = $dbo->fetchArray('SELECT * FROM co_iva WHERE id='.prepare($idiva));
+        $desc_iva = $rs_iva[0]['descrizione'];
+
+        $iva = (($prezzo_vendita * $qta) - $sconto) * $rs_iva[0]['percentuale'] / 100;
+
         // Aggiunto il collegamento fra l'articolo e l'intervento
-        $idriga = $dbo->query('INSERT INTO mg_articoli_interventi(idarticolo, idintervento, idimpianto, idautomezzo, descrizione, prezzo_vendita, prezzo_acquisto, sconto, sconto_unitario, tipo_sconto, idiva_vendita, qta, um, abilita_serial) VALUES ('.prepare($idarticolo).', '.prepare($id_record).', '.(empty($idimpianto) ? 'NULL' : prepare($idimpianto)).', '.prepare($idautomezzo).', '.prepare($descrizione).', '.prepare($prezzo_vendita).', '.prepare($prezzo_acquisto).', '.prepare($sconto).', '.prepare($sconto_unitario).', '.prepare($tipo_sconto).', (SELECT idiva_vendita FROM mg_articoli WHERE id='.prepare($idarticolo).'), '.prepare($qta).', '.prepare($um).', '.prepare($rsart[0]['abilita_serial']).')');
+        $idriga = $dbo->query('INSERT INTO mg_articoli_interventi(idarticolo, idintervento, idimpianto, idautomezzo, descrizione, prezzo_vendita, prezzo_acquisto, sconto, sconto_unitario, tipo_sconto, idiva, desc_iva, iva, qta, um, abilita_serial) VALUES ('.prepare($idarticolo).', '.prepare($id_record).', '.(empty($idimpianto) ? 'NULL' : prepare($idimpianto)).', '.prepare($idautomezzo).', '.prepare($descrizione).', '.prepare($prezzo_vendita).', '.prepare($prezzo_acquisto).', '.prepare($sconto).', '.prepare($sconto_unitario).', '.prepare($tipo_sconto).', '.prepare($idiva).', '.prepare($desc_iva).', '.prepare($iva).', '.prepare($qta).', '.prepare($um).', '.prepare($rsart[0]['abilita_serial']).')');
 
         if (!empty($serials)) {
             if ($old_qta > $qta) {
@@ -575,7 +602,7 @@ switch (post('op')) {
 
                 if (!$img->save($docroot.'/files/interventi/'.$firma_file)) {
                     $_SESSION['errors'][] = tr('Impossibile creare il file!');
-                } elseif ($dbo->query('UPDATE in_interventi SET firma_file='.prepare($firma_file).', firma_data=NOW(), firma_nome = '.prepare($firma_nome).', idstatointervento = (SELECT idstatointervento FROM in_statiintervento WHERE completato = 1 LIMIT 0, 1) WHERE id='.prepare($id_record))) {
+                } elseif ($dbo->query('UPDATE in_interventi SET firma_file='.prepare($firma_file).', firma_data=NOW(), firma_nome = '.prepare($firma_nome).', idstatointervento = "OK" WHERE id='.prepare($id_record))) {
                     $_SESSION['infos'][] = tr('Firma salvata correttamente!');
                     $_SESSION['infos'][] = tr('Attività completata!');
                 } else {

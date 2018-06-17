@@ -2,7 +2,7 @@
 
 include_once __DIR__.'/../../core.php';
 
-$idconto = get('idconto');
+$idconto = $_GET['idconto'];
 $module_name = 'Piano dei conti';
 
 // carica report html
@@ -11,7 +11,7 @@ $body = file_get_contents($docroot.'/templates/partitario_mastrino/partitario_bo
 include_once $docroot.'/templates/pdfgen_variables.php';
 
 // Calcolo il percorso piano dei conti
-if (get('lev') == '3') {
+if ($_GET['lev'] == '3') {
     $rs = $dbo->fetchArray("SELECT idpianodeiconti2, CONCAT_WS(' ', numero, descrizione ) AS descrizione FROM co_pianodeiconti3 WHERE id=\"".$idconto.'"');
     $percorso = $rs[0]['descrizione'];
     $idpianodeiconti2 = $rs[0]['idpianodeiconti2'];
@@ -24,7 +24,7 @@ if (get('lev') == '3') {
 
     ($rs[0]['descrizione'] == '01 Patrimoniale') ? $descrizione = 'Stato patrimoniale' : $descrizione = 'Conto economico';
     $percorso = $descrizione.'<br>&nbsp;&nbsp;'.$percorso;
-} elseif (get('lev') == '2') {
+} elseif ($_GET['lev'] == '2') {
     $rs = $dbo->fetchArray("SELECT idpianodeiconti1, CONCAT_WS(' ', numero, descrizione ) AS descrizione FROM co_pianodeiconti2 WHERE id=\"".$idconto.'"');
     $percorso = $rs[0]['descrizione'].'<br>&nbsp;&nbsp;&nbsp;&nbsp;'.$percorso;
     $idpianodeiconti1 = $rs[0]['idpianodeiconti1'];
@@ -33,7 +33,7 @@ if (get('lev') == '3') {
 
     ($rs[0]['descrizione'] == '01 Patrimoniale') ? $descrizione = 'Stato patrimoniale' : $descrizione = 'Conto economico';
     $percorso = $descrizione.'<br>&nbsp;&nbsp;'.$percorso;
-} elseif (get('lev') == '1') {
+} elseif ($_GET['lev'] == '1') {
     $rs = $dbo->fetchArray("SELECT CONCAT_WS(' ', numero, descrizione ) AS descrizione FROM co_pianodeiconti1 WHERE id=\"".$idconto.'"');
 
     ($rs[0]['descrizione'] == '01 Patrimoniale') ? $descrizione = 'Stato patrimoniale' : $descrizione = 'Conto economico';
@@ -46,7 +46,7 @@ $body = str_replace('|period_start|', Translator::dateToLocale($_SESSION['period
 $body = str_replace('|period_end|', Translator::dateToLocale($_SESSION['period_end']), $body);
 
 // Stampa da livello 3
-if (get('lev') == '3') {
+if ($_GET['lev'] == '3') {
     $body .= "<table style='table-layout:fixed; border-bottom:1px solid #777; border-right:1px solid #777; border-left:1px solid #777;' cellpadding='0' cellspacing='0'>
                     <col width='80'><col width='452'><col width='80'><col width='80'>
                     <tbody>\n";
@@ -85,23 +85,23 @@ if (get('lev') == '3') {
         $saldo_finale[] = $rs[$i]['totale'];
     }
 
-    if ( sum($saldo_finale) < 0) {
+    if (sum($saldo_finale) < 0) {
         $dare = '';
-        $avere = abs( sum($saldo_finale) );
+        $avere = abs(sum($saldo_finale));
     } else {
-        $dare = abs( sum($saldo_finale) );
+        $dare = abs(sum($saldo_finale));
         $avere = '';
     }
 
     // Mostro il saldo finale
-    $body .= "		<tr><td class='br bb padded'></td><td class='br bb padded'><b>SALDO FINALE</b></td><td class='br bb padded text-right'><b>".Translator::numberToLocale( abs( sum($dare) ) )."</b></td><td class='bb padded text-right'><b>".Translator::numberToLocale( abs( sum($avere) ) )."</b></td></tr>\n";
+    $body .= "		<tr><td class='br bb padded'></td><td class='br bb padded'><b>SALDO FINALE</b></td><td class='br bb padded text-right'><b>".Translator::numberToLocale(abs(sum($dare)))."</b></td><td class='bb padded text-right'><b>".Translator::numberToLocale(abs(sum($avere)))."</b></td></tr>\n";
 
     $body .= "		</tbody>
                 </table>\n";
 }
 
 // Stampa da livello 2
-elseif (get('lev') == '2') {
+elseif ($_GET['lev'] == '2') {
     $body .= "<table style='table-layout:fixed; border-bottom:1px solid #777; border-right:1px solid #777; border-left:1px solid #777;' cellpadding='0' cellspacing='0'>
                     <col width='80'><col width='452'><col width='80'><col width='80'>
                     <tbody>\n";
@@ -121,10 +121,10 @@ elseif (get('lev') == '2') {
         $saldo_iniziale = $rs[0]['totale'];
         $saldo_finale[] = $saldo_iniziale;
 
-        if ( $saldo_iniziale < 0) {
-            $v_avere[] = abs( $saldo_iniziale );
+        if ($saldo_iniziale < 0) {
+            $v_avere[] = abs($saldo_iniziale);
         } else {
-            $v_dare[] = abs( $saldo_iniziale );
+            $v_dare[] = abs($saldo_iniziale);
         }
 
         $rs = $dbo->fetchArray('SELECT * FROM co_movimenti WHERE idconto="'.$rs3[$z]['id'].'" AND data >= "'.$_SESSION['period_start'].'" AND data <= "'.$_SESSION['period_end'].'" ORDER BY data ASC');
@@ -215,9 +215,9 @@ elseif (get('lev') == '1') {
 
     // Stampa "Costi/Ricavi" se conto economico
     if ($rs1[0]['descrizione'] == 'Economico') {
-        $body .= "		<tr><th colspan='3' class='br bb padded'>RICAVI</th><th align='right' class='bb padded'>".Translator::numberToLocale( sum($ricavi) )."</th></tr>\n";
-        $body .= "		<tr><th colspan='3' class='br bb padded'>COSTI</th><th align='right' class='bb padded'>".Translator::numberToLocale( sum($costi) )."</th></tr>\n";
-        $body .= "		<tr><th colspan='3' class='br padded'>UTILE</th><th class='padded' align='right'>".Translator::numberToLocale( sum($ricavi) - sum($costi) )."</th></tr>\n";
+        $body .= "		<tr><th colspan='3' class='br bb padded'>RICAVI</th><th align='right' class='bb padded'>".Translator::numberToLocale(sum($ricavi))."</th></tr>\n";
+        $body .= "		<tr><th colspan='3' class='br bb padded'>COSTI</th><th align='right' class='bb padded'>".Translator::numberToLocale(sum($costi))."</th></tr>\n";
+        $body .= "		<tr><th colspan='3' class='br padded'>UTILE</th><th class='padded' align='right'>".Translator::numberToLocale(sum($ricavi) - sum($costi))."</th></tr>\n";
     }
 
     // Stampa "Attività/Passività" se stato patrimoniale
@@ -270,9 +270,9 @@ elseif (get('lev') == '1') {
         $body .= "	</table>\n";
 
         // Tabella di riepilogo finale
-        $totale_attivita = abs( sum($totale_attivita) );
-        $totale_passivita = abs( sum($totale_passivita) );
-        $utile_perdita = abs( sum($ricavi) ) - abs( sum($costi) );
+        $totale_attivita = abs(sum($totale_attivita));
+        $totale_passivita = abs(sum($totale_passivita));
+        $utile_perdita = abs(sum($ricavi)) - abs(sum($costi));
 
         if ($utile_perdita < 0) {
             $pareggio1 = $totale_attivita + abs($utile_perdita);

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Classe per la gestione delle informazioni relative ai moduli installati.
+ * Classe per la gestione delle informazioni relative ai plugin installati.
  *
  * @since 2.3
  */
@@ -13,7 +13,7 @@ class Plugins
     protected static $queries = [];
 
     /**
-     * Restituisce tutte le informazioni di tutti i moduli installati.
+     * Restituisce tutte le informazioni di tutti i plugin installati.
      *
      * @return array
      */
@@ -27,6 +27,11 @@ class Plugins
             $plugins = [];
 
             foreach ($results as $result) {
+                $result['options'] = App::replacePlaceholder($result['options'], filter('id_parent'));
+                $result['options2'] = App::replacePlaceholder($result['options2'], filter('id_parent'));
+
+                $result['option'] = empty($result['options2']) ? $result['options'] : $result['options2'];
+
                 $plugins[$result['id']] = $result;
                 $plugins[$result['name']] = $result['id'];
             }

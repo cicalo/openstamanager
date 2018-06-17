@@ -23,7 +23,7 @@ class Database extends Util\Singleton
 
     /**
      * Costruisce la nuova connessione al database.
-     * Basato sul framework open source Medoo.
+     * Ispirato dal framework open-source Medoo.
      *
      * @param string|array $server
      * @param string       $username
@@ -38,8 +38,6 @@ class Database extends Util\Singleton
      */
     protected function __construct($server, $username, $password, $database_name, $charset = null, $option = [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION])
     {
-        global $debug;
-
         if (is_array($server)) {
             $host = $server['host'];
             $port = !empty($server['port']) ? $server['port'] : null;
@@ -49,7 +47,12 @@ class Database extends Util\Singleton
             $port = !empty($temp[1]) ? $temp[1] : null;
         }
 
-        if (empty($port) || !is_int($port * 1)) {
+        // Possibilità di specificare una porta per il servizio MySQL diversa dalla standard 3306
+        $port = !empty(App::getConfig()['port']) ? App::getConfig()['port'] : $port;
+
+        if (!empty($port) && is_int($port * 1)) {
+            $port = $port;
+        } else {
             $port = 3306;
         }
 
@@ -64,7 +67,7 @@ class Database extends Util\Singleton
                 'password' => $password,
                 'charset' => 'utf8',
                 'prefix' => '',
-                'port' => 3306,
+                'port' => $port,
             ]);
 
             $this->connection = $this->capsule->getConnection();
@@ -107,17 +110,17 @@ class Database extends Util\Singleton
      *
      * @return Database
      */
-    public static function getConnection($new = false)
+    public static function getConnection($new = false, $data = [])
     {
-        $class = get_called_class(); // late-static-bound class name
+        $class = get_called_class();
 
         if (empty(parent::$instance[$class]) || !parent::$instance[$class]->isConnected() || $new) {
-            global $db_host;
-            global $db_username;
-            global $db_password;
-            global $db_name;
+            $config = App::getConfig();
 
-            parent::$instance[$class] = new self($db_host, $db_username, $db_password, $db_name);
+            // Sostituzione degli eventuali valori aggiuntivi
+            $config = array_merge($config, $data);
+
+            parent::$instance[$class] = new self($config['db_host'], $config['db_username'], $config['db_password'], $config['db_name']);
         }
 
         return parent::$instance[$class];
