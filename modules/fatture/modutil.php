@@ -832,7 +832,9 @@ function aggiorna_sconto($tables, $fields, $id_record, $options = [])
             'desc_iva' => $rsi[0]['descrizione'],
             'iva' => -$iva,
             'sconto_globale' => 1,
-            '#order' => '(SELECT IFNULL(MAX(`order`) + 1, 0) FROM '.$tables['row'].' AS t WHERE '.$fields['row'].'='.prepare($id_record).')',
+            'order' => Medoo\Medoo::raw('(SELECT IFNULL(MAX(<order>) + 1, 0) FROM <'.$tables['row'].'> AS t WHERE <'.$fields['row'].'> = :id)', [
+                ':id' => $id_record,
+            ]),
         ];
 
         $dbo->insert($tables['row'], $values);

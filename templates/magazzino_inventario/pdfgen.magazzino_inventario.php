@@ -39,8 +39,8 @@ if ($search_descrizione!='')
 $add_having = '';
 if (!empty($search_categoria))
 		$add_having .= "  AND CONCAT_WS( ' ', categoria, subcategoria ) LIKE '%".$search_categoria."%' ";
-	
-	
+
+
 
 include_once $docroot.'/templates/pdfgen_variables.php';
 

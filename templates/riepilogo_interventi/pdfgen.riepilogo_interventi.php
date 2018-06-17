@@ -17,7 +17,7 @@ if (is_array($_SESSION['module_'.$id_module])) {
         if ($field_value != '') {
             $field_name = str_replace('search_', '', $field_name);
             $field_name = str_replace('__', ' ', $field_name);
-			$field_name = str_replace('-', ' ', $field_name);
+            $field_name = str_replace('-', ' ', $field_name);
             array_push($search_filters, '`'.$field_name.'` LIKE "%'.$field_value.'%"');
         }
     }
@@ -78,7 +78,7 @@ $idinterventi = ['0'];
 if ($totrows > 0) {
     for ($i = 0; $i < $totrows; ++$i) {
         // Lettura dati dei tecnici dell'intervento corrente
-        $query = 'SELECT *, ( ( TIME_TO_SEC(orario_fine)-TIME_TO_SEC(orario_inizio) )  ) AS t, (SELECT ragione_sociale FROM an_anagrafiche WHERE idanagrafica=idtecnico) AS nome_tecnico FROM in_interventi_tecnici WHERE idintervento="'.$rsi[$i]['id'].'"';
+        $query = 'SELECT *, ( ( TIME_TO_SEC(orario_fine)-TIME_TO_SEC(orario_inizio) )  ) AS t, (SELECT ragione_sociale FROM an_anagrafiche WHERE idanagrafica=idtecnico) AS nome_tecnico FROM in_interventi_tecnici WHERE idintervento='.prepare($rsi[$i]['id']);
         $rs = $dbo->fetchArray($query);
         $n_tecnici = sizeof($rs);
 

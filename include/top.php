@@ -16,7 +16,7 @@ if (!empty($debug)) {
     $debugbar->addCollector(new DebugBar\DataCollector\TimeDataCollector());
 
     $debugbar->addCollector(new DebugBar\Bridge\MonologCollector($logger));
-    $debugbar->addCollector(new DebugBar\DataCollector\PDO\PDOCollector($dbo->getPDO()));
+    $debugbar->addCollector(new Extension\MedooCollector($dbo));
 
     $debugbarRenderer = $debugbar->getJavascriptRenderer();
     $debugbarRenderer->setIncludeVendors(false);

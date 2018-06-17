@@ -11,35 +11,30 @@ $body = file_get_contents($docroot.'/templates/partitario_mastrino/partitario_bo
 include_once $docroot.'/templates/pdfgen_variables.php';
 
 // Calcolo il percorso piano dei conti
-if ($_GET['lev'] == '3') {
-    $rs = $dbo->fetchArray("SELECT idpianodeiconti2, CONCAT_WS(' ', numero, descrizione ) AS descrizione FROM co_pianodeiconti3 WHERE id=\"".$idconto.'"');
+if (get('lev') == '3') {
+    $rs = $dbo->fetchArray("SELECT idpianodeiconti2, CONCAT_WS(' ', numero, descrizione ) AS descrizione FROM co_pianodeiconti3 WHERE id=".prepare($idconto));
     $percorso = $rs[0]['descrizione'];
     $idpianodeiconti2 = $rs[0]['idpianodeiconti2'];
 
-    $rs = $dbo->fetchArray("SELECT idpianodeiconti1, CONCAT_WS(' ', numero, descrizione ) AS descrizione FROM co_pianodeiconti2 WHERE id=\"".$idpianodeiconti2.'"');
+    $rs = $dbo->fetchArray("SELECT idpianodeiconti1, CONCAT_WS(' ', numero, descrizione ) AS descrizione FROM co_pianodeiconti2 WHERE id=".prepare($idpianodeiconti2));
     $percorso = $rs[0]['descrizione'].'<br>&nbsp;&nbsp;&nbsp;&nbsp;'.$percorso;
     $idpianodeiconti1 = $rs[0]['idpianodeiconti1'];
 
-    $rs = $dbo->fetchArray("SELECT CONCAT_WS(' ', numero, descrizione ) AS descrizione FROM co_pianodeiconti1 WHERE id=\"".$idpianodeiconti1.'"');
+    $rs = $dbo->fetchArray("SELECT CONCAT_WS(' ', numero, descrizione ) AS descrizione FROM co_pianodeiconti1 WHERE id=".prepare($idpianodeiconti1));
 
     ($rs[0]['descrizione'] == '01 Patrimoniale') ? $descrizione = 'Stato patrimoniale' : $descrizione = 'Conto economico';
     $percorso = $descrizione.'<br>&nbsp;&nbsp;'.$percorso;
-} elseif ($_GET['lev'] == '2') {
-    $rs = $dbo->fetchArray("SELECT idpianodeiconti1, CONCAT_WS(' ', numero, descrizione ) AS descrizione FROM co_pianodeiconti2 WHERE id=\"".$idconto.'"');
+} elseif (get('lev') == '2') {
+    $rs = $dbo->fetchArray("SELECT idpianodeiconti1, CONCAT_WS(' ', numero, descrizione ) AS descrizione FROM co_pianodeiconti2 WHERE id=".prepare($idconto));
     $percorso = $rs[0]['descrizione'].'<br>&nbsp;&nbsp;&nbsp;&nbsp;'.$percorso;
     $idpianodeiconti1 = $rs[0]['idpianodeiconti1'];
 
-    $rs = $dbo->fetchArray("SELECT CONCAT_WS(' ', numero, descrizione ) AS descrizione FROM co_pianodeiconti1 WHERE id=\"".$idpianodeiconti1.'"');
+    $rs = $dbo->fetchArray("SELECT CONCAT_WS(' ', numero, descrizione ) AS descrizione FROM co_pianodeiconti1 WHERE id=".prepare($idpianodeiconti1));
 
     ($rs[0]['descrizione'] == '01 Patrimoniale') ? $descrizione = 'Stato patrimoniale' : $descrizione = 'Conto economico';
     $percorso = $descrizione.'<br>&nbsp;&nbsp;'.$percorso;
-} elseif ($_GET['lev'] == '1') {
-    $rs = $dbo->fetchArray("SELECT CONCAT_WS(' ', numero, descrizione ) AS descrizione FROM co_pianodeiconti1 WHERE id=\"".$idconto.'"');
-
-    ($rs[0]['descrizione'] == '01 Patrimoniale') ? $descrizione = 'Stato patrimoniale' : $descrizione = 'Conto economico';
     $percorso = $descrizione.'<br>&nbsp;<br>&nbsp;';
 }
-
 $body = str_replace('|percorso|', $percorso, $body);
 $body = str_replace('|info_fornitore|', $f_ragionesociale.'<br>'.$f_indirizzo.'<br>'.$f_citta, $body);
 $body = str_replace('|period_start|', Translator::dateToLocale($_SESSION['period_start']), $body);
@@ -55,7 +50,7 @@ if ($_GET['lev'] == '3') {
     $saldo_finale = [];
 
     // Calcolo saldo iniziale
-    $rs = $dbo->fetchArray('SELECT SUM(totale) AS totale FROM co_movimenti WHERE idconto="'.$idconto.'" AND data < "'.$_SESSION['period_start'].'"');
+    $rs = $dbo->fetchArray('SELECT SUM(totale) AS totale FROM co_movimenti WHERE idconto='.prepare($idconto).' AND data < '.prepare($_SESSION['period_start']).'');
     $saldo_iniziale = $rs[0]['totale'];
     $saldo_finale = $saldo_iniziale;
 
@@ -69,7 +64,7 @@ if ($_GET['lev'] == '3') {
 
     $body .= "		<tr><td class='br bb padded'></td><td class='br bb padded'><b>SALDO INIZIALE</b></td><td class='br bb padded text-right'><b>".Translator::numberToLocale(abs($dare))."</b></td><td class='bb padded text-right'><b>".Translator::numberToLocale(abs($avere))."</b></td></tr>\n";
 
-    $rs = $dbo->fetchArray('SELECT * FROM co_movimenti WHERE idconto="'.$idconto.'" AND data >= "'.$_SESSION['period_start'].'" AND data <= "'.$_SESSION['period_end'].'" ORDER BY data ASC');
+    $rs = $dbo->fetchArray('SELECT * FROM co_movimenti WHERE idconto='.prepare($idconto).' AND data >= '.prepare($_SESSION['period_start']).' AND data <= '.prepare($_SESSION['period_end']).' ORDER BY data ASC');
 
     for ($i = 0; $i < sizeof($rs); ++$i) {
         if ($rs[$i]['totale'] >= 0) {
@@ -107,7 +102,7 @@ elseif ($_GET['lev'] == '2') {
                     <tbody>\n";
 
     // Ciclo fra i sotto-conti di livello 2
-    $rs3 = $dbo->fetchArray('SELECT id, numero, descrizione FROM co_pianodeiconti3 WHERE idpianodeiconti2="'.$idconto.'"');
+    $rs3 = $dbo->fetchArray('SELECT id, numero, descrizione FROM co_pianodeiconti3 WHERE idpianodeiconti2='.prepare($idconto).'');
 
     for ($z = 0; $z < sizeof($rs3); ++$z) {
         $v_dare = [];
@@ -117,7 +112,7 @@ elseif ($_GET['lev'] == '2') {
         $saldo_finale = [];
 
         // Calcolo saldo iniziale
-        $rs = $dbo->fetchArray('SELECT SUM(totale) AS totale FROM co_movimenti WHERE idconto="'.$rs3[$z]['id'].'" AND data < "'.$_SESSION['period_start'].'"');
+        $rs = $dbo->fetchArray('SELECT SUM(totale) AS totale FROM co_movimenti WHERE idconto='.prepare($rs3[$z]['id']).' AND data < '.prepare($_SESSION['period_start']).'');
         $saldo_iniziale = $rs[0]['totale'];
         $saldo_finale[] = $saldo_iniziale;
 
@@ -127,7 +122,7 @@ elseif ($_GET['lev'] == '2') {
             $v_dare[] = abs($saldo_iniziale);
         }
 
-        $rs = $dbo->fetchArray('SELECT * FROM co_movimenti WHERE idconto="'.$rs3[$z]['id'].'" AND data >= "'.$_SESSION['period_start'].'" AND data <= "'.$_SESSION['period_end'].'" ORDER BY data ASC');
+        $rs = $dbo->fetchArray('SELECT * FROM co_movimenti WHERE idconto='.prepare($rs3[$z]['id']).' AND data >= '.prepare($_SESSION['period_start']).' AND data <= '.prepare($_SESSION['period_end']).' ORDER BY data ASC');
 
         for ($i = 0; $i < sizeof($rs); ++$i) {
             if ($rs[$i]['totale'] >= 0) {
@@ -167,23 +162,23 @@ elseif (get('lev') == '1') {
                     <tbody>\n";
 
     // Ciclo fra il conto principale scelto (Economico o Patrimoniale)
-    $rs1 = $dbo->fetchArray('SELECT id, numero, descrizione FROM co_pianodeiconti1 WHERE id="'.$idconto.'" ORDER BY numero DESC');
+    $rs1 = $dbo->fetchArray('SELECT id, numero, descrizione FROM co_pianodeiconti1 WHERE id='.prepare($idconto).' ORDER BY numero DESC');
 
     for ($x = 0; $x < sizeof($rs1); ++$x) {
         // Ciclo fra i sotto-conti di livello 1
-        $rs2 = $dbo->fetchArray('SELECT id, numero, descrizione FROM co_pianodeiconti2 WHERE idpianodeiconti1="'.$rs1[$x]['id'].'"');
+        $rs2 = $dbo->fetchArray('SELECT id, numero, descrizione FROM co_pianodeiconti2 WHERE idpianodeiconti1='.prepare($rs1[$x]['id']).'');
 
         for ($y = 0; $y < sizeof($rs2); ++$y) {
             $body .= "		<tr><th class='bb padded' colspan='4'><b>".$rs2[$y]['numero'].' '.$rs2[$y]['descrizione']."</b></th></tr>\n";
 
             // Ciclo fra i sotto-conti di livello 2
-            $rs3 = $dbo->fetchArray('SELECT id, numero, descrizione FROM co_pianodeiconti3 WHERE idpianodeiconti2="'.$rs2[$y]['id'].'"');
+            $rs3 = $dbo->fetchArray('SELECT id, numero, descrizione FROM co_pianodeiconti3 WHERE idpianodeiconti2='.prepare($rs2[$y]['id']).'');
 
             for ($z = 0; $z < sizeof($rs3); ++$z) {
                 $v_dare = [];
                 $v_avere = [];
 
-                $rs = $dbo->fetchArray('SELECT * FROM co_movimenti WHERE idconto="'.$rs3[$z]['id'].'" AND data >= "'.$_SESSION['period_start'].'" AND data <= "'.$_SESSION['period_end'].'" ORDER BY data ASC');
+                $rs = $dbo->fetchArray('SELECT * FROM co_movimenti WHERE idconto='.prepare($rs3[$z]['id']).' AND data >= '.prepare($_SESSION['period_start']).' AND data <= '.prepare($_SESSION['period_end']).' ORDER BY data ASC');
 
                 for ($i = 0; $i < sizeof($rs); ++$i) {
                     if ($rs[$i]['totale'] >= 0) {
@@ -226,26 +221,26 @@ elseif (get('lev') == '1') {
         $ricavi = [];
 
         // Ciclo fra il conto economico per calcolare l'utile o la perdita
-        $rs1 = $dbo->fetchArray('SELECT id, numero, descrizione FROM co_pianodeiconti1 WHERE NOT id="'.$idconto.'" ORDER BY numero DESC');
+        $rs1 = $dbo->fetchArray('SELECT id, numero, descrizione FROM co_pianodeiconti1 WHERE NOT id='.prepare($idconto).' ORDER BY numero DESC');
 
         for ($x = 0; $x < sizeof($rs1); ++$x) {
             // Ciclo fra i sotto-conti di livello 1
-            $rs2 = $dbo->fetchArray('SELECT id, numero, descrizione FROM co_pianodeiconti2 WHERE idpianodeiconti1="'.$rs1[$x]['id'].'"');
+            $rs2 = $dbo->fetchArray('SELECT id, numero, descrizione FROM co_pianodeiconti2 WHERE idpianodeiconti1='.prepare($rs1[$x]['id']).'');
 
             for ($y = 0; $y < sizeof($rs2); ++$y) {
                 // Ciclo fra i sotto-conti di livello 2
-                $rs3 = $dbo->fetchArray('SELECT id, numero, descrizione FROM co_pianodeiconti3 WHERE idpianodeiconti2="'.$rs2[$y]['id'].'"');
+                $rs3 = $dbo->fetchArray('SELECT id, numero, descrizione FROM co_pianodeiconti3 WHERE idpianodeiconti2='.prepare($rs2[$y]['id']).'');
 
                 for ($z = 0; $z < sizeof($rs3); ++$z) {
                     // Inizializzo saldo finale
                     $saldo_finale = [];
 
                     // Calcolo saldo iniziale
-                    $rs = $dbo->fetchArray('SELECT SUM(totale) AS totale FROM co_movimenti WHERE idconto="'.$rs2[$y]['id'].'" AND data < "'.$_SESSION['period_start'].'"');
+                    $rs = $dbo->fetchArray('SELECT SUM(totale) AS totale FROM co_movimenti WHERE idconto='.prepare($rs2[$y]['id']).' AND data < '.prepare($_SESSION['period_start']).'');
                     $dare = [];
                     $avere = [];
 
-                    $rs = $dbo->fetchArray('SELECT * FROM co_movimenti WHERE idconto="'.$rs3[$z]['id'].'" AND data >= "'.$_SESSION['period_start'].'" AND data <= "'.$_SESSION['period_end'].'" ORDER BY data ASC');
+                    $rs = $dbo->fetchArray('SELECT * FROM co_movimenti WHERE idconto='.prepare($rs3[$z]['id']).' AND data >= '.prepare($_SESSION['period_start']).' AND data <= '.prepare($_SESSION['period_end']).' ORDER BY data ASC');
 
                     for ($i = 0; $i < sizeof($rs); ++$i) {
                         if ($rs[$i]['totale'] >= 0) {

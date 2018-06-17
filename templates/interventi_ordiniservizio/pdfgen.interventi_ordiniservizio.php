@@ -6,7 +6,7 @@ $module_name = 'Interventi';
 
 // carica info ordine servizio
 $idintervento = save($_GET['idintervento']);
-$query = "SELECT *, (SELECT CONCAT_WS('-', codice, ragione_sociale ) FROM an_anagrafiche WHERE idanagrafica=(SELECT idtecnico FROM in_interventi_tecnici WHERE idintervento=co_ordiniservizio.idintervento LIMIT 0,1)) AS tecnico, (SELECT data FROM in_interventi WHERE id=co_ordiniservizio.idintervento) AS data_intervento FROM co_ordiniservizio WHERE idintervento=\"$idintervento\" ".Modules::getAdditionalsQuery('Interventi');
+$query = "SELECT *, (SELECT CONCAT_WS('-', codice, ragione_sociale ) FROM an_anagrafiche WHERE idanagrafica=(SELECT idtecnico FROM in_interventi_tecnici WHERE idintervento=co_ordiniservizio.idintervento LIMIT 0,1)) AS tecnico, (SELECT data FROM in_interventi WHERE id=co_ordiniservizio.idintervento) AS data_intervento FROM co_ordiniservizio WHERE idintervento=".prepare($idintervento).' '.Modules::getAdditionalsQuery('Interventi');
 $rs = $dbo->fetchArray($query);
 $idcliente = $rs[0]['idanagrafica'];
 $data_intervento = $rs[0]['data_intervento'];
@@ -42,7 +42,7 @@ $body .= "</table>\n\n\n";
     Dati intestazione doppia
 */
 // Info contratto
-$rs2 = $dbo->fetchArray('SELECT * FROM co_contratti WHERE id="'.$rs[0]['idcontratto'].'"');
+$rs2 = $dbo->fetchArray('SELECT * FROM co_contratti WHERE id='.prepare($rs[0]['idcontratto']));
 $body .= "<table class=\"table_values\" cellspacing=\"0\" border=\"0\" cellpadding=\"0\" style=\"width:100%; table-layout:fixed; border-color:#aaa;\">\n";
 
 // Informazioni a sinistra
@@ -53,7 +53,7 @@ $body .= '	durata dal '.Translator::dateToLocale($rs2[0]['data_accettazione']).'
 $body .= '	Tipologia: '.$rs2[0]['nome']."<br/><br/>\n";
 
 // Info impianto
-$rs3 = $dbo->fetchArray('SELECT * FROM my_impianti WHERE id="'.$rs[0]['id'].'"');
+$rs3 = $dbo->fetchArray('SELECT * FROM my_impianti WHERE id='.prepare($rs[0]['id']));
 $body .= "	<b>Impianto:</b><br/>\n";
 $body .= '	Matricola: '.$rs3[0]['matricola']."<br/>\n";
 $body .= '	Tipologia: '.$rs3[0]['nome']."<br/>\n";
@@ -73,7 +73,7 @@ $body .= "<td style=\"width:50%;\" valign=\"top\">\n";
 
 // Sede impianto
 $ripeti = true;
-$rs2 = $dbo->fetchArray('SELECT * FROM an_sedi WHERE id=(SELECT idsede FROM my_impianti WHERE id="'.$rs[0]['id'].'")');
+$rs2 = $dbo->fetchArray('SELECT * FROM an_sedi WHERE id=(SELECT idsede FROM my_impianti WHERE id='.prepare($rs[0]['id']).')');
 
 if ($rs2[0]['indirizzo'] != '') {
     $body .= "	 <b>Indirizzo impianto:</b><br/>\n";
@@ -83,7 +83,7 @@ if ($rs2[0]['indirizzo'] != '') {
     $ripeti = false;
 }
 
-$rs2 = $dbo->fetchArray('SELECT * FROM an_anagrafiche WHERE idanagrafica=(SELECT idanagrafica FROM in_interventi WHERE id="'.$idintervento.'")');
+$rs2 = $dbo->fetchArray('SELECT * FROM an_anagrafiche WHERE idanagrafica=(SELECT idanagrafica FROM in_interventi WHERE id='.prepare($idintervento).')');
 
 if ($ripeti) {
     $body .= "	<b>Indirizzo impianto:</b><br/>\n";
@@ -112,7 +112,7 @@ $body .= "</table><br/>\n\n\n";
 /*
     Elenco voci di servizio
 */
-$rs = $dbo->fetchArray('SELECT * FROM co_ordiniservizio_vociservizio WHERE idordineservizio=(SELECT id FROM co_ordiniservizio WHERE idintervento="'.$idintervento.'" LIMIT 0,1) ORDER BY categoria ASC');
+$rs = $dbo->fetchArray('SELECT * FROM co_ordiniservizio_vociservizio WHERE idordineservizio=(SELECT id FROM co_ordiniservizio WHERE idintervento='.prepare($idintervento).' LIMIT 0,1) ORDER BY categoria ASC');
 
 $body .= "<table class=\"table_values\" cellspacing=\"0\" border=\"0\" cellpadding=\"10\" style=\"width:100%; table-layout:fixed; border-color:#aaa;\">\n";
 $body .= "<col width='60'><col width='16'><col width='16'><col width='77'>\n";

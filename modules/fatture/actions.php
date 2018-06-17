@@ -247,18 +247,18 @@ switch (post('op')) {
     // Duplicazione fattura
     case 'copy':
         if ($id_record) {
-			
+
 			 // Duplicazione righe
             $righe = $dbo->fetchArray('SELECT * FROM co_righe_documenti WHERE iddocumento='.prepare($id_record));
 
             // Lettura dati fattura attuale
             $rs = $dbo->fetchArray('SELECT * FROM co_documenti WHERE id='.prepare($id_record));
-			
+
 			$id_segment = $rs[0]['id_segment'];
-			
+
             // Calcolo prossimo numero fattura
             $numero = get_new_numerofattura(date('Y-m-d'));
-			  
+
             if ($dir == 'entrata') {
                 $numero_esterno = get_new_numerosecondariofattura(date('Y-m-d'));
             } else {
@@ -599,25 +599,25 @@ switch (post('op')) {
             if (!empty($post['import'])) {
                 // Replicazione delle righe del preventivo sul documento
                 $righe = $dbo->fetchArray('SELECT idarticolo, idiva, desc_iva, iva, iva_indetraibile, descrizione, subtotale, um, qta, sconto, sconto_unitario, tipo_sconto, IFNULL( (SELECT mg_articoli.abilita_serial FROM mg_articoli WHERE mg_articoli.id=co_righe_preventivi.idarticolo), 0 ) AS abilita_serial FROM co_righe_preventivi WHERE idpreventivo='.prepare($idpreventivo));
-				
-				
-			
-			
-			
+
+
+
+
+
                 foreach ($righe as $key => $riga) {
-					
+
 						$subtot = $riga['subtotale'];
-						
+
 						$sconto = $riga['sconto'];
-				
+
 						//Ricalcolo ritenuta per ogni singola riga
 					   if(get_var("Metodologia calcolo ritenuta d'acconto predefinito")=='Imponibile'){
 							$ritenutaacconto = ($subtot - $sconto) / 100 * $rs[0]['percentuale'];
 						}else{
 							$ritenutaacconto = ($subtot - $sconto + $rivalsainps) / 100 * $rs[0]['percentuale'];
 						}
-				
-				
+
+
                     $dbo->insert('co_righe_documenti', [
                         'iddocumento' => $id_record,
                         'idpreventivo' => $idpreventivo,
@@ -633,8 +633,14 @@ switch (post('op')) {
                         'qta' => $riga['qta'],
                         'sconto' => $riga['sconto'],
                         'sconto_unitario' => $riga['sconto_unitario'],
+<<<<<<< HEAD
+                        'order' => Medoo\Medoo::raw('(SELECT IFNULL(MAX(<order>) + 1, 0) FROM <co_righe_documenti> AS t WHERE <iddocumento> = :id)', [
+                            ':id' => $id_record,
+                        ]),
+=======
                         'tipo_sconto' => $riga['tipo_sconto'],
                         '#order' => '(SELECT IFNULL(MAX(`order`) + 1, 0) FROM co_righe_documenti AS t WHERE iddocumento='.prepare($id_record).')',
+>>>>>>> master
                         'idritenutaacconto' => get_var("Percentuale ritenuta d'acconto"),
                         'ritenutaacconto' => $ritenutaacconto,
                         'idrivalsainps' => get_var('Percentuale rivalsa INPS'),
@@ -652,11 +658,11 @@ switch (post('op')) {
                 $query = 'INSERT INTO co_righe_documenti(iddocumento, idpreventivo, idconto, desc_iva, iva, iva_indetraibile, descrizione, subtotale, sconto, sconto_unitario, tipo_sconto, um, qta, idritenutaacconto, ritenutaacconto, idrivalsainps, rivalsainps, `order`) VALUES('.prepare($id_record).', '.prepare($idpreventivo).', '.prepare($idconto).', '.prepare($desc_iva).', '.prepare($iva).', '.prepare($iva_indetraibile).', '.prepare($descrizione).', '.prepare($prezzo).', '.prepare($sconto).', '.prepare($sconto_unitario).', '.prepare($tipo_sconto).", '-', 1, ".prepare(get_var("Percentuale ritenuta d'acconto")).', '.prepare($ritenutaacconto).', '.prepare(get_var('Percentuale rivalsa INPS')).', '.prepare($rivalsainps).', (SELECT IFNULL(MAX(`order`) + 1, 0) FROM co_righe_documenti AS t WHERE iddocumento='.prepare($id_record).'))';
                 $dbo->query($query);
             }
-            
+
             // Aggiorno lo stato degli interventi collegati al preventivo se ce ne sono
             $query2 = 'SELECT idpreventivo FROM co_righe_documenti WHERE iddocumento='.prepare($id_record).' AND NOT idpreventivo=0 AND idpreventivo IS NOT NULL';
             $rs2 = $dbo->fetchArray($query2);
-            
+
             for ($j = 0; $j < sizeof($rs2); ++$j) {
                 $dbo->query("UPDATE in_interventi SET idstatointervento=(SELECT idstatointervento FROM in_statiintervento WHERE descrizione='Fatturato') WHERE id IN (SELECT idintervento FROM co_preventivi_interventi WHERE idpreventivo=".prepare($rs2[$j]['idpreventivo']).')');
             }
@@ -1256,7 +1262,7 @@ switch (post('op')) {
         if (!empty($id_record) && isset($post['idarticolo'])) {
             $idriga = post('idriga');
             $idarticolo = post('idarticolo');
-            
+
             // Leggo se la riga è collegata a un ddt, per aggiornargli lo stato
             $rs = $dbo->fetchArray('SELECT qta, descrizione, idarticolo, idddt, idiva FROM co_righe_documenti WHERE iddocumento='.prepare($id_record).' AND id='.prepare($idriga));
             $idddt = $rs[0]['idddt'];
@@ -1271,12 +1277,12 @@ switch (post('op')) {
                 if( !empty($idddt) ){
                     // Se nella fattura non c'é più il ddt rimosso, aggiorno lo stato del ddt in "Bozza"
                     $rs = $dbo->fetchArray('SELECT id FROM co_righe_documenti WHERE iddocumento='.prepare($id_record).' AND idddt='.prepare($idddt));
-                
+
                     if( sizeof($rs) == 0 ){
                         $dbo->query('UPDATE dt_ddt SET idstatoddt=(SELECT id FROM dt_statiddt WHERE descrizione="Bozza") WHERE id = '.prepare($idddt));
                     }
                 }
-                
+
                 // Ricalcolo inps, ritenuta e bollo
                 if ($dir == 'entrata') {
                     ricalcola_costiagg_fattura($id_record);
@@ -1416,12 +1422,12 @@ switch (post('op')) {
                 if( !empty($idddt) ){
                     // Se nella fattura non c'é più il ddt rimosso, aggiorno lo stato del ddt in "Bozza"
                     $rs = $dbo->fetchArray('SELECT id FROM co_righe_documenti WHERE iddocumento='.prepare($id_record).' AND idddt='.prepare($idddt));
-                
+
                     if( sizeof($rs) == 0 ){
                         $dbo->query('UPDATE dt_ddt SET idstatoddt=(SELECT id FROM dt_statiddt WHERE descrizione="Bozza") WHERE id = '.prepare($idddt));
                     }
                 }
-                
+
                 // Ricalcolo inps, ritenuta e bollo
                 if ($dir == 'entrata') {
                     ricalcola_costiagg_fattura($id_record);
@@ -1470,7 +1476,7 @@ if (!empty($id_record) && get_var('Cambia automaticamente stato ddt fatturati'))
     $rs = $dbo->fetchArray('SELECT idddt FROM co_righe_documenti WHERE iddocumento='.prepare($id_record));
 
     for ($i = 0; $i < sizeof($rs); ++$i) {
-        $dbo->query('UPDATE dt_ddt SET idstatoddt=(SELECT id FROM dt_statiddt WHERE descrizione="'.get_stato_ddt($rs[$i]['idddt']).'") WHERE id = '.prepare($rs[$i]['idddt']));
+        $dbo->query('UPDATE dt_ddt SET idstatoddt=(SELECT id FROM dt_statiddt WHERE descrizione='.prepare(get_stato_ddt($rs[$i]['idddt'])).') WHERE id = '.prepare($rs[$i]['idddt']));
     }
 }
 
@@ -1479,7 +1485,7 @@ if (!empty($id_record) && get_var('Cambia automaticamente stato ordini fatturati
     $rs = $dbo->fetchArray('SELECT idordine FROM co_righe_documenti WHERE iddocumento='.prepare($id_record));
 
     for ($i = 0; $i < sizeof($rs); ++$i) {
-        $dbo->query('UPDATE or_ordini SET idstatoordine=(SELECT id FROM or_statiordine WHERE descrizione="'.get_stato_ordine($rs[$i]['idordine']).'") WHERE id = '.prepare($rs[$i]['idordine']));
+        $dbo->query('UPDATE or_ordini SET idstatoordine=(SELECT id FROM or_statiordine WHERE descrizione='.prepare(get_stato_ordine($rs[$i]['idordine'])).') WHERE id = '.prepare($rs[$i]['idordine']));
     }
 }
 
