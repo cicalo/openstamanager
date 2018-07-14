@@ -66,7 +66,7 @@ class Database extends Util\Singleton
                     'password' => $password,
                     'charset' => 'utf8',
 
-                    'logging' => $debug,
+                    'logging' => App::debug(),
 
                     'option' => [
                         \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
