@@ -133,7 +133,7 @@ class Database extends Util\Singleton
      *
      * @since 2.3
      *
-     * @return \DebugBar\DataCollector\PDO\TraceablePDO
+     * @return \DebugBar\DataCollector\PDO\TraceablePDO|PDO
      */
     public function getPDO()
     {
@@ -162,7 +162,7 @@ class Database extends Util\Singleton
     public function isInstalled()
     {
         if (empty($this->is_installed)) {
-            $this->is_installed = $this->isConnected() && $this->fetchNum("SHOW TABLES LIKE 'zz_modules'");
+            $this->is_installed = $this->tableExists('zz_modules');
         }
 
         return $this->is_installed;
@@ -173,7 +173,7 @@ class Database extends Util\Singleton
      *
      * @since 2.3
      *
-     * @return int
+     * @return string
      */
     public function getMySQLVersion()
     {
@@ -269,8 +269,28 @@ class Database extends Util\Singleton
      */
     public function fetchRow($query)
     {
+        return $this->fetchOne($query);
+    }
+
+    /**
+     * Restituisce il primo elemento della selezione, strutturato in base ai nomi degli attributi.
+     * Attenzione: aggiunge il LIMIT relativo a fine della query.
+     *
+     * @since 2.4
+     *
+     * @param string $query Query da eseguire
+     *
+     * @return array
+     */
+    public function fetchOne($query)
+    {
+        if (!str_contains($query, 'LIMIT')) {
+            $query .= ' LIMIT 1';
+        }
+
         $result = $this->fetchArray($query);
-        if (is_array($result)) {
+
+        if (isset($result[0])) {
             return $result[0];
         }
 
@@ -284,16 +304,28 @@ class Database extends Util\Singleton
      *
      * @param string $query Query da eseguire
      *
-     * @return array
+     * @return int
      */
     public function fetchNum($query)
     {
-        $result = $this->fetchArray($query);
-        if (is_array($result)) {
-            return count($result);
+        $result = $this->fetchArray('SELECT COUNT(*) as `tot` FROM ('.$query.') AS `count`');
+
+        if (!empty($result)) {
+            return $result[0]['tot'];
         }
 
-        return $result;
+        return 0;
+    }
+
+    public function tableExists($table)
+    {
+        $results = null;
+
+        if ($this->isConnected()) {
+            $results = $this->fetchArray("SHOW TABLES LIKE '".$table."'");
+        }
+
+        return !empty($results);
     }
 
     /**
@@ -333,7 +365,7 @@ class Database extends Util\Singleton
      *
      * @since 2.3
      *
-     * @return string
+     * @return mixed
      */
     public function prepare($parameter)
     {
@@ -407,6 +439,59 @@ class Database extends Util\Singleton
             return $result;
         } catch (PDOException $e) {
             $this->signal($e, $this->database->last());
+        }
+    }
+
+    /**
+     * Costruisce la query per il SELECT definito dagli argomenti (LIMIT 1).
+     *
+     * @since 2.4.1
+     *
+     * @param string $table
+     * @param array  $array
+     * @param array  $conditions
+     * @param array  $order
+     * @param bool   $return
+     *
+     * @return string|array
+     */
+    public function selectOne($table, $array = [], $conditions = [], $order = [], $return = false)
+    {
+        $limit = 1;
+
+        $result = $this->select($table, $array, $conditions, $order, $limit, $return);
+
+        if (!is_string($result) && isset($result[0])) {
+            return $result[0];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Costruisce la query per l'DELETE definito dagli argomenti.
+     *
+     * @since 2.4.1
+     *
+     * @param string $table
+     * @param array  $conditions
+     * @param bool   $return
+     *
+     * @return string|array
+     */
+    public function delete($table, $conditions, $return = false)
+    {
+        if (!is_string($table) || !is_array($conditions)) {
+            throw new UnexpectedValueException();
+        }
+
+        // Costruzione della query
+        $query = 'DELETE FROM '.$this->quote($table).' WHERE '.$this->whereStatement($conditions);
+
+        if (!empty($return)) {
+            return $query;
+        } else {
+            return $this->query($query);
         }
     }
 
@@ -499,7 +584,7 @@ class Database extends Util\Singleton
         if (!empty($field) && !empty($sync)) {
             $conditions[$field] = $sync;
 
-            $database->delete($table, $conditions);
+            $this->database->delete($table, $conditions);
         }
     }
 

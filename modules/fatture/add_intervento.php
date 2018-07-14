@@ -1,7 +1,8 @@
 <?php
 
 include_once __DIR__.'/../../core.php';
-include_once $docroot.'/modules/interventi/modutil.php';
+
+include_once Modules::filepath('Interventi', 'modutil.php');
 
 $module = Modules::get($id_module);
 
@@ -34,7 +35,7 @@ echo '
 
 $rs = $dbo->fetchArray('SELECT
         in_interventi.id,
-        CONCAT(\'Intervento numero \', in_interventi.codice, \' del \', DATE_FORMAT(IFNULL((SELECT MIN(orario_inizio) FROM in_interventi_tecnici WHERE in_interventi_tecnici.idintervento=in_interventi.id), in_interventi.data_richiesta), \'%d/%m/%Y\')) AS descrizione,
+        CONCAT(\'Intervento numero \', in_interventi.codice, \' del \', DATE_FORMAT(IFNULL((SELECT MIN(orario_inizio) FROM in_interventi_tecnici WHERE in_interventi_tecnici.idintervento=in_interventi.id), in_interventi.data_richiesta), \'%d/%m/%Y\'), " [", `in_statiintervento`.`descrizione` , "]") AS descrizione,
         CONCAT(\'\n\', in_interventi.descrizione) AS descrizione_intervento,
         IF(idclientefinale='.prepare($idanagrafica).', \'Interventi conto terzi\', \'Interventi diretti\') AS `optgroup`
     FROM
@@ -44,7 +45,7 @@ $rs = $dbo->fetchArray('SELECT
         AND in_statiintervento.completato=1
         AND in_interventi.id NOT IN (SELECT idintervento FROM co_righe_documenti WHERE idintervento IS NOT NULL)
         AND NOT in_interventi.id IN (SELECT idintervento FROM co_preventivi_interventi WHERE idintervento IS NOT NULL)
-        AND NOT in_interventi.id IN (SELECT idintervento FROM co_righe_contratti WHERE idintervento IS NOT NULL)');
+        AND NOT in_interventi.id IN (SELECT idintervento FROM co_contratti_promemoria WHERE idintervento IS NOT NULL)');
 foreach ($rs as $key => $value) {
     $rs[$key]['prezzo'] = get_costi_intervento($value['id'])['totale'];
 }
@@ -58,7 +59,7 @@ echo '
         </div>
 
 		<div class="col-md-6">
-            {[ "type": "checkbox", "label": "'.tr('Copia descrizione').'", "name": "copia_descrizione", "required": 0, "values": "", "help": "", "placeholder": "'.tr('In fase di selezione copia la descrizione dell\'intervento').'." ]}
+            {[ "type": "checkbox", "label": "'.tr('Copia descrizione').'", "name": "copia_descrizione", "required": 0, "placeholder": "'.tr('In fase di selezione copia la descrizione dell\'intervento').'." ]}
         </div>
 
     </div>';

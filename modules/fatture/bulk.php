@@ -25,13 +25,9 @@ switch (post('op')) {
                 $rapportino_nome = sanitizeFilename($numero.' '.$r['data'].' '.$r['ragione_sociale'].'.pdf');
                 $filename = slashes($dir.'tmp/'.$rapportino_nome);
 
-                $iddocumento = $r['id'];
-                $ptype = 'fatture';
-                
-                $print = $dbo->fetchArray('SELECT id, previous FROM zz_prints WHERE directory = '.prepare($ptype).' ORDER BY main DESC LIMIT 1');
-                $id_print = $print[0]['id'];
+                $print = Prints::getModuleMainPrint($id_module);
 
-                Prints::render($id_print, $iddocumento, $filename);
+                Prints::render($print['id'], $r['id'], $filename);
             }
 
             $dir = slashes($dir);
@@ -52,26 +48,25 @@ switch (post('op')) {
         break;
 
         case 'delete-bulk':
-			
-			if ($debug){
-				foreach ($id_records as $id) {
-					$dbo->query('DELETE  FROM co_documenti  WHERE id = '.prepare($id).Modules::getAdditionalsQuery($id_module));
-					$dbo->query('DELETE FROM co_righe_documenti WHERE iddocumento='.prepare($id).Modules::getAdditionalsQuery($id_module));
-					$dbo->query('DELETE FROM co_scadenziario WHERE iddocumento='.prepare($id).Modules::getAdditionalsQuery($id_module));
-					$dbo->query('DELETE FROM mg_movimenti WHERE iddocumento='.prepare($id).Modules::getAdditionalsQuery($id_module));
-				}
 
-				$_SESSION['infos'][] = tr('Fatture eliminate!');
-			}else{
-				$_SESSION['warnings'][] = tr('Procedura in fase di sviluppo. Nessuna modifica apportata.');
-			}
-			
+            if ($debug) {
+                foreach ($id_records as $id) {
+                    $dbo->query('DELETE  FROM co_documenti  WHERE id = '.prepare($id).Modules::getAdditionalsQuery($id_module));
+                    $dbo->query('DELETE FROM co_righe_documenti WHERE iddocumento='.prepare($id).Modules::getAdditionalsQuery($id_module));
+                    $dbo->query('DELETE FROM co_scadenziario WHERE iddocumento='.prepare($id).Modules::getAdditionalsQuery($id_module));
+                    $dbo->query('DELETE FROM mg_movimenti WHERE iddocumento='.prepare($id).Modules::getAdditionalsQuery($id_module));
+                }
+
+                $_SESSION['infos'][] = tr('Fatture eliminate!');
+            } else {
+                $_SESSION['warnings'][] = tr('Procedura in fase di sviluppo. Nessuna modifica apportata.');
+            }
+
         break;
 }
 
 return [
-	
-	'delete-bulk' => tr('Elimina selezionati'),
+    'delete-bulk' => tr('Elimina selezionati'),
 
     'export-bulk' => [
         'text' => tr('Esporta stampe'),

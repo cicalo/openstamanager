@@ -39,28 +39,19 @@ CREATE TABLE IF NOT EXISTS `co_movimenti_modelli` (
   `idmastrino` int(11) NOT NULL,
   `descrizione` text NOT NULL,
   `idconto` int(11) NOT NULL
-) ENGINE=InnoDB;
+);
 
 ALTER TABLE `co_movimenti_modelli` ADD PRIMARY KEY (`id`);
 
 ALTER TABLE `co_movimenti_modelli` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 -- Modulo modelli prima nota
-INSERT INTO `zz_modules` (`id`, `name`, `title`, `directory`, `options`, `options2`, `icon`, `version`, `compatibility`, `order`, `parent`, `default`, `enabled`) VALUES (NULL, 'Modelli prima nota', 'Modelli prima nota', 'modelli_primanota', 'SELECT |select| FROM `co_movimenti_modelli` WHERE 1=1 GROUP BY `idmastrino` HAVING 2=2', '', 'fa fa-angle-right', '2.4.1', '2.4.1', '1', '40', '1', '1');
+INSERT INTO `zz_modules` (`id`, `name`, `title`, `directory`, `options`, `options2`, `icon`, `version`, `compatibility`, `order`, `parent`, `default`, `enabled`) VALUES (NULL, 'Modelli prima nota', 'Modelli prima nota', 'modelli_primanota', 'SELECT |select| FROM `co_movimenti_modelli` WHERE 1=1 GROUP BY `idmastrino` HAVING 2=2', '', 'fa fa-angle-right', '2.4.1', '2.4.1', '1', NULL, '1', '1');
+
+UPDATE `zz_modules` `t1` INNER JOIN `zz_modules` `t2` ON (`t1`.`name` = 'Modelli prima nota' AND `t2`.`name` = 'Tabelle') SET `t1`.`parent` = `t2`.`id`;
 
 INSERT INTO `zz_views` (`id`, `id_module`, `name`, `query`, `order`, `search`, `slow`, `format`, `search_inside`, `order_by`, `enabled`, `summable`, `default`) VALUES (NULL, (SELECT id FROM zz_modules WHERE name='Modelli prima nota'), 'id', 'co_movimenti_modelli.id', '0', '1', '0', '0', NULL, NULL, '0', '0', '1');
 INSERT INTO `zz_views` (`id`, `id_module`, `name`, `query`, `order`, `search`, `slow`, `format`, `search_inside`, `order_by`, `enabled`, `summable`, `default`) VALUES (NULL, (SELECT id FROM zz_modules WHERE name='Modelli prima nota'), 'Causale predefinita', 'co_movimenti_modelli.descrizione', '1', '1', '0', '0', NULL, NULL, '1', '0', '1');
-
-INSERT INTO `zz_group_view` (`id_gruppo`, `id_vista`) VALUES
-(1, (SELECT id FROM `zz_views` WHERE id_module=(SELECT id FROM zz_modules WHERE name='Modelli prima nota') AND name='id' )),
-(1, (SELECT id FROM `zz_views` WHERE id_module=(SELECT id FROM zz_modules WHERE name='Modelli prima nota') AND name='Causale predefinita' )),
-(2, (SELECT id FROM `zz_views` WHERE id_module=(SELECT id FROM zz_modules WHERE name='Modelli prima nota') AND name='id' )),
-(2, (SELECT id FROM `zz_views` WHERE id_module=(SELECT id FROM zz_modules WHERE name='Modelli prima nota') AND name='Causale predefinita' )),
-(3, (SELECT id FROM `zz_views` WHERE id_module=(SELECT id FROM zz_modules WHERE name='Modelli prima nota') AND name='id' )),
-(3, (SELECT id FROM `zz_views` WHERE id_module=(SELECT id FROM zz_modules WHERE name='Modelli prima nota') AND name='Causale predefinita' )),
-(4, (SELECT id FROM `zz_views` WHERE id_module=(SELECT id FROM zz_modules WHERE name='Modelli prima nota') AND name='id' )),
-(4, (SELECT id FROM `zz_views` WHERE id_module=(SELECT id FROM zz_modules WHERE name='Modelli prima nota') AND name='Causale predefinita' ));
-
 
 -- Widget per stampa calendario
 INSERT INTO `zz_widgets` (`id`, `name`, `type`, `id_module`, `location`, `class`, `query`, `bgcolor`, `icon`, `print_link`, `more_link`, `more_link_type`, `php_include`, `text`, `enabled`, `order`, `help` ) VALUES (NULL, 'Stampa calendario', 'print', '1', 'controller_top', 'col-md-12', NULL, '#4ccc4c', 'fa fa-print', '', './modules/dashboard/widgets/stampa_calendario.dashboard.php', 'popup', '', 'Stampa calendario', '1', '7', NULL);
@@ -93,8 +84,7 @@ CREATE TABLE IF NOT EXISTS `co_righe_contratti_materiali` (
   `tipo_sconto` enum('UNT','PRC') NOT NULL DEFAULT 'UNT',
   PRIMARY KEY (`id`),
   KEY `id_riga_contratto` (`id_riga_contratto`)
-) ENGINE=InnoDB;
-
+);
 
 
 -- Struttura della tabella `co_righe_contratti_articoli`
@@ -119,8 +109,7 @@ CREATE TABLE IF NOT EXISTS `co_righe_contratti_articoli` (
   PRIMARY KEY (`id`),
   KEY `id_riga_contratto` (`id_riga_contratto`),
   KEY `idimpianto` (`idimpianto`)
-) ENGINE=InnoDB;
-
+);
 
 
 -- Modifica query wiget per mostrare solo quelli che non sono stati rinnovati
@@ -151,21 +140,9 @@ UPDATE `zz_views` SET  `query` = 'CONCAT(mg_movimenti.qta,'' '', (SELECT um FROM
 INSERT INTO `zz_views` (`id_module`, `name`, `query`, `order`, `search`, `slow`,  `format`, `enabled`, `default`) VALUES
 ((SELECT `id` FROM `zz_modules` WHERE `name` = 'Movimenti'), 'Data', 'mg_movimenti.data', 5, 1, 0, 1, 1, 1);
 
-INSERT INTO `zz_group_view` (`id_gruppo`, `id_vista`) VALUES
-(1, (SELECT id FROM `zz_views` WHERE id_module=(SELECT id FROM zz_modules WHERE name='Movimenti') AND name='Data' )),
-(2, (SELECT id FROM `zz_views` WHERE id_module=(SELECT id FROM zz_modules WHERE name='Movimenti') AND name='Data' )),
-(3, (SELECT id FROM `zz_views` WHERE id_module=(SELECT id FROM zz_modules WHERE name='Movimenti') AND name='Data' )),
-(4, (SELECT id FROM `zz_views` WHERE id_module=(SELECT id FROM zz_modules WHERE name='Movimenti') AND name='Data' ));
-
 -- Aggiungo colonna impianti per i contratti
 INSERT INTO `zz_views` (`id_module`, `name`, `query`, `order`, `search`, `slow`,  `format`, `enabled`, `default`) VALUES
 ((SELECT `id` FROM `zz_modules` WHERE `name` = 'Contratti'), 'Impianti', '(SELECT IF(nome = '''', GROUP_CONCAT(matricola SEPARATOR ''<br>''), GROUP_CONCAT(matricola, '' - '', nome SEPARATOR ''<br>'')) FROM my_impianti INNER JOIN my_impianti_contratti ON my_impianti.id = my_impianti_contratti.idimpianto WHERE my_impianti_contratti.idcontratto = co_contratti.id)', 4, 1, 0, 0, 0, 1);
-
-INSERT INTO `zz_group_view` (`id_gruppo`, `id_vista`) VALUES
-(1, (SELECT id FROM `zz_views` WHERE id_module=(SELECT id FROM zz_modules WHERE name='Contratti') AND name='Impianti' )),
-(2, (SELECT id FROM `zz_views` WHERE id_module=(SELECT id FROM zz_modules WHERE name='Contratti') AND name='Impianti' )),
-(3, (SELECT id FROM `zz_views` WHERE id_module=(SELECT id FROM zz_modules WHERE name='Contratti') AND name='Impianti' )),
-(4, (SELECT id FROM `zz_views` WHERE id_module=(SELECT id FROM zz_modules WHERE name='Contratti') AND name='Impianti' ));
 
 -- Tempo standard per attività
 ALTER TABLE `in_tipiintervento` ADD `tempo_standard` DECIMAL(10,2)  NULL AFTER `costo_diritto_chiamata_tecnico`;
@@ -245,12 +222,6 @@ UPDATE `or_righe_ordini` SET `abilita_serial` = 0 WHERE `idarticolo` NOT IN (SEL
 INSERT INTO `zz_views` (`id_module`, `name`, `query`, `order`, `search`, `slow`,  `format`, `enabled`, `default`) VALUES
 ((SELECT `id` FROM `zz_modules` WHERE `name` = 'Preventivi'), 'idanagrafica', 'co_preventivi.idanagrafica', 0, 0, 0, 0, 0, 1);
 
-INSERT INTO `zz_group_view` (`id_gruppo`, `id_vista`) VALUES
-(1, (SELECT id FROM `zz_views` WHERE id_module=(SELECT id FROM zz_modules WHERE name='Preventivi') AND name='idanagrafica' )),
-(2, (SELECT id FROM `zz_views` WHERE id_module=(SELECT id FROM zz_modules WHERE name='Preventivi') AND name='idanagrafica' )),
-(3, (SELECT id FROM `zz_views` WHERE id_module=(SELECT id FROM zz_modules WHERE name='Preventivi') AND name='idanagrafica' )),
-(4, (SELECT id FROM `zz_views` WHERE id_module=(SELECT id FROM zz_modules WHERE name='Preventivi') AND name='idanagrafica' ));
-
 -- Fix name, title e order stampa ordine fornitore senza costi
 UPDATE `zz_prints` SET `name` = 'Ordine fornitore (senza costi)',  `title` = 'Ordine fornitore (senza costi)',  `order` = 1 WHERE `zz_prints`.`name` = 'Ordine fornitore' AND  options = '{"pricing":false}' AND `zz_prints`.`id_module` =  (SELECT id FROM zz_modules WHERE name='Ordini fornitore') ;
 -- Stampa ordine fornitore con costi costi
@@ -271,27 +242,132 @@ DELETE FROM `zz_settings` WHERE `nome` = 'Stampa i prezzi sui preventivi';
 -- Lo stato 'In programmazione' non può essere eliminato/modificato
 UPDATE `in_statiintervento` SET `can_delete` = '0' WHERE `in_statiintervento`.`idstatointervento` = 'WIP';
 
--- Importo per scadenzario, summable
+-- Campi Importo e Pagato dello Scadenzario sommabili
 UPDATE `zz_views` SET `summable` = '1' WHERE  `zz_views`.`id_module` = (SELECT `id` FROM `zz_modules` WHERE `name` = 'Scadenzario') AND name = 'Importo';
+UPDATE `zz_views` SET `summable` = '1' WHERE  `zz_views`.`id_module` = (SELECT `id` FROM `zz_modules` WHERE `name` = 'Scadenzario') AND name = 'Pagato';
 
 -- Collego il preventivo alla riga dell'ordine
 ALTER TABLE `or_righe_ordini` ADD `idpreventivo` INT(11) NOT NULL AFTER `idarticolo`;
 
 -- Fix foreign keys (2.4)
 ALTER TABLE `zz_emails`
-  ADD FOREIGN KEY (`id_module`) REFERENCES `zz_modules`(`id`) ON DELETE CASCADE,
-  ADD FOREIGN KEY (`id_smtp`) REFERENCES `zz_smtp`(`id`) ON DELETE CASCADE;
+ADD FOREIGN KEY (`id_module`) REFERENCES `zz_modules`(`id`) ON DELETE CASCADE,
+ADD FOREIGN KEY (`id_smtp`) REFERENCES `zz_smtp`(`id`) ON DELETE CASCADE;
 
 ALTER TABLE `zz_email_print`
-  ADD FOREIGN KEY (`id_email`) REFERENCES `zz_emails`(`id`) ON DELETE CASCADE,
-  ADD FOREIGN KEY (`id_print`) REFERENCES `zz_prints`(`id`) ON DELETE CASCADE;
+ADD FOREIGN KEY (`id_email`) REFERENCES `zz_emails`(`id`) ON DELETE CASCADE,
+ADD FOREIGN KEY (`id_print`) REFERENCES `zz_prints`(`id`) ON DELETE CASCADE;
 
 ALTER TABLE `zz_fields`
-  ADD FOREIGN KEY (`id_module`) REFERENCES `zz_modules`(`id`) ON DELETE CASCADE,
-  ADD FOREIGN KEY (`id_plugin`) REFERENCES `zz_plugins`(`id`) ON DELETE CASCADE;
+ADD FOREIGN KEY (`id_module`) REFERENCES `zz_modules`(`id`) ON DELETE CASCADE,
+ADD FOREIGN KEY (`id_plugin`) REFERENCES `zz_plugins`(`id`) ON DELETE CASCADE;
 
 ALTER TABLE `zz_field_record`
-  ADD FOREIGN KEY (`id_field`) REFERENCES `zz_fields`(`id`) ON DELETE CASCADE;
+ADD FOREIGN KEY (`id_field`) REFERENCES `zz_fields`(`id`) ON DELETE CASCADE;
 
 ALTER TABLE `zz_prints`
-  ADD FOREIGN KEY (`id_module`) REFERENCES `zz_modules`(`id`) ON DELETE CASCADE;
+ADD FOREIGN KEY (`id_module`) REFERENCES `zz_modules`(`id`) ON DELETE CASCADE;
+
+-- Widget per attività senza nessun tecnico assegnato
+INSERT INTO `zz_widgets` (`id`, `name`, `type`, `id_module`, `location`, `class`, `query`, `bgcolor`, `icon`, `print_link`, `more_link`, `more_link_type`, `php_include`, `text`, `enabled`, `order`, `help`) VALUES (NULL, 'Attività da pianificare', 'stats', (SELECT id FROM zz_modules WHERE name = 'Dashboard'), 'controller_top', 'col-md-3', 'SELECT COUNT(id) AS dato FROM in_interventi WHERE id NOT IN (SELECT idintervento FROM in_interventi_tecnici) AND idstatointervento IN (SELECT idstatointervento FROM in_statiintervento WHERE completato = 0) ', '#6dab3c', 'fa fa-cogs', '', './modules/interventi/widgets/interventi.pianificazionedashboard.interventi.php', 'popup', '', 'Promemoria attività da pianificare', 1, '0', NULL);
+
+-- Impostazione "Tempo di attesa ricerche"
+INSERT INTO `zz_settings` (`idimpostazione`, `nome`, `valore`, `tipo`, `editable`, `sezione`) VALUES (NULL, 'Tempo di attesa ricerche in secondi', '2', 'integer', '0', 'Generali');
+
+-- Rimozione IVA duplicata
+DELETE FROM `co_iva` WHERE `id` = 31;
+UPDATE `an_anagrafiche` SET `idiva_acquisti` = 75 WHERE `idiva_acquisti` = 31;
+UPDATE `an_anagrafiche` SET `idiva_vendite` = 75 WHERE `idiva_vendite` = 31;
+UPDATE `co_preventivi` SET `idiva` = 75 WHERE `idiva` = 31;
+UPDATE `co_righe2_contratti` SET `idiva` = 75 WHERE `idiva` = 31;
+UPDATE `co_righe_contratti_articoli` SET `idiva` = 75 WHERE `idiva` = 31;
+UPDATE `co_righe_contratti_materiali` SET `idiva` = 75 WHERE `idiva` = 31;
+UPDATE `co_righe_documenti` SET `idiva` = 75 WHERE `idiva` = 31;
+UPDATE `co_righe_documenti` SET `idiva` = 75 WHERE `idiva` = 31;
+UPDATE `dt_ddt` SET `idiva` = 75 WHERE `idiva` = 31;
+UPDATE `dt_righe_ddt` SET `idiva` = 75 WHERE `idiva` = 31;
+UPDATE `in_righe_interventi` SET `idiva` = 75 WHERE `idiva` = 31;
+UPDATE `mg_articoli` SET `idiva_vendita` = 75 WHERE `idiva_vendita` = 31;
+UPDATE `mg_articoli_interventi` SET `idiva` = 75 WHERE `idiva` = 31;
+UPDATE `or_righe_ordini` SET `idiva` = 75 WHERE `idiva` = 31;
+
+-- Rimozione idtipointervento da co_contratti
+ALTER TABLE `co_contratti` DROP `idtipointervento`;
+
+-- Rinominazione tabelle
+ALTER TABLE `co_righe_contratti` RENAME `co_contratti_promemoria`;
+ALTER TABLE `co_righe2_contratti` RENAME `co_righe_contratti`;
+UPDATE `zz_widgets` SET `query` = REPLACE(`query`, 'co_righe_contratti', 'co_contratti_promemoria');
+UPDATE `zz_widgets` SET `query` = REPLACE(`query`, 'co_righe2_contratti', 'co_righe_contratti');
+
+-- Ordine per le Impostazioni
+ALTER TABLE `zz_settings` ADD `order` int(11);
+UPDATE `zz_settings` SET `order` = 1 WHERE `nome` = 'Azienda predefinita';
+UPDATE `zz_settings` SET `order` = 2 WHERE `nome` = 'Nascondere la barra sinistra di default';
+UPDATE `zz_settings` SET `order` = 3 WHERE `nome` = 'Backup automatico';
+UPDATE `zz_settings` SET `order` = 4 WHERE `nome` = 'Numero di backup da mantenere';
+UPDATE `zz_settings` SET `order` = 5 WHERE `nome` = 'Vista dashboard';
+UPDATE `zz_settings` SET `order` = 6 WHERE `nome` = 'Utilizzare i tooltip sul calendario';
+UPDATE `zz_settings` SET `order` = 7 WHERE `nome` = 'Visualizzare la domenica sul calendario';
+UPDATE `zz_settings` SET `order` = 8 WHERE `nome` = 'Abilitare orario lavorativo';
+UPDATE `zz_settings` SET `order` = 9 WHERE `nome` = 'Cifre decimali per importi';
+UPDATE `zz_settings` SET `order` = 10 WHERE `nome` = 'Cifre decimali per quantità';
+UPDATE `zz_settings` SET `order` = 11 WHERE `nome` = 'Prima pagina';
+UPDATE `zz_settings` SET `order` = 12 WHERE `nome` = 'Google Maps API key';
+UPDATE `zz_settings` SET `order` = 13 WHERE `nome` = 'Attiva notifica di presenza utenti sul record';
+UPDATE `zz_settings` SET `order` = 14 WHERE `nome` = 'Timeout notifica di presenza (minuti)';
+UPDATE `zz_settings` SET `order` = 15 WHERE `nome` = 'apilayer API key for Email';
+UPDATE `zz_settings` SET `order` = 16 WHERE `nome` = 'apilayer API key for VAT number';
+UPDATE `zz_settings` SET `order` = 17 WHERE `nome` = 'CSS Personalizzato';
+
+-- Fix tipo del campo order
+ALTER TABLE `co_righe_preventivi` CHANGE `order` `order` int(11) NOT NULL;
+ALTER TABLE `dt_righe_ddt` CHANGE `order` `order` int(11) NOT NULL;
+ALTER TABLE `or_righe_ordini` CHANGE `order` `order` int(11) NOT NULL;
+ALTER TABLE `co_righe_contratti` CHANGE `order` `order` int(11) NOT NULL;
+
+-- Impostazione "Logo stampe"
+INSERT INTO `zz_settings` (`idimpostazione`, `nome`, `valore`, `tipo`, `editable`, `sezione`) VALUES (NULL, 'Logo stampe', '', 'string', '0', 'Generali');
+
+-- Categorie zz_files
+ALTER TABLE `zz_files` ADD `category` varchar(100) AFTER `original`;
+
+-- Impostazione "Abilita esportazione Excel e PDF"
+INSERT INTO `zz_settings` (`idimpostazione`, `nome`, `valore`, `tipo`, `editable`, `sezione`, `order`) VALUES (NULL, 'Abilita esportazione Excel e PDF', '0', 'boolean', '1', 'Generali', 18);
+
+-- Rimozione idtipoanagrafica da zz_users
+ALTER TABLE `zz_users` DROP `idtipoanagrafica`;
+
+-- Introduzione controllo duplicazione della numerazione Fatture di vendita
+INSERT INTO `zz_views` (`id_module`, `name`, `query`, `order`, `search`, `slow`, `enabled`, `default`) VALUES
+((SELECT `id` FROM `zz_modules` WHERE `name` = 'Fatture di vendita'), '_bg_', 'IF((SELECT COUNT(t.numero_esterno) FROM co_documenti AS t WHERE t.numero_esterno = co_documenti.numero_esterno AND t.id_segment = co_documenti.id_segment  AND idtipodocumento IN (SELECT id FROM co_tipidocumento WHERE dir = ''entrata'') AND t.data >= ''|period_start|'' AND t.data <= ''|period_end|'') > 1, ''red'', '''')', 0, 0, 0, 0, 1);
+
+-- Aggiunto supporto a Note di accredito e addebito
+ALTER TABLE `co_documenti` ADD `ref_documento` int(11) AFTER `idagente`, ADD FOREIGN KEY (`ref_documento`) REFERENCES `co_documenti`(`id`) ON DELETE CASCADE;
+ALTER TABLE `co_righe_documenti` ADD `qta_evasa` int(11) NOT NULL AFTER `qta`, ADD `ref_riga_documento` int(11) AFTER `idcontratto`, ADD FOREIGN KEY (`ref_riga_documento`) REFERENCES `co_righe_documenti`(`id`) ON DELETE CASCADE;
+
+ALTER TABLE `co_tipidocumento` ADD `reversed` BOOLEAN NOT NULL DEFAULT FALSE AFTER `dir`;
+UPDATE `co_tipidocumento` SET `reversed` = 1 WHERE `descrizione` = 'Nota di accredito';
+
+-- Fix id_sottocategoria in mg_articoli
+ALTER TABLE `mg_articoli` CHANGE `id_sottocategoria` `id_sottocategoria` int(11);
+
+-- Immagini articoli come allegati
+ALTER TABLE `mg_articoli` CHANGE `immagine01` `immagine` varchar(255);
+UPDATE `mg_articoli` SET `immagine` = NULL WHERE `immagine` = '';
+INSERT INTO `zz_files` (`id_module`, `id_record`, `nome`, `filename`, `original`) SELECT (SELECT `id` FROM `zz_modules` WHERE `name` = 'Articoli'), `id`, 'Immagine', `immagine`, `immagine` FROM `mg_articoli` WHERE `immagine` IS NOT NULL;
+
+-- Immagini impianto come allegati
+ALTER TABLE `my_impianti` CHANGE `immagine` `immagine` varchar(255);
+UPDATE `my_impianti` SET `immagine` = NULL WHERE `immagine` = '';
+INSERT INTO `zz_files` (`id_module`, `id_record`, `nome`, `filename`, `original`) SELECT (SELECT `id` FROM `zz_modules` WHERE `name` = 'MyImpianti'), `id`, 'Immagine', `immagine`, `immagine` FROM `my_impianti` WHERE `immagine` IS NOT NULL;
+
+-- Fix widgets fatturato
+UPDATE `zz_widgets` SET `query` = 'SELECT CONCAT_WS(\" \", REPLACE(REPLACE(REPLACE(FORMAT(SUM((SELECT SUM(subtotale+iva-sconto) FROM co_righe_documenti WHERE iddocumento=co_documenti.id)+iva_rivalsainps+rivalsainps+bollo-ritenutaacconto), 2), \",\", \"#\"), \".\", \",\"), \"#\", \".\"), \"&euro;\") AS dato FROM co_documenti WHERE idtipodocumento IN (SELECT id FROM co_tipidocumento WHERE dir=\"entrata\") AND idstatodocumento NOT IN (SELECT id FROM co_statidocumento WHERE descrizione=\"Bozza\" OR descrizione=\"Annullata\") |segment| AND data >= \"|period_start|\" AND data <= \"|period_end|\" AND 1=1' WHERE `zz_widgets`.`name` = 'Fatturato';
+UPDATE `zz_widgets` SET `query` = 'SELECT CONCAT_WS(\" \", REPLACE(REPLACE(REPLACE(FORMAT((SELECT ABS(SUM(da_pagare))), 2), \",\", \"#\"), \".\", \",\"), \"#\", \".\"), \"&euro;\") AS dato FROM (co_scadenziario INNER JOIN co_documenti ON co_scadenziario.iddocumento=co_documenti.id) INNER JOIN co_tipidocumento ON co_documenti.idtipodocumento=co_tipidocumento.id WHERE dir=\'uscita\' AND idstatodocumento NOT IN (SELECT id FROM co_statidocumento WHERE descrizione=\"Bozza\" OR descrizione=\"Annullata\") |segment| AND data_emissione >= \"|period_start|\" AND data_emissione <= \"|period_end|\"' WHERE `zz_widgets`.`name` = 'Acquisti';
+
+-- Introduzione del tipo documento nelle tabelle Fatture
+INSERT INTO `zz_views` (`id_module`, `name`, `query`, `order`, `search`, `slow`, `enabled`, `default`) VALUES
+((SELECT `id` FROM `zz_modules` WHERE `name` = 'Fatture di vendita'), 'Tipo', 'co_tipidocumento.descrizione', 4, 1, 0, 1, 1);
+INSERT INTO `zz_views` (`id_module`, `name`, `query`, `order`, `search`, `slow`, `enabled`, `default`) VALUES
+((SELECT `id` FROM `zz_modules` WHERE `name` = 'Fatture di acquisto'), 'Tipo', 'co_tipidocumento.descrizione', 4, 1, 0, 1, 1);

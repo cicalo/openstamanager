@@ -67,5 +67,14 @@ try {
     $result = API::error('serverError');
 }
 
+json_decode($result);
+
+// Impostazioni di Content-Type e Charset Header
+if (json_last_error() == JSON_ERROR_NONE) {
+    header('Content-Type: application/json; charset=UTF-8');
+} else {
+    header('Content-Type: text/plain; charset=UTF-8');
+}
+
 // Stampa dei risultati
 echo $result;

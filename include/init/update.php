@@ -1,6 +1,6 @@
 <?php
 
-include_once __DIR__.'/../core.php';
+include_once __DIR__.'/../../core.php';
 
 $updateRate = 20;
 $scriptValue = $updateRate * 5;
@@ -73,44 +73,20 @@ if (filter('action') == 'do_update') {
         Update::updateCleanup();
 
         echo '
-        <p><strong>'.tr('Aggiornamento completato!!!').'</strong> <i class="fa fa-smile-o"></i></p>';
-
-        // Rimostro la finestra di login
-        echo '
-        <script>
-            $(".login-box").fadeIn();
-        </script>';
+        <p><strong>'.tr('Aggiornamento completato').'</strong> <i class="fa fa-smile-o"></i></p>';
 
         // Istruzioni per la prima installazione
         if ($_GET['firstuse'] == 'true') {
-            if (!empty($_SESSION['osm_password'])) {
-                $password = $_SESSION['osm_password'];
-            } else {
-                $password = 'admin';
-            }
-
             echo '
-        <p>'.tr('Puoi procedere al login con i seguenti dati').':</p>
-        <p>'.tr('Username').': <i>admin</i></p>
-        <p>'.tr('Password').': <i> '.$password.'</i></p>
         <p class="text-danger">'.tr("E' fortemente consigliato rimuovere i permessi di scrittura dal file _FILE_", [
             '_FILE_' => '<b>config.inc.php</b>',
         ]).'.</p>';
-
-            // Imposto la password di admin che l'utente ha selezionato all'inizio
-            if (isset($_SESSION['osm_password'])) {
-                $dbo->query('UPDATE `zz_users` SET `password`='.prepare(Auth::hashPassword($password))." WHERE `username`='admin'");
-
-                unset($_SESSION['osm_password']);
-            }
-
-            if (isset($_SESSION['osm_email'])) {
-                if (!empty($_SESSION['osm_email'])) {
-                    $dbo->query('UPDATE `zz_users` SET `email`='.prepare($_SESSION['osm_email'])." WHERE `username`='admin' ");
-                }
-                unset($_SESSION['osm_email']);
-            }
         }
+
+        echo '
+        <a class="btn btn-success btn-block" href="'.ROOTDIR.'">
+            <i class="fa fa-check"></i> '.tr('Continua').'
+        </a>';
     }
 
     exit();
@@ -119,11 +95,7 @@ if (filter('action') == 'do_update') {
     if (Update::isUpdateLocked() && filter('force') === null) {
         $pageTitle = tr('Aggiornamento in corso!');
 
-        if (file_exists($docroot.'/include/custom/top.php')) {
-            include_once $docroot.'/include/custom/top.php';
-        } else {
-            include_once $docroot.'/include/top.php';
-        }
+        include_once App::filepath('include|custom|', 'top.php');
 
         echo '
         <div class="box box-center box-danger box-solid text-center">
@@ -137,11 +109,7 @@ if (filter('action') == 'do_update') {
             </div>
         </div>';
 
-        if (file_exists($docroot.'/include/custom/bottom.php')) {
-            include_once $docroot.'/include/custom/bottom.php';
-        } else {
-            include_once $docroot.'/include/bottom.php';
-        }
+        include_once App::filepath('include|custom|', 'bottom.php');
 
         exit();
     }
@@ -151,11 +119,7 @@ if (filter('action') == 'do_update') {
     $button = !$dbo->isInstalled() ? tr('Installa!') : tr('Aggiorna!');
     $pageTitle = !$dbo->isInstalled() ? tr('Installazione') : tr('Aggiornamento');
 
-    if (file_exists($docroot.'/include/custom/top.php')) {
-        include_once $docroot.'/include/custom/top.php';
-    } else {
-        include_once $docroot.'/include/top.php';
-    }
+    include_once App::filepath('include|custom|', 'top.php');
 
     echo '
         <div class="box box-center-large box-warning text-center">

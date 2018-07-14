@@ -16,13 +16,12 @@ $rst = $dbo->fetchArray('SELECT COUNT(mg_movimenti.id) AS row, SUM(qta) AS qta_t
 $qta_totale = $rst[0]['qta_totale'];
 $qta_totale_attuale = $rst[0]['qta_totale_attuale'];
 
-if ( $rst[0]['row']>0){
-	echo '
-	<p>'.tr('Quantità calcolata dai movimenti').': <b>'.Translator::numberToLocale($qta_totale).' '.$records[0]['um'].'</b> <span  class=\'tip\' title=\''.tr('Quantità calcolata da tutti i movimenti registrati').'.\' ><i class="fa fa-question-circle-o"></i></span></p>';
+if ($rst[0]['row'] > 0) {
+    echo '
+	<p>'.tr('Quantità calcolata dai movimenti').': <b>'.Translator::numberToLocale($qta_totale, 'qta').' '.$records[0]['um'].'</b> <span  class=\'tip\' title=\''.tr('Quantità calcolata da tutti i movimenti registrati').'.\' ><i class="fa fa-question-circle-o"></i></span></p>';
 
-	echo '
-	<p>'.tr('Quantità calcolata attuale').': <b>'.Translator::numberToLocale($qta_totale_attuale).' '.$records[0]['um'].'</b> <span  class=\'tip\' title=\''.tr('Quantità calcolata secondo i movimenti registrati con data oggi o date trascorse').'.\' ><i class="fa fa-question-circle-o"></i></span></p>';
-
+    echo '
+	<p>'.tr('Quantità calcolata attuale').': <b>'.Translator::numberToLocale($qta_totale_attuale, 'qta').' '.$records[0]['um'].'</b> <span  class=\'tip\' title=\''.tr('Quantità calcolata secondo i movimenti registrati con data oggi o date trascorse').'.\' ><i class="fa fa-question-circle-o"></i></span></p>';
 }
 
 // Elenco movimenti magazzino
@@ -54,20 +53,21 @@ if (!empty($rs2)) {
         // Quantità
         echo '
             <tr>
-                <td class="text-right">'.Translator::numberToLocale($r['qta']).' '.$records[0]['um'].'</td>';
+                <td class="text-right">'.Translator::numberToLocale($r['qta'], 'qta').' '.$records[0]['um'].'</td>';
 
-				
-	
-			
         // Causale
-		$dir = ($r['qta']<0) ? 'vendita' : 'acquisto';
-		
+        $dir = ($r['qta'] < 0) ? 'vendita' : 'acquisto';
+
+        if (!empty($r['iddocumento'])) {
+            $dir = $dbo->fetchArray('SELECT dir FROM co_tipidocumento WHERE id = (SELECT idtipodocumento FROM co_documenti WHERE id = '.prepare($r['iddocumento']).')')[0]['dir'] == 'entrata' ? 'vendita' : 'acquisto';
+        }
+
         echo '
-                <td>'.$r['movimento'].' 
-				'.((!empty($r['idintervento'])) ? Modules::link('Interventi', $r['idintervento']) :'').'
-				'.((!empty($r['idautomezzo'])) ? Modules::link('Automezzi', $r['idautomezzo']) :'').'
-				'.((!empty($r['iddt'])) ? Modules::link('DDt di '.$dir.'', $r['iddt']) :'').'
-				'.((!empty($r['iddocumento'])) ? Modules::link('Fatture di '.$dir.'', $r['iddocumento']) :'').'
+                <td>'.$r['movimento'].'
+				'.((!empty($r['idintervento'])) ? Modules::link('Interventi', $r['idintervento']) : '').'
+				'.((!empty($r['idautomezzo'])) ? Modules::link('Automezzi', $r['idautomezzo']) : '').'
+				'.((!empty($r['iddt'])) ? Modules::link('DDt di '.$dir.'', $r['iddt']) : '').'
+				'.((!empty($r['iddocumento'])) ? Modules::link('Fatture di '.$dir.'', $r['iddocumento']) : '').'
 				</td>';
 
         // Data
@@ -78,7 +78,7 @@ if (!empty($rs2)) {
         echo '
                 <td class="text-center">';
 
-        if (Auth::admin() && $r['manuale']=='1') {
+        if (Auth::admin() && $r['manuale'] == '1') {
             echo '
                     <a class="btn btn-danger btn-sm ask" data-backto="record-edit" data-op="delmovimento" data-idmovimento="'.$r['id'].'">
                         <i class="fa fa-trash"></i>
@@ -92,16 +92,11 @@ if (!empty($rs2)) {
     echo '
         </table>';
 } else {
-	
-	
-	 echo '
+    echo '
 	<div class="alert alert-info">
 		<i class="fa fa-info-circle"></i>
 		'.tr('Questo articolo non è ancora stato movimentato', []).'.
 	</div>';
-	
-	
-  
 }
 
 echo '

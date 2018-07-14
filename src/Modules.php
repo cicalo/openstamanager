@@ -7,13 +7,9 @@
  */
 class Modules
 {
-    /** @var int Identificativo del modulo corrente */
-    protected static $current_module;
-    /** @var int Identificativo dell'elemento corrente */
-    protected static $current_element;
-
     /** @var array Elenco dei moduli disponibili */
     protected static $modules = [];
+    protected static $references = [];
     /** @var array Elenco delle condizioni aggiuntive disponibili */
     protected static $additionals = [];
     /** @var array Elenco dei segmenti disponibili */
@@ -43,29 +39,30 @@ class Modules
             $results = $database->fetchArray('SELECT * FROM `zz_modules` LEFT JOIN (SELECT `idmodule`, `permessi` FROM `zz_permissions` WHERE `idgruppo` = (SELECT `idgruppo` FROM `zz_users` WHERE `id` = '.prepare($user['id_utente']).')) AS `zz_permissions` ON `zz_modules`.`id`=`zz_permissions`.`idmodule`');
 
             $modules = [];
+            $references = [];
+
             foreach ($results as $result) {
                 $result['options'] = App::replacePlaceholder($result['options']);
                 $result['options2'] = App::replacePlaceholder($result['options2']);
 
                 $result['option'] = empty($result['options2']) ? $result['options'] : $result['options2'];
 
-                if (empty($modules[$result['id']])) {
-                    if (empty($result['permessi'])) {
-                        if (Auth::admin()) {
-                            $result['permessi'] = 'rw';
-                        } else {
-                            $result['permessi'] = '-';
-                        }
+                if (empty($result['permessi'])) {
+                    if (Auth::admin()) {
+                        $result['permessi'] = 'rw';
+                    } else {
+                        $result['permessi'] = '-';
                     }
-
-                    unset($result['idmodule']);
-
-                    $modules[$result['id']] = $result;
-                    $modules[$result['name']] = $result['id'];
                 }
+
+                unset($result['idmodule']);
+
+                $modules[$result['id']] = $result;
+                $references[$result['name']] = $result['id'];
             }
 
             self::$modules = $modules;
+            self::$references = $references;
         }
 
         return self::$modules;
@@ -80,6 +77,7 @@ class Modules
     {
         // Individuazione dei moduli con permesso di accesso
         $modules = self::getModules();
+
         foreach ($modules as $key => $module) {
             if ($module['permessi'] == '-') {
                 unset($modules[$key]);
@@ -98,11 +96,13 @@ class Modules
      */
     public static function get($module)
     {
-        if (!is_numeric($module) && !empty(self::getModules()[$module])) {
-            $module = self::getModules()[$module];
+        $modules = self::getModules();
+
+        if (!is_numeric($module) && !empty(self::$references[$module])) {
+            $module = self::$references[$module];
         }
 
-        return self::getModules()[$module];
+        return $modules[$module];
     }
 
     /**
@@ -129,7 +129,7 @@ class Modules
         $module = self::get($module);
         $user = Auth::user();
 
-        if (!isset(self::$additionals[$module])) {
+        if (!isset(self::$additionals[$module['id']])) {
             $database = Database::getConnection();
 
             $additionals['WHR'] = [];
@@ -285,14 +285,14 @@ class Modules
             $pos = array_search($module['t'.$actual.'.id'], array_column($data, 'id'));
             if ($pos === false && !empty($module['t'.$actual.'.id'])) {
                 $array = self::get($module['t'.$actual.'.id']);
-                $array['childrens'] = [];
+                $array['children'] = [];
 
                 $data[] = $array;
                 $pos = count($data) - 1;
             }
 
             if (!empty($module['t'.($actual + 1).'.id'])) {
-                $data[$pos]['childrens'] = self::buildArray($module, $data[$pos]['childrens'], $actual + 1);
+                $data[$pos]['children'] = self::buildArray($module, $data[$pos]['children'], $actual + 1);
             }
         }
 
@@ -337,11 +337,11 @@ class Modules
         $options = ($element['options2'] != '') ? $element['options2'] : $element['options'];
         $link = ($options != '' && $options != 'menu') ? ROOTDIR.'/controller.php?id_module='.$element['id'] : 'javascript:;';
         $title = $element['title'];
-        $target = ($element['new'] == 1) ? '_blank' : '_self';
+        $target = '_self'; // $target = ($element['new'] == 1) ? '_blank' : '_self';
         $active = ($actual == $element['name']);
         $show = (self::getPermission($element['id']) != '-' && !empty($element['enabled'])) ? true : false;
 
-        $submenus = $element['childrens'];
+        $submenus = $element['children'];
         if (!empty($submenus)) {
             $temp = '';
             foreach ($submenus as $submenu) {
@@ -386,7 +386,7 @@ class Modules
     }
 
     /**
-     * Undocumented function.
+     * Costruisce un link HTML per il modulo e il record indicati.
      *
      * @param string|int $modulo
      * @param int        $id_record
@@ -417,5 +417,21 @@ class Modules
         } else {
             return $alternativo;
         }
+    }
+
+    /**
+     * Individua il percorso per il file.
+     *
+     * @param string|int $module
+     * @param string     $file
+     *
+     * @return string|null
+     */
+    public static function filepath($module, $file)
+    {
+        $module = self::get($module);
+        $directory = 'modules/'.$module['directory'].'|custom|';
+
+        return App::filepath($directory, $file);
     }
 }

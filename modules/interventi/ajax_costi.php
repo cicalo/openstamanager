@@ -1,7 +1,12 @@
 <?php
 
-include_once __DIR__.'/../../core.php';
-include_once __DIR__.'/modutil.php';
+if (file_exists(__DIR__.'/../../../core.php')) {
+    include_once __DIR__.'/../../../core.php';
+} else {
+    include_once __DIR__.'/../../core.php';
+}
+
+include_once Modules::filepath('Interventi', 'modutil.php');
 
 $idiva = get_var('Iva predefinita');
 $rs_iva = $dbo->fetchArray('SELECT descrizione, percentuale, indetraibile FROM co_iva WHERE id='.prepare($idiva));

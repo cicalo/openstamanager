@@ -1,6 +1,6 @@
 <?php
 
-include_once __DIR__.'/../core.php';
+include_once __DIR__.'/../../core.php';
 
 $valid_config = isset($db_host) && isset($db_name) && isset($db_username) && isset($db_password);
 
@@ -11,11 +11,7 @@ if (file_exists('config.inc.php') && $valid_config && $dbo->isConnected()) {
 
 $pageTitle = tr('Configurazione');
 
-if (file_exists($docroot.'/include/custom/top.php')) {
-    include_once $docroot.'/include/custom/top.php';
-} else {
-    include_once $docroot.'/include/top.php';
-}
+include_once App::filepath('include|custom|', 'top.php');
 
 // Controllo sull'esistenza di nuovi parametri di configurazione
 if (post('db_host') !== null) {
@@ -238,16 +234,16 @@ if (empty($creation) && (!file_exists('config.inc.php') || !$valid_config)) {
 
                 return result;
             });
-            
+
             $("#install").on("click", function(){
 
                 if($(this).closest("form").parsley().validate()){
                     prev_html = $("#install").html();
-                    $("#install").html("<i class=\'fa fa-spinner fa-pulse  fa-fw\'></i> '.tr("Attendere").'...");
+                    $("#install").html("<i class=\'fa fa-spinner fa-pulse  fa-fw\'></i> '.tr('Attendere').'...");
                     $("#install").prop(\'disabled\', true);
                     $("#test").prop(\'disabled\', true);
-                    
-                    $("#config_form").submit();
+
+                    $("#config-form").submit();
                 }
 
             });
@@ -255,7 +251,7 @@ if (empty($creation) && (!file_exists('config.inc.php') || !$valid_config)) {
             $("#test").on("click", function(){
                 if($(this).closest("form").parsley().validate()){
 					prev_html = $("#test").html();
-					$("#test").html("<i class=\'fa fa-spinner fa-pulse  fa-fw\'></i> '.tr("Attendere").'...");
+					$("#test").html("<i class=\'fa fa-spinner fa-pulse  fa-fw\'></i> '.tr('Attendere').'...");
                     $("#test").prop(\'disabled\', true);
                     $("#install").prop(\'disabled\', true);
                     $(this).closest("form").ajaxSubmit({
@@ -263,14 +259,14 @@ if (empty($creation) && (!file_exists('config.inc.php') || !$valid_config)) {
                         data: {
                             test: 1,
                         },
-                        type: "post",	 
+                        type: "post",
                         success: function(data){
                             data = parseFloat(data.trim());
-							
+
 							$("#test").html(prev_html);
                             $("#test").prop(\'disabled\', false);
                             $("#install").prop(\'disabled\', false);
-						
+
                             if(data == 0){
                                 swal("'.tr('Errore della configurazione').'", "'.tr('La configurazione non è corretta').'.", "error");
                             } else if(data == 1){
@@ -297,7 +293,6 @@ if (empty($creation) && (!file_exists('config.inc.php') || !$valid_config)) {
 
             <div class="box-body" id="smartwizard">';
 
-    // REQUISITI PER IL CORRETTO FUNZIONAMENTO
     echo '
                 <ul>
                     <li><a href="#step-1">
@@ -315,154 +310,12 @@ if (empty($creation) && (!file_exists('config.inc.php') || !$valid_config)) {
 
                 <div id="steps">
 
-                    <div id="step-1">
-                        <p>'.tr('Benvenuto in <strong>OpenSTAManager</strong>!').'</p>
-                        <p>'.tr("Prima di procedere alla configurazione e all'installazione del software, sono necessari alcuni accorgimenti per garantire il corretto funzionamento del gestionale").'. '.tr('Stai utilizzando la versione PHP _PHP_', [
-                            '_PHP_' => phpversion(),
-                        ]).'.</p>
-                        <hr>';
+                    <div id="step-1">';
 
-    // Estensioni di PHP
+    // REQUISITI PER IL CORRETTO FUNZIONAMENTO
+    include __DIR__.'/requirements.php';
+
     echo '
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <p>'.tr('Le seguenti estensioni PHP devono essere abilitate dal file di configurazione _FILE_', [
-                                    '_FILE_' => '<b>php.ini</b>',
-                                ]).':</p>
-                                <div class="list-group">';
-    $extensions = [
-        'zip' => tr("Necessario per l'utilizzo delle funzioni di aggiornamento automatico e backup, oltre che per eventuali moduli aggiuntivi"),
-        'pdo_mysql' => tr('Necessario per la connessione al database'),
-        'openssl' => tr('Utile per la generazione di chiavi complesse (facoltativo)'),
-        'intl' => tr('Utile per la gestione automatizzata della conversione numerica (facoltativo)'),
-    ];
-    foreach ($extensions as $key => $value) {
-        $check = extension_loaded($key);
-        echo '
-                                    <div class="list-group-item">
-                                        <h4 class="list-group-item-heading">
-                                            '.$key;
-        if ($check) {
-            echo '
-                                            <span class="label label-success pull-right">
-                                                <i class="fa fa-check"></i>
-                                            </span>';
-        } else {
-            echo '
-                                            <span class="label label-danger pull-right">
-                                                <i class="fa fa-times"></i>
-                                            </span>';
-        }
-        echo '
-                                        </h4>
-                                        <p class="list-group-item-text">'.$value.'</p>
-                                </div>';
-    }
-    echo '
-                                </div>
-
-                                <hr>
-                            </div>';
-
-    // Impostazione di valore per PHP
-    echo '
-
-                            <div class="col-md-6">
-                                <p>'.tr('Le seguenti impostazioni PHP devono essere modificate nel file di configurazione _FILE_', [
-                                    '_FILE_' => '<b>php.ini</b>',
-                                ]).':</p>
-                                <div class="list-group">';
-    $values = [
-        'display_errors' => true,
-        'upload_max_filesize' => '>16M',
-        'post_max_size' => '>16M',
-    ];
-    foreach ($values as $key => $value) {
-        $ini = str_replace(['k', 'M'], ['000', '000000'], ini_get($key));
-        $real = str_replace(['k', 'M'], ['000', '000000'], $value);
-
-        if (starts_with($real, '>')) {
-            $check = $ini >= substr($real, 1);
-        } elseif (starts_with($real, '<')) {
-            $check = $ini <= substr($real, 1);
-        } else {
-            $check = ($real == $ini);
-        }
-
-        if (is_bool($value)) {
-            $value = !empty($value) ? 'On' : 'Off';
-        } else {
-            $value = str_replace(['>', '<'], '', $value);
-        }
-
-        echo '
-                                    <div class="list-group-item">
-                                        <h4 class="list-group-item-heading">
-                                            '.$key;
-        if ($check) {
-            echo '
-                                            <span class="label label-success pull-right">
-                                                <i class="fa fa-check"></i>
-                                            </span>';
-        } else {
-            echo '
-                                            <span class="label label-danger pull-right">
-                                                <i class="fa fa-times"></i>
-                                            </span>';
-        }
-        echo '
-                                        </h4>
-                                        <p class="list-group-item-text">'.tr('Valore consigliato').': '.$value.'</p>
-                                    </div>';
-    }
-    echo '
-                                </div>
-
-                                <hr>
-                            </div>
-                        </div>';
-
-    // Percorsi necessari
-    echo '
-
-                        <div class="row">
-                            <div class="col-md-12">
-                                <p>'.tr('Le seguenti cartelle devono risultare scrivibili da parte del gestionale').':</p>
-                                <div class="list-group">';
-    $dirs = [
-        'backup' => tr('Necessario per il salvataggio dei backup'),
-        'files' => tr('Necessario per il salvataggio di file inseriti dagli utenti'),
-        'logs' => tr('Necessario per la gestione dei file di log'),
-    ];
-    foreach ($dirs as $key => $value) {
-        $check = is_writable($docroot.DIRECTORY_SEPARATOR.$key);
-        echo '
-                                    <div class="list-group-item">
-                                        <h4 class="list-group-item-heading">
-                                            '.$key;
-        if ($check) {
-            echo '
-                                            <span class="label label-success pull-right">
-                                                <i class="fa fa-check"></i>
-                                            </span>';
-        } else {
-            echo '
-                                            <span class="label label-danger pull-right">
-                                                <i class="fa fa-times"></i>
-                                            </span>';
-        }
-        echo '
-                                        </h4>
-                                        <p class="list-group-item-text">'.$value.'</p>
-                                    </div>';
-    }
-    echo '
-                                </div>
-
-                                <hr>
-                            </div>
-                        </div>
                     </div>';
 
     // LICENZA
@@ -492,8 +345,6 @@ if (empty($creation) && (!file_exists('config.inc.php') || !$valid_config)) {
     $username = !empty($db_username) ? $db_username : '';
     $password = !empty($db_password) ? $db_password : '';
     $name = !empty($db_name) ? $db_name : '';
-    $osm_password = !empty($_SESSION['osm_password']) ? $_SESSION['osm_password'] : '';
-    $osm_email = !empty($_SESSION['osm_email']) ? $_SESSION['osm_email'] : '';
 
     // PARAMETRI
     echo '
@@ -507,7 +358,7 @@ if (empty($creation) && (!file_exists('config.inc.php') || !$valid_config)) {
 
     // Form dei parametri
     echo '
-                        <form action="?action=updateconfig&firstuse=true" method="post" id="config_form">
+                        <form action="?action=updateconfig&firstuse=true" method="post" id="config-form">
                             <div class="row">';
 
     // db_host
@@ -536,25 +387,7 @@ if (empty($creation) && (!file_exists('config.inc.php') || !$valid_config)) {
                                 <div class="col-md-4">
                                     {[ "type": "text", "label": "'.tr('Nome del database').'", "name": "db_name", "placeholder": "'.tr('Nome del database').'", "value": "'.$name.'", "help": "'.tr('Esempio').': openstamanager", "show-help": 0, "required": 1 ]}
                                 </div>
-                            </div>
-
-                            <div class="row">';
-
-    // Password utente admin
-    echo '
-                                <div class="col-md-6">
-                                    {[ "type": "password", "label": "'.tr("Password dell'amministratore").'", "name": "osm_password", "placeholder": "'.tr('Scegli la password di amministratore').'", "value": "'.$osm_password.'", "help": "'.tr('Valore di default').': admin", "show-help": 1 ]}
-                                </div>';
-
-    // Email utente admin
-    echo '
-                                <div class="col-md-6">
-                                    {[ "type": "email", "label": "'.tr("Email dell'amministratore").'", "name": "osm_email", "placeholder": "'.tr("Digita l'indirizzo email dell'amministratore").'", "value": "'.$osm_email.'" ]}
-                                </div>
                             </div>';
-
-    echo '
-                            ';
 
     echo '
                             <!-- PULSANTI -->
@@ -568,12 +401,11 @@ if (empty($creation) && (!file_exists('config.inc.php') || !$valid_config)) {
                                     </button>
                                 </div>
                                 <div class="col-md-4 text-right">
-                                    <button type="button" id="install" class="btn btn-success btn-block">
+                                    <button type="submit" id="install" class="btn btn-success btn-block">
                                         <i class="fa fa-check"></i> '.tr('Installa').'
                                     </button>
                                 </div>
                             </div>
-
 
                         </form>
                     </div>
@@ -583,10 +415,6 @@ if (empty($creation) && (!file_exists('config.inc.php') || !$valid_config)) {
         </div>';
 }
 
-if (file_exists($docroot.'/include/custom/bottom.php')) {
-    include_once $docroot.'/include/custom/bottom.php';
-} else {
-    include_once $docroot.'/include/bottom.php';
-}
+include_once App::filepath('include|custom|', 'bottom.php');
 
 exit();

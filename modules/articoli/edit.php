@@ -2,7 +2,19 @@
 
 include_once __DIR__.'/../../core.php';
 
+// Necesario per funzione \Util\Ini::getList
+include_once Modules::filepath('MyImpianti', 'modutil.php');
+
 $_SESSION['superselect']['id_categoria'] = $records[0]['id_categoria'];
+
+$img = null;
+if (!empty($records[0]['immagine'])) {
+    $fileinfo = Uploads::fileInfo($records[0]['immagine']);
+
+    $default_img = '/'.Uploads::getUploadDirectory($id_module).'/'.$fileinfo['filename'].'_thumb600.'.$fileinfo['extension'];
+
+    $img = file_exists(DOCROOT.$default_img) ? ROOTDIR.$default_img : ROOTDIR.'/'.Uploads::getUploadDirectory($id_module).'/'.$records[0]['immagine'];
+}
 
 ?><form action="" method="post" id="edit-form" enctype="multipart/form-data">
 	<input type="hidden" name="backto" value="record-edit">
@@ -17,7 +29,7 @@ $_SESSION['superselect']['id_categoria'] = $records[0]['id_categoria'];
 		<div class="panel-body">
 			<div class="row">
 				<div class="col-md-3">
-					{[ "type": "image", "label": "<?php echo tr('Immagine'); ?>", "name": "immagine01", "class": "img-thumbnail", "value": "<?php echo  !empty($records[0]['immagine01']) ? $rootdir.'/files/articoli/'.$records[0]['immagine01'] : ''; ?>" ]}
+					{[ "type": "image", "label": "<?php echo tr('Immagine'); ?>", "name": "immagine", "class": "img-thumbnail", "value": "<?php echo $img; ?>" ]}
 				</div>
 
 				<div class="col-md-4">
@@ -27,7 +39,7 @@ $_SESSION['superselect']['id_categoria'] = $records[0]['id_categoria'];
 				</div>
 
 				<div class="col-md-5">
-                    {[ "type": "checkbox", "label": "<?php echo tr("Seleziona per rendere attivo l'articolo"); ?>", "name": "attivo", "value": "$attivo$", "help": "", "placeholder": "<?php echo tr('Articolo attivo'); ?>" ]}
+                    {[ "type": "checkbox", "label": "<?php echo tr("Seleziona per rendere attivo l'articolo"); ?>", "name": "attivo", "value": "$attivo$", "placeholder": "<?php echo tr('Articolo attivo'); ?>" ]}
 				    <br>
                     {[ "type": "select", "label": "<?php echo tr('Subcategoria'); ?>", "name": "subcategoria", "value": "$id_sottocategoria$", "ajax-source": "sottocategorie" ]}
                 </div>
@@ -41,7 +53,7 @@ $_SESSION['superselect']['id_categoria'] = $records[0]['id_categoria'];
 			<div class="row">
 				<div class="col-md-3">
 					{[ "type": "number", "label": "<?php echo tr('Quantità'); ?>", "name": "qta", "required": 1, "value": "$qta$", "readonly": 1, "decimals": "qta", "min-value": "undefined" ]}
-					<input type="hidden" id="old_qta" value="<?=$records[0]['qta']?>">
+					<input type="hidden" id="old_qta" value="<?php echo $records[0]['qta']; ?>">
 				</div>
 				<div class="col-md-3">
 					{[ "type": "checkbox", "label": "<?php echo tr('Modifica quantità manualmente'); ?>", "name": "qta_manuale", "value": 0, "help": "<?php echo tr('Seleziona per modificare manualmente la quantità'); ?>", "placeholder": "<?php echo tr('Quantità manuale'); ?>", "extra": "<?php echo ($records[0]['servizio']) ? 'disabled' : ''; ?>" ]}
@@ -93,10 +105,10 @@ $_SESSION['superselect']['id_categoria'] = $records[0]['id_categoria'];
 
 
 			</div>
-			
+
 			<div class='row' id="div_modifica_manuale" style="display:none;">
 				<div class='col-md-3'>
-					{[ "type": "text", "label": "<?php echo tr('Descrizione movimento'); ?>", "name": "descrizione_movimento", "value": "" ]}
+					{[ "type": "text", "label": "<?php echo tr('Descrizione movimento'); ?>", "name": "descrizione_movimento" ]}
 				</div>
 				<div class='col-md-3'>
 					{[ "type": "date", "label": "<?php echo tr('Data movimento'); ?>", "name": "data_movimento", "value": "-now-" ]}
@@ -182,9 +194,6 @@ $_SESSION['superselect']['id_categoria'] = $records[0]['id_categoria'];
 
 		<div class="panel-body">
 <?php
-
-    /* necesario per funzione \Util\Ini::getList */
-    include $docroot.'/modules/my_impianti/modutil.php';
 
     echo '
             <div class="row">

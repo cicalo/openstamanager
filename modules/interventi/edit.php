@@ -46,7 +46,7 @@ $_SESSION['superselect']['idanagrafica'] = $records[0]['idanagrafica'];
 
 			<!-- RIGA 2 -->
 			<div class="row">
-				<div class="col-md-3">
+				<div class="col-md-6">
 					<?php
                     if (($records[0]['idpreventivo'] != '')) {
                         echo '
@@ -57,9 +57,9 @@ $_SESSION['superselect']['idanagrafica'] = $records[0]['idanagrafica'];
 					{[ "type": "select", "label": "<?php echo tr('Preventivo'); ?>", "name": "idpreventivo", "value": "$idpreventivo$", "ajax-source": "preventivi", "readonly": "<?php echo $records[0]['flag_completato']; ?>" ]}
 				</div>
 
-				<div class="col-md-3">
+				<div class="col-md-6">
 					<?php
-                        $rs = $dbo->fetchArray('SELECT id, idcontratto FROM co_righe_contratti WHERE idintervento='.prepare($id_record));
+                        $rs = $dbo->fetchArray('SELECT id, idcontratto FROM co_contratti_promemoria WHERE idintervento='.prepare($id_record));
                         if (count($rs) == 1) {
                             $idcontratto = $rs[0]['idcontratto'];
                             $idcontratto_riga = $rs[0]['id'];
@@ -158,7 +158,17 @@ $_SESSION['superselect']['idanagrafica'] = $records[0]['idanagrafica'];
 
 			<div class="row">
 				<div class="col-md-12" id="tecnici">
-					<script>$('#tecnici').load('<?php echo $rootdir; ?>/modules/interventi/ajax_tecnici.php?id_module=<?php echo $id_module; ?>&id_record=<?php echo $id_record; ?>');</script>
+					<?php
+                        if (file_exists($docroot.'/modules/interventi/custom/ajax_tecnici.php')) {
+                            ?>
+						<script>$('#tecnici').load('<?php echo $rootdir; ?>/modules/interventi/custom/ajax_tecnici.php?id_module=<?php echo $id_module; ?>&id_record=<?php echo $id_record; ?>');</script>
+					<?php
+                        } else {
+                            ?>
+						<script>$('#tecnici').load('<?php echo $rootdir; ?>/modules/interventi/ajax_tecnici.php?id_module=<?php echo $id_module; ?>&id_record=<?php echo $id_record; ?>');</script>
+					<?php
+                        }
+                    ?>
 				</div>
 			</div>
 		</div>
@@ -173,14 +183,20 @@ $_SESSION['superselect']['idanagrafica'] = $records[0]['idanagrafica'];
 
         <div class="panel-body">
             <div id="articoli">
-                <?php include $docroot.'/modules/interventi/ajax_articoli.php'; ?>
+				<?php
+                    if (file_exists($docroot.'/modules/interventi/custom/ajax_articoli.php')) {
+                        include $docroot.'/modules/interventi/custom/ajax_articoli.php';
+                    } else {
+                        include $docroot.'/modules/interventi/ajax_articoli.php';
+                    }
+                ?>
             </div>
 
             <?php if (!$records[0]['flag_completato']) {
-                        ?>
+                    ?>
                 <button type="button" class="btn btn-primary" onclick="launch_modal( '<?php echo tr('Aggiungi articolo'); ?>', '<?php echo $rootdir; ?>/modules/interventi/add_articolo.php?id_module=<?php echo $id_module; ?>&id_record=<?php echo $id_record; ?>&idriga=0&idautomezzo='+$('#idautomezzo').find(':selected').val(), 1);"><i class="fa fa-plus"></i> <?php echo tr('Aggiungi articolo'); ?>...</button>
             <?php
-                    } ?>
+                } ?>
         </div>
     </div>
 
@@ -192,14 +208,20 @@ $_SESSION['superselect']['idanagrafica'] = $records[0]['idanagrafica'];
 
         <div class="panel-body">
             <div id="righe">
-                <?php include $docroot.'/modules/interventi/ajax_righe.php'; ?>
+                <?php
+                    if (file_exists($docroot.'/modules/interventi/custom/ajax_righe.php')) {
+                        include $docroot.'/modules/interventi/custom/ajax_righe.php';
+                    } else {
+                        include $docroot.'/modules/interventi/ajax_righe.php';
+                    }
+                ?>
             </div>
 
             <?php if (!$records[0]['flag_completato']) {
-                        ?>
+                    ?>
                 <button type="button" class="btn btn-primary" onclick="launch_modal( '<?php echo tr('Aggiungi altre spese'); ?>', '<?php echo $rootdir; ?>/modules/interventi/add_righe.php?id_module=<?php echo $id_module; ?>&id_record=<?php echo $id_record; ?>', 1 );"><i class="fa fa-plus"></i> <?php echo tr('Aggiungi altre spese'); ?>...</button>
             <?php
-                    } ?>
+                } ?>
         </div>
     </div>
 
@@ -212,14 +234,24 @@ $_SESSION['superselect']['idanagrafica'] = $records[0]['idanagrafica'];
 		<div class="panel-body">
 			<div class="row">
 				<div class="col-md-12" id="costi">
-					<script>$('#costi').load('<?php echo $rootdir; ?>/modules/interventi/ajax_costi.php?id_module=<?php echo $id_module; ?>&id_record=<?php echo $id_record; ?>');</script>
+					<?php
+                        if (file_exists($docroot.'/modules/interventi/custom/ajax_costi.php')) {
+                            ?>
+						<script>$('#costi').load('<?php echo $rootdir; ?>/modules/interventi/custom/ajax_costi.php?id_module=<?php echo $id_module; ?>&id_record=<?php echo $id_record; ?>');</script>
+					<?php
+                        } else {
+                            ?>
+						<script>$('#costi').load('<?php echo $rootdir; ?>/modules/interventi/ajax_costi.php?id_module=<?php echo $id_module; ?>&id_record=<?php echo $id_record; ?>');</script>
+					<?php
+                        }
+                    ?>
 				</div>
 			</div>
 		</div>
 	</div>
 </form>
 
-{( "name": "filelist_and_upload", "id_module": "<?php echo $id_module; ?>", "id_record": "<?php echo $id_record; ?>", <?php echo ($records[0]['flag_completato']) ? '"readonly":"true"' : '"readonly":"false"'; ?> )}
+{( "name": "filelist_and_upload", "id_module": "<?php echo $id_module; ?>", "id_record": "<?php echo $id_record; ?>", <?php echo ($records[0]['flag_completato']) ? '"readonly": 1' : '"readonly": 0'; ?> )}
 
 <!-- EVENTUALE FIRMA GIA' EFFETTUATA -->
 <div class="text-center">
@@ -295,7 +327,7 @@ $_SESSION['superselect']['idanagrafica'] = $records[0]['idanagrafica'];
 
 <?php
 
-//fatture collegate a questo intervento
+// Fatture collegate a questo intervento
 
 $fatture = $dbo->fetchArray('SELECT `co_documenti`.*, `co_tipidocumento`.`descrizione` AS tipo_documento, `co_tipidocumento`.`dir` FROM `co_documenti` JOIN `co_tipidocumento` ON `co_tipidocumento`.`id` = `co_documenti`.`idtipodocumento` WHERE `co_documenti`.`id` IN (SELECT `iddocumento` FROM `co_righe_documenti` WHERE `idintervento` = '.prepare($id_record).') ORDER BY `data`');
 if (!empty($fatture)) {

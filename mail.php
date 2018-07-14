@@ -49,14 +49,14 @@ echo '
 
     <p><b>'.tr('Mittente').'</b>: '.$smtp['from_name'].' &lt;'.$smtp['from_address'].'&gt;</p>';
 
-if (!empty($smtp['cc'])) {
+if (!empty($template['cc'])) {
     echo '
-    <p><b>'.tr('CC').'</b>: '.$smtp['cc'].'</p>';
+    <p><b>'.tr('CC').'</b>: '.$template['cc'].'</p>';
 }
 
-if (!empty($smtp['cc'])) {
+if (!empty($template['bcc'])) {
     echo '
-    <p><b>'.tr('CCN').'</b>: '.$smtp['bcc'].'</p>';
+    <p><b>'.tr('CCN').'</b>: '.$template['bcc'].'</p>';
 }
 
 echo '
@@ -131,8 +131,11 @@ echo '
 <script>
     var emails = [];
 
-    $(document).ready(function(){
+    $(document).ready(function(){';
+
         // Autocompletamento destinatario
+        if (!empty($variables['id_anagrafica'])) {
+            echo '
 		$(document).load(globals.rootdir + "/ajax_complete.php?module=Anagrafiche&op=get_email&id_anagrafica='.$variables['id_anagrafica'].'", function(response) {
             emails = JSON.parse(response);
 
@@ -144,7 +147,10 @@ echo '
                     $(this).autocomplete("search", $(this).val())
                 });;
             });
-        });
+        });';
+        }
+
+        echo '
 
         CKEDITOR.replace("body", {
             toolbar: globals.ckeditorToolbar,

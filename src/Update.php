@@ -17,7 +17,7 @@ class Update
     {
         $database = Database::getConnection();
 
-        $database_ready = $database->isConnected() && $database->fetchNum("SHOW TABLES LIKE 'updates'");
+        $database_ready = $database->isConnected() && $database->tableExists('updates');
 
         // Individuazione di tutti gli aggiornamenti fisicamente presenti
         // Aggiornamenti del gestionale
@@ -76,7 +76,7 @@ class Update
         $results = [];
 
         // Aggiornamenti del gestionale
-        $core = (array) glob(DOCROOT.'/update/*.{php,sql}', GLOB_BRACE);
+        $core = glob(DOCROOT.'/update/*.{php,sql}', GLOB_BRACE);
         foreach ($core as $value) {
             $infos = pathinfo($value);
             $value = str_replace('_', '.', $infos['filename']);
@@ -102,7 +102,7 @@ class Update
         $results = [];
 
         // Aggiornamenti dei moduli
-        $modules = (array) glob(DOCROOT.'/modules/*/update/*.{php,sql}', GLOB_BRACE);
+        $modules = glob(DOCROOT.'/modules/*/update/*.{php,sql}', GLOB_BRACE);
         foreach ($modules as $value) {
             $infos = pathinfo($value);
 
@@ -172,7 +172,7 @@ class Update
      */
     public static function isVersion($string)
     {
-        return preg_match('/^\d+(?:\.\d+)+$/', $string);
+        return preg_match('/^\d+(?:\.\d+)+$/', $string) === 1;
     }
 
     /**
@@ -355,6 +355,25 @@ class Update
                 // Imposta l'aggiornamento nello stato di esecuzione dello script
                 $database->query('UPDATE `updates` SET `done` = 0 WHERE id = '.prepare($update['id']));
 
+                // Permessi di default delle viste
+                if ($database->tableExists('zz_views')) {
+                    $gruppi = $database->fetchArray('SELECT `id` FROM `zz_groups`');
+                    $viste = $database->fetchArray('SELECT `id` FROM `zz_views` WHERE `id` NOT IN (SELECT `id_vista` FROM `zz_group_view`)');
+
+                    $array = [];
+                    foreach ($viste as $vista) {
+                        foreach ($gruppi as $gruppo) {
+                            $array[] = [
+                                'id_gruppo' => $gruppo['id'],
+                                'id_vista' => $vista['id'],
+                            ];
+                        }
+                    }
+                    if (!empty($array)) {
+                        $database->insert('zz_group_view', $array);
+                    }
+                }
+
                 // Normalizzazione dei campi per l'API
                 self::executeScript(DOCROOT.'/update/api.php');
 
@@ -382,7 +401,7 @@ class Update
      * Normalizza l'infrastruttura del database indicato, generalizzando charset e collation all'interno del database e delle tabelle ed effettuando una conversione delle tabelle all'engine InnoDB.
      * <b>Attenzione</b>: se l'engine InnoDB non è supportato, il server ignorerà la conversione dell'engine e le foreign key del gestionale non funzioneranno adeguatamente.
      *
-     * @param [type] $database_name
+     * @param string $database_name
      */
     protected static function normalizeDatabase($database_name)
     {

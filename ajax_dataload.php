@@ -31,11 +31,7 @@ $results['summable'] = [];
 
 if (!empty($result_query) && $result_query != 'menu' && $result_query != 'custom') {
     // Conteggio totale
-    $count_query = 'SELECT COUNT(*) as `tot` FROM ('.$result_query.') AS `count`';
-    $count = $dbo->fetchArray($count_query);
-    if (!empty($count)) {
-        $results['recordsTotal'] = $count[0]['tot'];
-    }
+    $results['recordsTotal'] = $dbo->fetchNum($result_query);
 
     // Filtri di ricerica
     $search_filters = [];
@@ -48,12 +44,17 @@ if (!empty($result_query) && $result_query != 'menu' && $result_query != 'custom
                     $search_filters[] = str_replace('|search|', prepare('%'.$piece.'%'), $total['search_inside'][$i]);
                 }
             } else {
-                // Per le icone cerco per il campo icon_title
-                if (preg_match('/^icon_(.+?)$/', $total['search_inside'][$i], $m)) {
-                    $total['search_inside'][$i] = 'icon_title_'.$m[1];
+                // Per le icone cerco nel campo icon_title
+                if (preg_match('/^icon_(.+?)$/', $total['fields'][$i], $m)) {
+                    $total['search_inside'][$i] = '`icon_title_'.$m[1].'`';
                 }
 
-                $search_filters[] = '`'.$total['search_inside'][$i].'` LIKE '.prepare('%'.trim($columns[$i]['search']['value'].'%'));
+                // Per i colori cerco nel campo color_title
+                elseif (preg_match('/^color_(.+?)$/', $total['fields'][$i], $m)) {
+                    $total['search_inside'][$i] = '`color_title_'.$m[1].'`';
+                }
+
+                $search_filters[] = $total['search_inside'][$i].' LIKE '.prepare('%'.trim($columns[$i]['search']['value'].'%'));
             }
         }
     }
@@ -102,7 +103,7 @@ if (!empty($result_query) && $result_query != 'menu' && $result_query != 'custom
 
     // Query effettiva
     $query = str_replace_once('SELECT', 'SELECT SQL_CALC_FOUND_ROWS', $result_query);
-    
+
     $rs = $dbo->fetchArray($query);
 
     // Conteggio dei record filtrati
@@ -161,7 +162,7 @@ if (!empty($result_query) && $result_query != 'menu' && $result_query != 'custom
 
             // Icona
             if (preg_match('/^color_(.+?)$/', $field, $m)) {
-                $value = $r['color_title_'.$m[1]] ?: '';
+                $value = isset($r['color_title_'.$m[1]]) ? $r['color_title_'.$m[1]] : '';
 
                 $column['class'] = 'text-center small';
                 $column['data-background'] = $r[$field];
@@ -187,7 +188,7 @@ if (!empty($result_query) && $result_query != 'menu' && $result_query != 'custom
 
             // Colore del testo
             if (!empty($column['data-background'])) {
-                $column['data-color'] = $column['data-color'] ?: color_inverse($column['data-background']);
+                $column['data-color'] = isset($column['data-color']) ? $column['data-color'] : color_inverse($column['data-background']);
             }
 
             // Link della colonna

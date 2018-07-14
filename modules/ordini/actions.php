@@ -2,8 +2,8 @@
 
 include_once __DIR__.'/../../core.php';
 
-include $docroot.'/modules/articoli/modutil.php';
-include_once $docroot.'/modules/fatture/modutil.php';
+include_once Modules::filepath('Articoli', 'modutil.php');
+include_once Modules::filepath('Fatture di vendita', 'modutil.php');
 
 $module = Modules::get($id_module);
 
@@ -34,12 +34,11 @@ switch (post('op')) {
             $campo = ($dir == 'entrata') ? 'idpagamento_vendite' : 'idpagamento_acquisti';
 
             // Tipo di pagamento predefinito dall'anagrafica
-            $query = 'SELECT id FROM co_pagamenti WHERE id=(SELECT '.$campo.' AS pagamento FROM an_anagrafiche WHERE idanagrafica='.prepare($idanagrafica).')';
-            $rs = $dbo->fetchArray($query);
-            $idpagamento = $rs[0]['id'];
+            $rs = $dbo->fetchArray('SELECT id FROM co_pagamenti WHERE id=(SELECT '.$campo.' AS pagamento FROM an_anagrafiche WHERE idanagrafica='.prepare($idanagrafica).')');
+            $idpagamento = isset($rs[0]) ? $rs[0]['id'] : null;
 
             // Se l'ordine è un ordine cliente e non è stato associato un pagamento predefinito al cliente leggo il pagamento dalle impostazioni
-            if ($dir == 'entrata' && $idpagamento == '') {
+            if ($dir == 'entrata' && empty($idpagamento)) {
                 $idpagamento = get_var('Tipo di pagamento predefinito');
             }
 
@@ -148,7 +147,7 @@ switch (post('op')) {
             $sconto = ($tipo_sconto == 'PRC') ? ($prezzo * $sconto_unitario) / 100 : $sconto_unitario;
             $sconto = $sconto * $qta;
 
-            add_articolo_inordine($id_record, $idarticolo, $descrizione, $idiva, $qta, $prezzo_vendita * $qta, $sconto, $sconto_unitario, $tipo_sconto);
+            add_articolo_inordine($id_record, $idarticolo, $descrizione, $idiva, $qta, $post['um'], $prezzo_vendita * $qta, $sconto, $sconto_unitario, $tipo_sconto);
 
             $_SESSION['infos'][] = tr('Articolo aggiunto!');
         }
@@ -352,11 +351,11 @@ switch (post('op')) {
         }
 
         break;
-        
+
     case 'ordine_da_preventivo':
-		
-		$idanagrafica = post('idanagrafica');
-		$idpreventivo = post('idpreventivo');
+
+        $idanagrafica = post('idanagrafica');
+        $idpreventivo = post('idpreventivo');
 
         $data = $post['data'];
 
@@ -377,10 +376,10 @@ switch (post('op')) {
             // Tipo di pagamento predefinito dall'anagrafica
             $query = 'SELECT id FROM co_pagamenti WHERE id=(SELECT '.$campo.' AS pagamento FROM an_anagrafiche WHERE idanagrafica='.prepare($idanagrafica).')';
             $rs = $dbo->fetchArray($query);
-            $idpagamento = $rs[0]['id'];
+            $idpagamento = isset($rs[0]) ? $rs[0]['id'] : null;
 
             // Se l'ordine è un ordine cliente e non è stato associato un pagamento predefinito al cliente leggo il pagamento dalle impostazioni
-            if ($dir == 'entrata' && $idpagamento == '') {
+            if ($dir == 'entrata' && empty($idpagamento)) {
                 $idpagamento = get_var('Tipo di pagamento predefinito');
             }
 
@@ -392,58 +391,50 @@ switch (post('op')) {
             $_SESSION['infos'][] = tr('Aggiunto ordine numero _NUM_!', [
                 '_NUM_' => $numero,
             ]);
-            
-            
-             // Lettura di tutte le righe della tabella in arrivo
-             // Inserisco anche le righe descrittive
-        foreach ($post['evadere'] as $i => $value) {
-            // Processo solo le righe da evadere
-            if ($post['evadere'][$i] == 'on') {
 
-				$descrizione = post('descrizione')[$i];
-				$prezzo = post('subtot')[$i];
-				$qta = post('qta_da_evadere')[$i];
-				$idiva = post('idiva')[$i];
-				$um = post('um')[$i];
-				$subtot = $prezzo * $qta;
-				$idarticolo = post('idarticolo')[$i];
-				$sconto = post('sconto')[$i];
+            // Lettura di tutte le righe della tabella in arrivo
+            // Inserisco anche le righe descrittive
+            foreach ($post['evadere'] as $i => $value) {
+                // Processo solo le righe da evadere
+                if ($post['evadere'][$i] == 'on') {
+                    $descrizione = post('descrizione')[$i];
+                    $prezzo = post('subtot')[$i];
+                    $qta = post('qta_da_evadere')[$i];
+                    $idiva = post('idiva')[$i];
+                    $um = post('um')[$i];
+                    $subtot = $prezzo * $qta;
+                    $idarticolo = post('idarticolo')[$i];
+                    $sconto = post('sconto')[$i];
 
-				// Ottengo le informazioni sullo sconto
-				$qprc = 'SELECT tipo_sconto, sconto_unitario FROM co_righe_preventivi WHERE id='.prepare($i);
-                $rsprc = $dbo->fetchArray($qprc);
+                    // Ottengo le informazioni sullo sconto
+                    $qprc = 'SELECT tipo_sconto, sconto_unitario FROM co_righe_preventivi WHERE id='.prepare($i);
+                    $rsprc = $dbo->fetchArray($qprc);
 
-                $sconto_unitario = $rsprc[0]['sconto_unitario'];
-                $tipo_sconto = $rsprc[0]['tipo_sconto'];
-				
-				$sconto = $sconto * $qta;
+                    $sconto_unitario = $rsprc[0]['sconto_unitario'];
+                    $tipo_sconto = $rsprc[0]['tipo_sconto'];
 
-				// Calcolo iva
-				$query = 'SELECT descrizione, percentuale, indetraibile FROM co_iva WHERE id='.prepare($idiva);
-				$rs = $dbo->fetchArray($query);
-				$iva = ($subtot - $sconto) / 100 * $rs[0]['percentuale'];
-				$iva_indetraibile = $iva / 100 * $rs[0]['indetraibile'];
+                    $sconto = $sconto * $qta;
 
-				$query = 'INSERT INTO or_righe_ordini(idordine, idarticolo, idpreventivo, idiva, desc_iva, iva, iva_indetraibile, descrizione, subtotale, sconto, sconto_unitario, tipo_sconto, um, qta, is_descrizione, `order`) VALUES('.prepare($id_record).', '.prepare($idarticolo).', '.prepare($idpreventivo).', '.prepare($idiva).', '.prepare($rs[0]['descrizione']).', '.prepare($iva).', '.prepare($iva_indetraibile).', '.prepare($descrizione).', '.prepare($subtot).', '.prepare($sconto).', '.prepare($sconto_unitario).', '.prepare($tipo_sconto).', '.prepare($um).', '.prepare($qta).', '.prepare(empty($qta)).', (SELECT IFNULL(MAX(`order`) + 1, 0) FROM or_righe_ordini AS t WHERE idordine='.prepare($id_record).'))';
-				$dbo->query($query);
+                    // Calcolo iva
+                    $query = 'SELECT descrizione, percentuale, indetraibile FROM co_iva WHERE id='.prepare($idiva);
+                    $rs = $dbo->fetchArray($query);
+                    $iva = ($subtot - $sconto) / 100 * $rs[0]['percentuale'];
+                    $iva_indetraibile = $iva / 100 * $rs[0]['indetraibile'];
 
-				
+                    $query = 'INSERT INTO or_righe_ordini(idordine, idarticolo, idpreventivo, idiva, desc_iva, iva, iva_indetraibile, descrizione, subtotale, sconto, sconto_unitario, tipo_sconto, um, qta, is_descrizione, `order`) VALUES('.prepare($id_record).', '.prepare($idarticolo).', '.prepare($idpreventivo).', '.prepare($idiva).', '.prepare($rs[0]['descrizione']).', '.prepare($iva).', '.prepare($iva_indetraibile).', '.prepare($descrizione).', '.prepare($subtot).', '.prepare($sconto).', '.prepare($sconto_unitario).', '.prepare($tipo_sconto).', '.prepare($um).', '.prepare($qta).', '.prepare(empty($qta)).', (SELECT IFNULL(MAX(`order`) + 1, 0) FROM or_righe_ordini AS t WHERE idordine='.prepare($id_record).'))';
+                    $dbo->query($query);
+                }
             }
-            
-            
+
+            // Ricalcolo inps, ritenuta e bollo
+            if ($dir == 'entrata') {
+                ricalcola_costiagg_ordine($id_record);
+            } else {
+                ricalcola_costiagg_ordine($id_record);
+            }
         }
-        
-        // Ricalcolo inps, ritenuta e bollo
-        if ($dir == 'entrata') {
-			ricalcola_costiagg_ordine($id_record);
-		} else {
-			ricalcola_costiagg_ordine($id_record);
-		}    
-        
-            
-		}
-    
-		break;
+
+        break;
 }
 
 if (post('op') !== null && post('op') != 'update') {

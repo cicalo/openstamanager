@@ -6,13 +6,9 @@ include_once __DIR__.'/../core.php';
 if (!empty($id_plugin)) {
     $element = Plugins::get($id_plugin);
 
+    // Inclusione di eventuale plugin personalizzato
     if (!empty($element['script'])) {
-        // Inclusione di eventuale plugin personalizzato
-        if (file_exists($docroot.'/modules/'.$element['module_dir'].'/plugins/custom/'.$element['script'])) {
-            include $docroot.'/modules/'.$element['module_dir'].'/plugins/custom/'.$element['script'];
-        } elseif (file_exists($docroot.'/modules/'.$element['module_dir'].'/plugins/'.$element['script'])) {
-            include $docroot.'/modules/'.$element['module_dir'].'/plugins/'.$element['script'];
-        }
+        include App::filepath('modules/'.$element['module_dir'].'/plugins|custom|', $element['script']);
 
         return;
     }
@@ -41,17 +37,13 @@ $total = App::readQuery($element);
 $module_options = (!empty($element['options2'])) ? $element['options2'] : $element['options'];
 
 // Caricamento file aggiuntivo su elenco record
-if (file_exists($docroot.$directory.'/custom/controller_before.php')) {
-    include $docroot.$directory.'/custom/controller_before.php';
-} elseif (file_exists($docroot.$directory.'/controller_before.php')) {
-    include $docroot.$directory.'/controller_before.php';
-}
+include App::filepath($directory.'|custom|', 'controller_before.php');
 
 if (count(Modules::getSegments($id_module)) > 1) {
     ?>
     <div class="row">
     	<div class="col-md-4 pull-right">
-    		{[ "type": "select", "label": "", "name": "id_segment_", "required": 0, "values": "query=SELECT id, name AS descrizione FROM zz_segments WHERE id_module = '<?php echo $id_module; ?>'", "value": "<?php echo $_SESSION['m'.$id_module]['id_segment']; ?>" ]}
+    		{[ "type": "select", "name": "id_segment_", "required": 0, "values": "query=SELECT id, name AS descrizione FROM zz_segments WHERE id_module = '<?php echo $id_module; ?>'", "value": "<?php echo $_SESSION['m'.$id_module]['id_segment']; ?>" ]}
     	</div>
     </div>
     <br>
@@ -178,10 +170,34 @@ if (!empty($module_options) && $module_options != 'menu' && $module_options != '
         </div>
 
         <div class="col-md-5 text-right">
-            <div class="btn-group" role="group">
-                <button type="button" class="btn btn-primary btn-csv disabled" disabled>'.tr('Esporta').'</button>
-                <button type="button" class="btn btn-default btn-copy disabled" disabled>'.tr('Copia').'</button>
-                <button type="button" class="btn btn-default btn-print disabled" disabled>'.tr('Stampa').'</button>
+            <div class="btn-group" role="group">';
+
+    if (Settings::get('Abilita esportazione Excel e PDF')) {
+        echo '
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary table-btn btn-csv disabled" disabled>'.tr('Esporta').'</button>
+
+                    <button type="button" class="btn btn-primary  table-btn disabled dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="caret"></span>
+                        <span class="sr-only">Toggle Dropdown</span>
+                    </button>
+
+                    <ul class="dropdown-menu">
+                        <li><a class="table-btn btn-pdf disabled" disabled>'.tr('PDF').'</a></li>
+
+                        <li><a class="table-btn btn-excel disabled" disabled>'.tr('Excel').'</a></li>
+                    </ul>
+                </div>';
+    } else {
+        echo '
+            <button type="button" class="btn btn-primary table-btn btn-csv disabled" disabled>'.tr('Esporta').'</button>';
+    }
+
+    echo '
+
+                <button type="button" class="btn btn-default table-btn btn-copy disabled" disabled>'.tr('Copia').'</button>
+
+                <button type="button" class="btn btn-default table-btn btn-print disabled" disabled>'.tr('Stampa').'</button>
             </div>
         </div>
     </div>';
@@ -204,8 +220,4 @@ elseif ($module_options == 'custom') {
 }
 
 // Caricamento file aggiuntivo su elenco record
-if (file_exists($docroot.$directory.'/custom/controller_after.php')) {
-    include $docroot.$directory.'/custom/controller_after.php';
-} elseif (file_exists($docroot.$directory.'/controller_after.php')) {
-    include $docroot.$directory.'/controller_after.php';
-}
+include App::filepath($directory.'|custom|', 'controller_after.php');

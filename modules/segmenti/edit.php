@@ -86,7 +86,7 @@ if (strpos($table[0], 'co_documenti') !== false) {
 						<p><font style='font-size:20px;'><b>####</b></font> <?php echo tr('Questi caratteri vengono sostituiti con il numero progressivo della fattura, vengono aggiunti zeri non significativi per raggiungere il numero desiderato di caratteri'); ?>.</p>
 
 						<p><font style='font-size:20px;'><b>YYYY</b></font> <?php echo tr("Questi caratteri vengono sosituiti con l'anno corrente a 4 cifre, è possibile specificare l'anno a 2 cifre con _YY_", [
-                            '_YY_' => 'YY',
+                            '_YY_' => 'yy',
                         ]); ?>.</p>
 
 						<p><?php echo tr("E' possibile aggiungere altri caratteri fissi, come lettere, trattini, eccetera, prima e/o dopo e/o tra le maschere _####_ e _YYYY_", [
@@ -107,34 +107,34 @@ if (strpos($table[0], 'co_documenti') !== false) {
 
 <?php
 if ($tot > 0) {
-    echo "<div class='alert alert-danger' style='margin:0px;'>";
+                            echo "<div class='alert alert-danger' style='margin:0px;'>";
 
-    echo tr("Ci sono _TOT_ righe collegate al segmento per il modulo '_MODULO_'. Il comando elimina è stato disattivato, eliminare le righe per attivare il comando 'Elimina segmento'.", [
+                            echo tr("Ci sono _TOT_ righe collegate al segmento per il modulo '_MODULO_'. Il comando elimina è stato disattivato, eliminare le righe per attivare il comando 'Elimina segmento'.", [
         '_TOT_' => $tot,
         '_MODULO_' => $records[0]['modulo'],
     ]);
 
-    echo '</div>';
-} elseif ($records[0]['predefined']) {
-    echo "<div class='alert alert-danger' style='margin:0px;'>";
+                            echo '</div>';
+                        } elseif ($records[0]['predefined']) {
+                            echo "<div class='alert alert-danger' style='margin:0px;'>";
 
-    echo tr("Questo è il segmento predefinito per il modulo '_MODULO_'. Il comando elimina è stato disattivato.", [
+                            echo tr("Questo è il segmento predefinito per il modulo '_MODULO_'. Il comando elimina è stato disattivato.", [
         '_MODULO_' => $records[0]['modulo'],
     ]);
 
-    echo '</div>';
-} elseif ($records[0]['n_sezionali'] < 2) {
-    echo "<div class='alert alert-danger' style='margin:0px;'>";
+                            echo '</div>';
+                        } elseif ($records[0]['n_sezionali'] < 2) {
+                            echo "<div class='alert alert-danger' style='margin:0px;'>";
 
-    echo tr("Questo è l'unico segmento per il modulo '_MODULO_'. Il comando elimina è stato disattivato.", [
+                            echo tr("Questo è l'unico segmento per il modulo '_MODULO_'. Il comando elimina è stato disattivato.", [
         '_MODULO_' => $records[0]['modulo'],
     ]);
 
-    echo '</div>';
-} else {
-    echo '
+                            echo '</div>';
+                        } else {
+                            echo '
 <a class="btn btn-danger ask" data-backto="record-list">
     <i class="fa fa-trash"></i> '.tr('Elimina').'
 </a>';
-}
+                        }
 ?>
